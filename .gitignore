@@ -1,0 +1,6 @@
+.vscode/
+build/
+r-type_server
+r-type_client
+doc/html/
+.DS_store
