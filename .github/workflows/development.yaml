@@ -27,10 +27,9 @@ jobs:
           sudo apt update
           sudo apt install cmake -y
 
-      - name: "🔧 Install windows dependencies"
+      - name: "🔧 Install Windows dependencies"
         if: matrix.os == 'windows-latest'
         run: |
-          choco install make
           choco install cmake
 
       - name: "🏗️ Make"
@@ -47,13 +46,13 @@ jobs:
       - name: "☁️ checkout repository"
         uses: actions/checkout@v2
 
-      - name: "🔧 Install linux dependencies"
+      - name: "🔧 Install Linux dependencies"
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt update
           sudo apt install cmake -y
 
-      - name: "🔧 Install windows dependencies"
+      - name: "🔧 Install Windows dependencies"
         if: matrix.os == 'windows-latest'
         run: |
           choco install make
