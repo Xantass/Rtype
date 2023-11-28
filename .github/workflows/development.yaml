@@ -11,39 +11,24 @@ on:
   workflow_call:
 
 jobs:
-  macBuildTest:
-    name: MacOs Build test
-    runs-on: macos-latest
+  BuildTest:
+    name: Build Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
     steps:
       - name: "☁️ checkout repository"
         uses: actions/checkout@v2
 
-      - name: "🏗️ Make"
-        run: make
-
-  linuxBuildTest:
-    name: Linux Build test
-    runs-on: ubuntu-latest
-    steps:
-      - name: "☁️ checkout repository"
-        uses: actions/checkout@v2
-
-      - name: "🔧 Install dependencies"
+      - name: "🔧 Install linux dependencies"
+        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt update
           sudo apt install cmake -y
-  
-      - name: "🏗️ Make"
-        run: make
 
-  windowsBuildTest:
-    name: Windows Build test
-    runs-on: windows-latest
-    steps:
-      - name: "☁️ checkout repository"
-        uses: actions/checkout@v2
-
-      - name: "🔧 Install dependencies"
+      - name: "🔧 Install windows dependencies"
+        if: matrix.os == 'windows-latest'
         run: |
           choco install make
           choco install cmake
