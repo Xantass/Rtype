@@ -2,5 +2,5 @@
 build/
 r-type_server
 r-type_client
-doc/html/
+docs/html/
 .DS_store
