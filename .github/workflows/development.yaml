@@ -35,3 +35,32 @@ jobs:
 
       - name: "🏗️ Make"
         run: make
+
+  RunTests:
+    name: Run Tests
+    needs: BuildTest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    steps:
+      - name: "☁️ checkout repository"
+        uses: actions/checkout@v2
+
+      - name: "🔧 Install linux dependencies"
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt update
+          sudo apt install cmake -y
+
+      - name: "🔧 Install windows dependencies"
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install make
+          choco install cmake
+
+      - name: "🏗️ Make"
+        run: make
+
+      - name: "🧪 Run Tests"
+        run: echo "Tests not implemented yet"
