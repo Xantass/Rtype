@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags:
+       - "v*"
+  
+jobs:
+  Tests:
+    name: Build and Test
+    uses: ./.github/workflows/development.yaml
+  CreateRelease:
+    name: Create Release
+    needs: Tests
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+  UploadRelease:
+    name: Upload Release
+    needs: CreateRelease
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    steps:
+      - name: "☁️ checkout repository"
+        uses: actions/checkout@v2
+
+      - name: "🔧 Install Linux dependencies"
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt update
+          sudo apt install cmake -y
+
+      - name: "🔧 Install Windows dependencies"
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install cmake
+
+      - name: "🏗️ Make"
+        run: make
+
+      - name: "📦 Zip Windows files"
+        if: matrix.os == 'windows-latest'
+        run: |
+          Get-ChildItem -Path ./r-type_client.exe, ./r-type_server.exe, ./assets/ | Compress-Archive -DestinationPath R-Type.zip 
+
+      - name: "📦 Zip Linux and MacOs files"
+        if: matrix.os != 'windows-latest'
+        run: |
+          zip -r R-Type.zip ./r-type_client ./r-type_server ./assets/
+
+      - name: Upload release assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.CreateRelease.outputs.upload_url }}
+          asset_name: R-Type_${{ matrix.os }}.zip
+          asset_path: ./R-Type.zip
+          asset_content_type: application/octet-stream
