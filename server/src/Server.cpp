@@ -89,8 +89,12 @@ void Server::receiveData(int clientSocket)
             std::cerr << "Erreur lors de la lecture des données du client." << std::endl;
         }
         close(clientSocket);
-        auto it = std::find(_clientSockets.begin(), _clientSockets.end(), static_cast<int>(clientSocket));
-        _clientSockets.erase(it);
+        for (auto it = _clientSockets.begin(); it != _clientSockets.end(); ++it) {
+            if (*it == static_cast<int>(clientSocket)) {
+                _clientSockets.erase(it);
+                break;  // Exit the loop after erasing the element
+            }
+        }
     } else {
         buffer[bytesRead] = '\0'; // Ajouter un caractère de fin de chaîne
         std::cout << "Message reçu du client : " << buffer.get() << std::endl;
