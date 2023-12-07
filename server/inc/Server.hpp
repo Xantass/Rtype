@@ -24,6 +24,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <sys/select.h>
+#include <memory>
 
 class Server {
 public:
