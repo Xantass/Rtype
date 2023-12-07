@@ -15,12 +15,17 @@
 #ifndef SERVER_HPP_
 #define SERVER_HPP_
 
+#ifdef _WIN32 // Vérifie si le système d'exploitation est Windows
+    #include <winsock2.h>
+#else
+    #include <arpa/inet.h>
+#endif
+
 #include <iostream>
 #include <vector>
 #include <cstdlib>
 #include <csignal>
 #include <cstring>
-#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <sys/select.h>
