@@ -17,8 +17,10 @@
 
 #ifdef _WIN32 // Vérifie si le système d'exploitation est Windows
     #include <winsock2.h>
+    #include <ws2tcpip.h>
 #else
     #include <arpa/inet.h>
+    #include <sys/socket.h>
 #endif
 
 #include <iostream>
@@ -26,7 +28,6 @@
 #include <cstdlib>
 #include <csignal>
 #include <cstring>
-#include <sys/socket.h>
 #include <unistd.h>
 #include <sys/select.h>
 #include <memory>
