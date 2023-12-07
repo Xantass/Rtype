@@ -31,5 +31,5 @@ endif()
 
 # Configuration spécifique à Linux
 if(UNIX AND NOT APPLE)
-    target_compile_options(pbrain-gomoku-ai PRIVATE -std=c++17 -Wall -Wextra -O3)
+    target_compile_options(r-type_server PRIVATE -std=c++17 -Wall -Wextra -O3)
 endif()
