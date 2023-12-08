@@ -39,6 +39,7 @@
 #include <thread>
 #include <mutex>
 #include <string>
+#include <bitset>
 #include "RoomManager.hpp"
 
 class Server {
@@ -116,6 +117,9 @@ public:
      * 
      */
     void closeThreads();
+
+    std::string stringToBinary(const std::string buffer);
+    std::string binaryToString(const std::string buffer);
 
 protected:
 private:

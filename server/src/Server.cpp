@@ -128,7 +128,8 @@ void Server::checkCmd(std::string buffer, int clientSocket)
             return;
         std::cout << "CREATE ROOM WITH PORT " + std::to_string(port) << std::endl;
         _threads.push_back(std::thread(createRoom, port));
-        send(clientSocket, std::to_string(port).c_str(), std::to_string(port).length(), 0);
+        
+        send(clientSocket, stringToBinary(std::to_string(port)).c_str(), std::to_string(port).length(), 0);
     }
 }
 
@@ -151,8 +152,9 @@ void Server::receiveData(int clientSocket)
         }
     } else {
         buffer[bytesRead] = '\0';
-        std::cout << "Message reçu du client : " << buffer.get() << std::endl;
         std::string str(buffer.get());
+        str = binaryToString(str);
+        std::cout << "Message reçu du client : " << str << std::endl;
         checkCmd(str, clientSocket);
     }
     return;
@@ -165,6 +167,26 @@ void Server::closeThreads()
             thread.join(); // Attendre la fin de l'exécution du thread
         }
     }
+}
+
+std::string Server::binaryToString(const std::string binary)
+{
+    std::string text;
+    for (size_t i = 0; i < binary.length(); i += 8) {
+        std::string byte = binary.substr(i, 8);
+        char c = static_cast<char>(std::stoi(byte, nullptr, 2));
+        text += c;
+    }
+    return text;
+}
+
+std::string Server::stringToBinary(const std::string buffer)
+{
+    std::string binaryString;
+    for (char c : buffer) {
+        binaryString += std::bitset<8>(c).to_string();
+    }
+    return binaryString;
 }
 
 bool Server::loop()
