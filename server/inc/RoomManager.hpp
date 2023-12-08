@@ -10,6 +10,7 @@
 
 #ifdef _WIN32
     #include <winsock2.h>
+    #define close closesocket
 #else
     #include <sys/socket.h>
     #include <arpa/inet.h>

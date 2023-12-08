@@ -38,6 +38,7 @@
 #include <memory>
 #include <thread>
 #include <mutex>
+#include <string>
 #include "RoomManager.hpp"
 
 class Server {
