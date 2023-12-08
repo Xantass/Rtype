@@ -39,6 +39,7 @@
 #include <thread>
 #include <mutex>
 #include <string>
+#include <bitset>
 #include "RoomManager.hpp"
 
 class Server {
@@ -117,6 +118,22 @@ public:
      */
     void closeThreads();
 
+    /**
+     * @brief Converts a string to binary representation
+     * 
+     * @param buffer The input string to convert to binary
+     * @return The binary representation of the input string
+     */
+    std::string stringToBinary(const std::string buffer);
+
+    /**
+     * @brief Converts a binary string to its string representation
+     * 
+     * @param buffer The binary string to convert to a regular string
+     * @return The string representation of the input binary string
+     */
+    std::string binaryToString(const std::string buffer);
+
 protected:
 private:
     int _serverSocket; /**< The server's socket file descriptor */
@@ -127,5 +144,6 @@ private:
     fd_set _readfds; /**< File descriptor set for select() */
     std::vector<std::thread> _threads; /**< Vector to store threads */
 };
+
 
 #endif /* !SERVER_HPP_ */
