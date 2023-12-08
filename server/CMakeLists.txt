@@ -28,5 +28,7 @@ if (APPLE AND UNIX)
 endif()
 
 if(UNIX AND NOT APPLE)
-    target_compile_options(r-type_server PRIVATE -std=c++17 -Wall -Wextra -O3 -pthread)
+    target_compile_options(r-type_server PRIVATE -std=c++17 -Wall -Wextra -O3)
+    find_package(Threads REQUIRED)
+    target_link_libraries(votre_executable Threads::Threads)
 endif()
