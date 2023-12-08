@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(r-type_server)
 
 include_directories("./inc/")  # Chemin vers le répertoire des fichiers .hpp
+target_link_libraries(NomDeVotreExecutable Ws2_32.lib)
 
 # Configuration des sources de votre projet
 set(SOURCES
