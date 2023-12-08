@@ -15,7 +15,7 @@ set(SOURCES
 add_executable(r-type_server ${SOURCES})
 
 if(WIN32)
-    target_link_libraries(NomDeVotreExecutable Ws2_32.lib)
+    target_link_libraries(r-type_server Ws2_32.lib)
 endif()
 
 if(MSVC)
