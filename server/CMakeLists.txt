@@ -10,6 +10,7 @@ include_directories("./inc/")
 set(SOURCES
     src/Server.cpp
     src/main.cpp
+    src/RoomManager.cpp
 )
 
 add_executable(r-type_server ${SOURCES})
