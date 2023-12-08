@@ -10,6 +10,7 @@ include_directories("./inc/")
 set(SOURCES
     src/Server.cpp
     src/main.cpp
+    src/RoomManager.cpp
 )
 
 add_executable(r-type_server ${SOURCES})
@@ -28,4 +29,6 @@ endif()
 
 if(UNIX AND NOT APPLE)
     target_compile_options(r-type_server PRIVATE -std=c++17 -Wall -Wextra -O3)
+    find_package(Threads REQUIRED)
+    target_link_libraries(r-type_server Threads::Threads)
 endif()

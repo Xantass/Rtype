@@ -25,6 +25,29 @@ Server::~Server()
 {
 }
 
+int Server::portAvailable(int port)
+{
+    int testSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if (testSocket == -1) {
+        std::cerr << "Erreur lors de la création du socket." << std::endl;
+        return -1;
+    }
+
+    sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    for (int i = port; i > 0; ++i) {
+        addr.sin_port = htons(i);
+        if (bind(testSocket, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)) != -1) {
+            close(testSocket);
+            return i; 
+        }
+    }
+    close(testSocket);
+    return -1;
+}
+
 bool Server::start()
 {
     _serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -78,6 +101,37 @@ void Server::initSocket()
     }
 }
 
+int createRoom(int port) {
+    RoomManager room(port);
+
+    room.createRoom();
+    room.handleRooms();
+    return 0;
+}
+
+void Server::checkThreads()
+{
+    for (auto& thread : _threads) {
+        if (thread.joinable()) {
+            thread.join();
+        }
+    }
+}
+
+void Server::checkCmd(std::string buffer, int clientSocket)
+{
+    int port = -1;
+
+    if (buffer == "CREATE") {
+        port = portAvailable(5000);
+        if (port == -1)
+            return;
+        std::cout << "CREATE ROOM WITH PORT " + std::to_string(port) << std::endl;
+        _threads.push_back(std::thread(createRoom, port));
+        send(clientSocket, std::to_string(port).c_str(), std::to_string(port).length(), 0);
+    }
+}
+
 void Server::receiveData(int clientSocket)
 {
     std::unique_ptr<char[]> buffer(new char[1024]);
@@ -92,14 +146,25 @@ void Server::receiveData(int clientSocket)
         for (auto it = _clientSockets.begin(); it != _clientSockets.end(); ++it) {
             if (*it == static_cast<int>(clientSocket)) {
                 _clientSockets.erase(it);
-                break;  // Exit the loop after erasing the element
+                break;
             }
         }
     } else {
-        buffer[bytesRead] = '\0'; // Ajouter un caractère de fin de chaîne
+        buffer[bytesRead] = '\0';
         std::cout << "Message reçu du client : " << buffer.get() << std::endl;
+        std::string str(buffer.get());
+        checkCmd(str, clientSocket);
     }
     return;
+}
+
+void Server::closeThreads()
+{
+    for (auto& thread : _threads) {
+        if (thread.joinable()) {
+            thread.join(); // Attendre la fin de l'exécution du thread
+        }
+    }
 }
 
 bool Server::loop()
@@ -112,10 +177,11 @@ bool Server::loop()
 
     while (!signalReceived) {
         initSocket();
+        checkThreads();
         int activity = select(_maxSocket + 1, &_readfds, nullptr, nullptr, &timeout);
         if ((activity < 0)) {
             closeSockets();
-            return false;
+            break;
         }
         if (FD_ISSET(_serverSocket, &_readfds)) {
             int newSocket = accept(_serverSocket, nullptr, nullptr);
@@ -127,6 +193,8 @@ bool Server::loop()
             }
         }
     }
-
+    std::cout << "FREE MEMORY" << std::endl;
+    closeSockets();
+    closeThreads();
     return true;
 }
