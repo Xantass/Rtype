@@ -23,8 +23,6 @@
     #include <winsock2.h>
     #define FD_SETSIZE 64 // Taille arbitraire, adaptez-la à vos besoins
     #define close closesocket
-    int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
-
 #else
     #include <arpa/inet.h>
     #include <sys/socket.h>
