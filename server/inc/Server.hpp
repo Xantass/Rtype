@@ -18,9 +18,23 @@
 #ifdef _WIN32 // Vérifie si le système d'exploitation est Windows
     #include <winsock2.h>
     #include <ws2tcpip.h>
+    #define NOMINMAX // Pour éviter les conflits de noms
+    #include <windows.h>
+    #include <winsock.h>
+    typedef struct fd_set {
+        u_int   fd_count;
+        SOCKET  fd_array[FD_SETSIZE];
+    } fd_set;
+    
+    #define FD_SETSIZE 64 // Taille arbitraire, adaptez-la à vos besoins
+
+    int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+
 #else
     #include <arpa/inet.h>
     #include <sys/socket.h>
+    #include <sys/select.h>
+    #include <unistd.h>
 #endif
 
 #include <iostream>
@@ -28,8 +42,6 @@
 #include <cstdlib>
 #include <csignal>
 #include <cstring>
-#include <unistd.h>
-#include <sys/select.h>
 #include <memory>
 
 class Server {
