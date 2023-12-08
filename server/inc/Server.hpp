@@ -20,14 +20,9 @@
     #include <ws2tcpip.h>
     #define NOMINMAX // Pour éviter les conflits de noms
     #include <windows.h>
-    #include <winsock.h>
-    typedef struct fd_set {
-        u_int   fd_count;
-        SOCKET  fd_array[FD_SETSIZE];
-    } fd_set;
-    
+    #include <winsock2.h>
     #define FD_SETSIZE 64 // Taille arbitraire, adaptez-la à vos besoins
-
+    #define close closesocket
     int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
 
 #else
