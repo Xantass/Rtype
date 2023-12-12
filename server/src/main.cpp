@@ -7,17 +7,51 @@
 
 #include "main.hpp"
 
+#include "Coordinator.hpp"
+#include "components/Position.hpp"
+#include "components/Velocity.hpp"
+#include "systems/PhysicSystem.hpp"
+#include "Signature.hpp"
+
 int main(int argc, char **argv)
 {
-    Server server(12346);
+    // Server server(12346);
 
-    if (!server.start()) {
-        return -1;
-    }
+    // if (!server.start()) {
+    //     return -1;
+    // }
 
-    server.loop();
+    // server.loop();
 
-    server.closeSockets();
+    // server.closeSockets();
+
+    Coordinator coordinator;
+
+    coordinator.Init();
+
+    coordinator.RegisterComponent<Position>();
+    coordinator.RegisterComponent<Velocity>();
+
+    auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
+
+    Signature signature;
+
+    signature.set(coordinator.GetComponentType<Position>());
+    signature.set(coordinator.GetComponentType<Velocity>());
+    coordinator.SetSystemSignature<PhysicSystem>(signature);
+
+    Entity entity = coordinator.CreateEntity();
+    coordinator.AddComponent<Position>(entity, {1, 1});
+    coordinator.AddComponent<Velocity>(entity, {1, 2});
+
+    physicSystem->Update(coordinator);
+
+
+    Entity entity2 = coordinator.CreateEntity();
+    coordinator.AddComponent<Position>(entity2, {1, 1});
+    coordinator.AddComponent<Velocity>(entity2, {1, 2});
+
+    physicSystem->Update(coordinator);
 
     return 0;
 }

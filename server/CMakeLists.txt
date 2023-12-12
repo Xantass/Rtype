@@ -11,6 +11,12 @@ set(SOURCES
     src/Server.cpp
     src/main.cpp
     src/RoomManager.cpp
+    src/Entity.cpp
+    src/EntityManager.cpp
+    src/ComponentArray.cpp
+    src/ComponentManager.cpp
+    src/SystemManager.cpp
+    src/Coordinator.cpp
 )
 
 add_executable(r-type_server ${SOURCES})
