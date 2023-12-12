@@ -9,6 +9,7 @@
 #define ENTITYMANAGER_HPP_
 
 #include <queue>
+#include <array>
 
 #include "Signature.hpp"
 #include "Entity.hpp"

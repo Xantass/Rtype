@@ -9,7 +9,7 @@
 #define COMPONENTARRAY_HPP_
 
 #include <array>
-#include <map>
+#include <unordered_map>
 
 #include "Entity.hpp"
 
@@ -31,7 +31,7 @@ public:
         }
 
 		// Put new entry at end and update the maps
-		size_t newIndex = mSize;
+		std::size_t newIndex = mSize;
 		mEntityToIndexMap[entity] = newIndex;
 		mIndexToEntityMap[newIndex] = entity;
 		mComponentArray[newIndex] = component;
@@ -43,8 +43,8 @@ public:
 		// assert(mEntityToIndexMap.find(entity) != mEntityToIndexMap.end() && "Removing non-existent component.");
 
 		// Copy element at end into deleted element's place to maintain density
-		size_t indexOfRemovedEntity = mEntityToIndexMap[entity];
-		size_t indexOfLastElement = mSize - 1;
+		std::size_t indexOfRemovedEntity = mEntityToIndexMap[entity];
+		std::size_t indexOfLastElement = mSize - 1;
 		mComponentArray[indexOfRemovedEntity] = mComponentArray[indexOfLastElement];
 
 		// Update map to point to moved spot
@@ -89,7 +89,7 @@ private:
 	std::unordered_map<size_t, Entity> mIndexToEntityMap;
 
 	// Total size of valid entries in the array.
-	size_t mSize;
+	std::size_t mSize;
 };
 
 #endif /* !COMPONENTARRAY_HPP_ */

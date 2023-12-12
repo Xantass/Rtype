@@ -8,7 +8,8 @@
 #ifndef SYSTEMMANAGER_HPP_
 #define SYSTEMMANAGER_HPP_
 
-#include <map>
+#include <memory>
+#include <unordered_map>
 
 #include "Entity.hpp"
 #include "Signature.hpp"
