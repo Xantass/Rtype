@@ -9,7 +9,7 @@
 
 void PhysicSystem::Update(Coordinator &coordinator) {
     std::cout << "PhysicSystem update :" << std::endl; // TEST - TO BE REMOVED
-    for (auto entity : _entities) {
+    for (auto entity : this->_entities) {
         auto& pos = coordinator.GetComponent<Position>(entity);
         auto& vel = coordinator.GetComponent<Velocity>(entity);
 
