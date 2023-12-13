@@ -6,17 +6,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(r-type_server)
 
 include_directories("./inc/")
+include_directories("../ECS/inc/")
 
 set(SOURCES
     src/Server.cpp
     src/main.cpp
     src/RoomManager.cpp
-    src/Entity.cpp
-    src/EntityManager.cpp
-    src/ComponentArray.cpp
-    src/ComponentManager.cpp
-    src/SystemManager.cpp
-    src/Coordinator.cpp
+
+    ../ECS/src/systems/PhysicSystem.cpp
+    ../ECS/src/systems/PhysicSystem.cpp
+    ../ECS/src/EntityManager.cpp
+    ../ECS/src/ComponentArray.cpp
+    ../ECS/src/ComponentManager.cpp
+    ../ECS/src/SystemManager.cpp
+    ../ECS/src/Coordinator.cpp
 )
 
 add_executable(r-type_server ${SOURCES})
