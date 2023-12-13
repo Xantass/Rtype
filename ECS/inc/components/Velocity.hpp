@@ -5,9 +5,20 @@
 ** Velocity
 */
 
+/**
+ * @file Velocity.hpp
+ * @brief File containing the Velocity struct
+ * 
+ */
+
 #ifndef VELOCITY_HPP_
 #define VELOCITY_HPP_
 
+/**
+ * @struct Velocity
+ * @brief Struct containing the velocity of an entity
+ * 
+ */
 struct Velocity {
     float x;
     float y;

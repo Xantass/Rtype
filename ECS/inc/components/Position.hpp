@@ -5,12 +5,23 @@
 ** Position
 */
 
+/**
+ * @file Position.hpp
+ * @brief File containing the Position struct
+ * 
+ */
+
 #ifndef POSITION_HPP_
 #define POSITION_HPP_
 
+/**
+ * @struct Position
+ * @brief Struct containing the position of an entity
+ * 
+ */
 struct Position {
-    float x;
-    float y;
+    float x; ///< X position
+    float y; ///< Y position
 };
 
 #endif /* !POSITION_HPP_ */

@@ -8,14 +8,14 @@
 #include "systems/PhysicSystem.hpp"
 
 void PhysicSystem::Update(Coordinator &coordinator) {
-    std::cout << "PhysicSystem update :" << std::endl;
-    for (auto entity : mEntities) {
+    std::cout << "PhysicSystem update :" << std::endl; // TEST - TO BE REMOVED
+    for (auto entity : _entities) {
         auto& pos = coordinator.GetComponent<Position>(entity);
         auto& vel = coordinator.GetComponent<Velocity>(entity);
 
         pos.x += vel.x;
         pos.y += vel.y;
 
-        std::cout << "Entity position : " << pos.x << " " << pos.y << std::endl;
+        std::cout << "Entity position : " << pos.x << " " << pos.y << std::endl; // TEST - TO BE REMOVED
     }
 }

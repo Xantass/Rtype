@@ -5,6 +5,12 @@
 ** Entity
 */
 
+/**
+ * @file Entity.hpp
+ * @brief File containing the Entity type
+ * 
+ */
+
 #ifndef ENTITY_HPP_
 #define ENTITY_HPP_
 

@@ -5,6 +5,12 @@
 ** ComponentType
 */
 
+/**
+ * @file ComponentType.hpp
+ * @brief File containing the ComponentType enum
+ * 
+ */
+
 #ifndef COMPONENTTYPE_HPP_
 #define COMPONENTTYPE_HPP_
 

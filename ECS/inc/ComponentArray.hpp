@@ -5,6 +5,12 @@
 ** ComponentArray
 */
 
+/**
+ * @file ComponentArray.hpp
+ * @brief File containing the ComponentArray class
+ * 
+ */
+
 #ifndef COMPONENTARRAY_HPP_
 #define COMPONENTARRAY_HPP_
 
@@ -13,83 +19,134 @@
 
 #include "Entity.hpp"
 
+/**
+ * @interface IComponentArray
+ * @brief Interface for the ComponentArray class
+ * @details An interface is needed so that the ComponentManager can tell a generic ComponentArray that an entity has been destroyed and that it needs to update its array mappings.
+ * 
+ */
 class IComponentArray
 {
 public:
+	/**
+	 * @brief Destroy the IComponentArray object
+	 * 
+	 */
 	virtual ~IComponentArray() = default;
+
+	/**
+	 * @brief Called when an entity is destroyed so that the component array can update its references
+	 * 
+	 * @param entity Entity to be destroyed
+	 */
 	virtual void EntityDestroyed(Entity entity) = 0;
 };
 
+/**
+ * @class ComponentArray
+ * @brief Class of the component array
+ * @details The ComponentArray class is a template class that stores the components of a specific type T.
+ * 
+ * @tparam T Type of the component
+ */
 template<typename T>
 class ComponentArray : public IComponentArray
 {
 public:
-	void InsertData(Entity entity, T component)
-	{
-        if (mEntityToIndexMap.find(entity) != mEntityToIndexMap.end()) {
+
+	/**
+	 * @brief Link a new component to an entity
+	 * 
+	 * @param entity Entity to link the component to
+	 * @param component Component to link to the entity
+	 */
+	void InsertData(Entity entity, T component) {
+        if (this->_entityToIndex.find(entity) == this->_entityToIndex.end()) {
             // ERROR : Component added to same entity more than once.
         }
 
 		// Put new entry at end and update the maps
-		std::size_t newIndex = mSize;
-		mEntityToIndexMap[entity] = newIndex;
-		mIndexToEntityMap[newIndex] = entity;
-		mComponentArray[newIndex] = component;
-		++mSize;
+		std::size_t newIndex = this->_arraySize;
+		this->_entityToIndex[entity] = newIndex;
+		this->_indexToEntity[newIndex] = entity;
+		this->_componentArray[newIndex] = component;
+		this->_arraySize++;
 	}
 
-	void RemoveData(Entity entity)
-	{
-		// assert(mEntityToIndexMap.find(entity) != mEntityToIndexMap.end() && "Removing non-existent component.");
+	/**
+	 * @brief Remove an entity and its components
+	 * 
+	 * @param entity Entity to remove
+	 */
+	void RemoveData(Entity entity) {
+		if (this->_entityToIndex.find(entity) == this->_entityToIndex.end()) {
+			// ERROR : "Retrieving non-existent component."
+		}
 
 		// Copy element at end into deleted element's place to maintain density
-		std::size_t indexOfRemovedEntity = mEntityToIndexMap[entity];
-		std::size_t indexOfLastElement = mSize - 1;
-		mComponentArray[indexOfRemovedEntity] = mComponentArray[indexOfLastElement];
+		std::size_t indexOfRemovedEntity = this->_entityToIndex[entity];
+		std::size_t indexOfLastElement = this->_arraySize - 1;
+		this->_componentArray[indexOfRemovedEntity] = this->_componentArray[indexOfLastElement];
 
 		// Update map to point to moved spot
-		Entity entityOfLastElement = mIndexToEntityMap[indexOfLastElement];
-		mEntityToIndexMap[entityOfLastElement] = indexOfRemovedEntity;
-		mIndexToEntityMap[indexOfRemovedEntity] = entityOfLastElement;
+		Entity entityOfLastElement = this->_indexToEntity[indexOfLastElement];
+		this->_entityToIndex[entityOfLastElement] = indexOfRemovedEntity;
+		this->_indexToEntity[indexOfRemovedEntity] = entityOfLastElement;
 
-		mEntityToIndexMap.erase(entity);
-		mIndexToEntityMap.erase(indexOfLastElement);
+		this->_entityToIndex.erase(entity);
+		this->_indexToEntity.erase(indexOfLastElement);
 
-		--mSize;
+		this->_arraySize--;
 	}
 
-	T& GetData(Entity entity)
-	{
-		// assert(mEntityToIndexMap.find(entity) != mEntityToIndexMap.end() && "Retrieving non-existent component.");
-
-		// Return a reference to the entity's component
-		return mComponentArray[mEntityToIndexMap[entity]];
-	}
-
-	void EntityDestroyed(Entity entity) override
-	{
-		if (mEntityToIndexMap.find(entity) != mEntityToIndexMap.end())
-		{
-			// Remove the entity's component if it existed
-			RemoveData(entity);
+	/**
+	 * @brief Get the component of an entity
+	 * 
+	 * @param entity Entity to get the component from
+	 * @return T& Reference to the component
+	 */
+	T& GetData(Entity entity) {
+		if (this->_entityToIndex.find(entity) == this->_entityToIndex.end()) {
+			// ERROR : "Retrieving non-existent component."
 		}
+
+		return this->_componentArray[this->_entityToIndex[entity]];
+	}
+
+	/**
+	 * @brief Called when an entity is destroyed so that the component array can update its references
+	 * 
+	 * @param entity Entity destroyed
+	 */
+	void EntityDestroyed(Entity entity) override {
+		if (this->_entityToIndex.find(entity) == this->_entityToIndex.end())
+			RemoveData(entity);
 	}
 
 private:
-	// The packed array of components (of generic type T),
-	// set to a specified maximum amount, matching the maximum number
-	// of entities allowed to exist simultaneously, so that each entity
-	// has a unique spot.
-	std::array<T, MAX_ENTITIES> mComponentArray;
+	/**
+	 * @brief Array of components for each type T
+	 * 
+	 */
+	std::array<T, MAX_ENTITIES> _componentArray;
 
-	// Map from an entity ID to an array index.
-	std::unordered_map<Entity, size_t> mEntityToIndexMap;
+	/**
+	 * @brief Map from an entity ID to an array index
+	 * 
+	 */
+	std::unordered_map<Entity, size_t> _entityToIndex;
 
-	// Map from an array index to an entity ID.
-	std::unordered_map<size_t, Entity> mIndexToEntityMap;
+	/**
+	 * @brief Map from an array index to an entity ID
+	 * 
+	 */
+	std::unordered_map<size_t, Entity> _indexToEntity;
 
-	// Total size of valid entries in the array.
-	std::size_t mSize;
+	/**
+	 * @brief Size of the array
+	 * 
+	 */
+	std::size_t _arraySize;
 };
 
 #endif /* !COMPONENTARRAY_HPP_ */

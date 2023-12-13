@@ -5,6 +5,12 @@
 ** Signature
 */
 
+/**
+ * @file Signature.hpp
+ * @brief File containing the Signature type
+ * 
+ */
+
 #ifndef SIGNATURE_HPP_
 #define SIGNATURE_HPP_
 

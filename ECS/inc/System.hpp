@@ -5,6 +5,12 @@
 ** System
 */
 
+/**
+ * @file System.hpp
+ * @brief File containing the System class
+ * 
+ */
+
 #ifndef SYSTEM_HPP_
 #define SYSTEM_HPP_
 
@@ -12,9 +18,19 @@
 
 #include "Entity.hpp"
 
+/**
+ * @class System
+ * @brief Class of the system
+ * 
+ */
 class System {
 public:
-	std::set<Entity> mEntities;
+
+	/**
+	 * @brief Entities list
+	 * 
+	 */
+	std::set<Entity> _entities;
 };
 
 #endif /* !SYSTEM_HPP_ */

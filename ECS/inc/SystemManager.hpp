@@ -5,6 +5,12 @@
 ** SystemManager
 */
 
+/**
+ * @file SystemManager.hpp
+ * @brief File containing the SystemManager class
+ * 
+ */
+
 #ifndef SYSTEMMANAGER_HPP_
 #define SYSTEMMANAGER_HPP_
 
@@ -15,72 +21,100 @@
 #include "Signature.hpp"
 #include "System.hpp"
 
+/**
+ * @class SystemManager
+ * @brief Class of the system manager
+ * 
+ */
 class SystemManager {
 public:
+
+	/**
+	 * @brief Register a new system
+	 * 
+	 * @tparam T Type of the system
+	 * @return std::shared_ptr<T> Pointer to the system
+	 */
 	template<typename T>
-	std::shared_ptr<T> RegisterSystem()
-	{
+	std::shared_ptr<T> RegisterSystem() {
 		const char* typeName = typeid(T).name();
 
-		// assert(mSystems.find(typeName) == mSystems.end() && "Registering system more than once.");
+		if (this->_systems.find(typeName) == this->_systems.end()) {
+			// ERROR : "Registering system more than once."
+		}
 
 		// Create a pointer to the system and return it so it can be used externally
 		auto system = std::make_shared<T>();
-		mSystems.insert({typeName, system});
+		this->_systems.insert({typeName, system});
 		return system;
 	}
 
+	/**
+	 * @brief Set the Signature object
+	 * @details The signature is a bitset that contains the components of the system. If the system has the components 0, 1 and 3, the signature will be 1011.
+	 * 
+	 * @tparam T Type of the system
+	 * @param signature Signature to set
+	 */
 	template<typename T>
-	void SetSignature(Signature signature)
-	{
+	void SetSignature(Signature signature) {
 		const char* typeName = typeid(T).name();
 
-		// assert(mSystems.find(typeName) != mSystems.end() && "System used before registered.");
+		if (this->_systems.find(typeName) == this->_systems.end()) {
+			// ERROR : "System used before registered."
+		}
 
-		// Set the signature for this system
-		mSignatures.insert({typeName, signature});
+		_signatures.insert({typeName, signature});
 	}
 
+	/**
+	 * @brief Called when an entity is destroyed so that the system manager can update its references
+	 * 
+	 * @param entity Entity to be destroyed
+	 */
 	void EntityDestroyed(Entity entity)
 	{
-		// Erase a destroyed entity from all system lists
-		// mEntities is a set so no check needed
-		for (auto const& pair : mSystems)
-		{
+		for (auto const& pair : this->_systems) {
 			auto const& system = pair.second;
 
-			system->mEntities.erase(entity);
+			system->_entities.erase(entity);
 		}
 	}
 
+	/**
+	 * @brief Called when a component is added to an entity so that the system manager can update its references
+	 * 
+	 * @param entity Entity to add the component to
+	 * @param entitySignature Signature of the entity
+	 */
 	void EntitySignatureChanged(Entity entity, Signature entitySignature)
 	{
 		// Notify each system that an entity's signature changed
-		for (auto const& pair : mSystems)
-		{
+		for (auto const& pair : this->_systems) {
 			auto const& type = pair.first;
 			auto const& system = pair.second;
-			auto const& systemSignature = mSignatures[type];
+			auto const& systemSignature = this->_signatures[type];
 
-			// Entity signature matches system signature - insert into set
-			if ((entitySignature & systemSignature) == systemSignature)
-			{
-				system->mEntities.insert(entity);
-			}
-			// Entity signature does not match system signature - erase from set
+			if ((entitySignature & systemSignature) == systemSignature) 
+				system->_entities.insert(entity); // Entity signature matches system signature - insert into set
 			else
-			{
-				system->mEntities.erase(entity);
-			}
+				system->_entities.erase(entity); // Entity signature does not match system signature - erase from set
 		}
 	}
 
 private:
-	// Map from system type string pointer to a signature
-	std::unordered_map<const char*, Signature> mSignatures{};
 
-	// Map from system type string pointer to a system pointer
-	std::unordered_map<const char*, std::shared_ptr<System>> mSystems{};
+	/**
+	 * @brief Map to store the signatures of the systems registered
+	 * 
+	 */
+	std::unordered_map<const char*, Signature> _signatures{};
+
+	/**
+	 * @brief Map to store the systems registered
+	 * 
+	 */
+	std::unordered_map<const char*, std::shared_ptr<System>> _systems{};
 };
 
 #endif /* !SYSTEMMANAGER_HPP_ */
