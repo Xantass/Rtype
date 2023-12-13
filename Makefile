@@ -47,7 +47,7 @@ clean:
 	rm -f $(SERVER_NAME)
 
 doc:
-	doxygen doc/Doxyfile
-	open doc/html/index.html
+	doxygen docs/Doxyfile
+	open docs/html/index.html
 
 re: clean all
