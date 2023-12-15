@@ -1,7 +1,10 @@
-[![Release](https://github.com/EpitechPromo2026/B-CPP-500-PAR-5-2-rtype-jules.gresset/actions/workflows/release.yaml/badge.svg)](https://github.com/EpitechPromo2026/B-CPP-500-PAR-5-2-rtype-jules.gresset/actions/workflows/release.yaml)
-
 # R-Type
 This project is a reimplementation of the famous R-Type game. Our version is playable in network with multiple clients able to connect to the server.
+
+Works on :
+![windows logo](./docs/images/windows-logo.png) ![linux logo](./docs/images/linux-logo.png) ![apple logo](./docs/images/apple-logo.png)  
+The project runs on Windows and Unix systems, using [CMake](https://cmake.org/).  
+
 
 ## Usage
 The latest version from our game can be found in the [release section of the Github repository](https://github.com/EpitechPromo2026/B-FUN-500-PAR-5-1-glados-theo.fouque/releases).
@@ -28,3 +31,9 @@ All other documentations (including RFC protocol between client and server) can 
 
 ## Contribution
 To contribute to this project, check our [Contribution Guidelines](https://github.com/EpitechPromo2026/B-CPP-500-PAR-5-2-rtype-jules.gresset/blob/main/docs/CONTRIBUTING.md).
+
+## Authors
+- [alecorver](https://github.com/alecorvec)
+- [JulesGresset](https://github.com/JulesGresset)
+- [Lucaslgd02](https://github.com/Lucaslgd02)
+- [Xantas](https://github.com/Xantass)
