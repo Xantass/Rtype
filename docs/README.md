@@ -1,8 +1,9 @@
 # R-Type
 This project is a reimplementation of the famous R-Type game. Our version is playable in network with multiple clients able to connect to the server.
 
-Works on :
-![windows logo](./docs/images/windows-logo.png) ![linux logo](./docs/images/linux-logo.png) ![apple logo](./docs/images/apple-logo.png)  
+This project works on :
+
+![windows logo](./images/windows-logo.jpg) ![linux logo](./images/linux-logo.png) ![apple logo](./images/apple-logo.png)  
 The project runs on Windows and Unix systems, using [CMake](https://cmake.org/).  
 
 
