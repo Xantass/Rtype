@@ -8,14 +8,41 @@
 #include "systems/PhysicSystem.hpp"
 
 void PhysicSystem::Update(Coordinator &coordinator) {
-    std::cout << "PhysicSystem update :" << std::endl; // TEST - TO BE REMOVED
+    std::cout << "----------------------" << std::endl << "PhysicSystem update :" << std::endl; // TEST - TO BE REMOVED
     for (auto entity : this->_entities) {
         auto& pos = coordinator.GetComponent<Position>(entity);
         auto& vel = coordinator.GetComponent<Velocity>(entity);
+        auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
+
+        for (auto entity2 : this->_entities) {
+            if (entity == entity2)
+                continue;
+            auto& pos2 = coordinator.GetComponent<Position>(entity2);
+            auto& hitbox2 = coordinator.GetComponent<Hitbox>(entity2);
+
+            if (pos.x + hitbox.x + hitbox.width >= pos2.x + hitbox2.x &&
+                pos.x + hitbox.x <= pos2.x + hitbox2.x + hitbox2.width &&
+                pos.y + hitbox.y + hitbox.height >= pos2.y + hitbox2.y &&
+                pos.y + hitbox.y <= pos2.y + hitbox2.y + hitbox2.height &&
+                hitbox.type == PLAYER && hitbox2.type == PLAYER) {
+                std::cout << "Collision with " << entity2 << " detected, idling velocity of entity " << entity << std::endl; // TEST - TO BE REMOVED
+                vel.x = 0;
+                vel.y = 0;
+            }
+            if (pos.x + hitbox.x + hitbox.width >= pos2.x + hitbox2.x &&
+                pos.x + hitbox.x <= pos2.x + hitbox2.x + hitbox2.width &&
+                pos.y + hitbox.y + hitbox.height >= pos2.y + hitbox2.y &&
+                pos.y + hitbox.y <= pos2.y + hitbox2.y + hitbox2.height &&
+                hitbox.type == PLAYER && hitbox2.type == ENNEMY) {
+                std::cout << "Collision with " << entity2 << " detected, destroying entity " << entity << std::endl; // TEST - TO BE REMOVED
+                coordinator.DestroyEntity(entity);
+                return;
+            }
+        }
 
         pos.x += vel.x;
         pos.y += vel.y;
 
-        std::cout << "Entity position : " << pos.x << " " << pos.y << std::endl; // TEST - TO BE REMOVED
+        std::cout << "Entity "<< entity << " position : " << pos.x << " " << pos.y << std::endl; // TEST - TO BE REMOVED
     }
 }

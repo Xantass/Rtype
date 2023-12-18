@@ -18,6 +18,7 @@
 #include "../Coordinator.hpp"
 #include "../components/Position.hpp"
 #include "../components/Velocity.hpp"
+#include "../components/Hitbox.hpp"
 
 /**
  * @class PhysicSystem
