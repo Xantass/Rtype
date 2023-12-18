@@ -28,94 +28,49 @@
  * 
  */
 class SystemManager {
-public:
-
-	/**
-	 * @brief Register a new system
-	 * 
-	 * @tparam T Type of the system
-	 * @return std::shared_ptr<T> Pointer to the system
-	 */
-	template<typename T>
-	std::shared_ptr<T> RegisterSystem() {
-		std::type_index typeName = std::type_index(typeid(T));
-
-		// if (this->_systems[typeName] == this->_systems[this->_systems.end()]) {
-			// ERROR : "Registering system more than once."
-		// }
-
-		// Create a pointer to the system and return it so it can be used externally
-		auto system = std::make_shared<T>();
-		this->_systems.insert({typeName, system});
-		return system;
-	}
-
-	/**
-	 * @brief Set the Signature object
-	 * @details The signature is a bitset that contains the components of the system. If the system has the components 0, 1 and 3, the signature will be 1011.
-	 * 
-	 * @tparam T Type of the system
-	 * @param signature Signature to set
-	 */
-	template<typename T>
-	void SetSignature(Signature signature) {
-		std::type_index typeName = typeid(T);
-
-		// if (this->_systems[typeName] == this->_systems.end()) {
-			// ERROR : "System used before registered."
-		// }
-
-		_signatures.insert({typeName, signature});
-	}
-
-	/**
-	 * @brief Called when an entity is destroyed so that the system manager can update its references
-	 * 
-	 * @param entity Entity to be destroyed
-	 */
-	void EntityDestroyed(Entity entity)
-	{
-		for (auto const& pair : this->_systems) {
-			auto const& system = pair.second;
-
-			system->_entities.erase(entity);
-		}
-	}
-
-	/**
-	 * @brief Called when a component is added to an entity so that the system manager can update its references
-	 * 
-	 * @param entity Entity to add the component to
-	 * @param entitySignature Signature of the entity
-	 */
-	void EntitySignatureChanged(Entity entity, Signature entitySignature)
-	{
-		// Notify each system that an entity's signature changed
-		for (auto const& pair : this->_systems) {
-			auto const& type = pair.first;
-			auto const& system = pair.second;
-			auto const& systemSignature = this->_signatures[type];
-
-			if ((entitySignature & systemSignature) == systemSignature) 
-				system->_entities.insert(entity); // Entity signature matches system signature - insert into set
-			else
-				system->_entities.erase(entity); // Entity signature does not match system signature - erase from set
-		}
-	}
-
-private:
-
-	/**
-	 * @brief Map to store the signatures of the systems registered
-	 * 
-	 */
-	std::unordered_map<std::type_index, Signature> _signatures{};
-
-	/**
-	 * @brief Map to store the systems registered
-	 * 
-	 */
-	std::unordered_map<std::type_index, std::shared_ptr<System>> _systems{};
+	public:
+		/**
+		 * @brief Register a new system
+		 * 
+		 * @tparam T Type of the system
+		 * @return std::shared_ptr<T> Pointer to the system
+		 */
+		template<typename T>
+		std::shared_ptr<T> RegisterSystem();
+		/**
+		 * @brief Set the Signature object
+		 * @details The signature is a bitset that contains the components of the system. If the system has the components 0, 1 and 3, the signature will be 1011.
+		 * 
+		 * @tparam T Type of the system
+		 * @param signature Signature to set
+		 */
+		template<typename T>
+		void SetSignature(Signature signature);
+		/**
+		 * @brief Called when an entity is destroyed so that the system manager can update its references
+		 * 
+		 * @param entity Entity to be destroyed
+		 */
+		void EntityDestroyed(Entity entity);
+	
+		/**
+		 * @brief Called when a component is added to an entity so that the system manager can update its references
+		 * 
+		 * @param entity Entity to add the component to
+		 * @param entitySignature Signature of the entity
+		 */
+		void EntitySignatureChanged(Entity entity, Signature entitySignature);
+	private:
+		/**
+		 * @brief Map to store the signatures of the systems registered
+		 * 
+		 */
+		std::unordered_map<std::type_index, Signature> _signatures{};
+		/**
+		 * @brief Map to store the systems registered
+		 * 
+		 */
+		std::unordered_map<std::type_index, std::shared_ptr<System>> _systems{};
 };
 
 #endif /* !SYSTEMMANAGER_HPP_ */

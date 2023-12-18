@@ -24,13 +24,12 @@
  * 
  */
 class System {
-public:
-
-	/**
-	 * @brief Entities list
-	 * 
-	 */
-	std::set<Entity> _entities;
+	public:
+		/**
+		 * @brief Entities list
+		 * 
+		 */
+		std::set<Entity> _entities;
 };
 
 #endif /* !SYSTEM_HPP_ */

@@ -14,7 +14,6 @@ set(SOURCES
     src/RoomManager.cpp
 
     ../ECS/src/systems/PhysicSystem.cpp
-    ../ECS/src/systems/PhysicSystem.cpp
     ../ECS/src/EntityManager.cpp
     ../ECS/src/ComponentArray.cpp
     ../ECS/src/ComponentManager.cpp
