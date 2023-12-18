@@ -34,7 +34,7 @@ set(SOURCES
 add_executable(r-type_server ${SOURCES})
 
 if(WIN32)
-    target_link_libraries(r-type_server Ws2_32.lib PRIVATE asio)
+    target_link_libraries(r-type_server PRIVATE Ws2_32.lib asio)
 endif()
 
 if(MSVC)
