@@ -5,7 +5,7 @@ project(r-type_client)
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++17")
 
 
-# include(ExternalProject)
+include(ExternalProject)
 
 # Explicitly set the path to raylib
 # set(raylib_DIR ${CMAKE_BINARY_DIR}/raylib/install/)
@@ -24,6 +24,24 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(raylib)
+
+FetchContent_GetProperties(raylib)
+if (NOT raylib_POPULATED)
+    FetchContent_Populate(raylib)
+    add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
+endif()
+
+# Use ExternalProject to build and install raylib's dependencies
+ExternalProject_Add(
+    raylib_deps
+    PREFIX ${CMAKE_BINARY_DIR}/raylib_deps
+    GIT_REPOSITORY https://github.com/glfw/glfw.git
+    GIT_TAG 3.3.4
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/raylib_deps/install
+)
+
+# Ensure raylib target is built after its dependencies
+add_dependencies(raylib raylib_deps)
 
 include_directories("./inc/")
 include_directories("../ECS/inc/")
