@@ -25,7 +25,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt update
-          sudo apt install build-essential libtool autoconf unzip wget openssl -y
+          sudo apt install build-essential libtool autoconf unzip wget openssl libssl-dev -y
           version=3.27
           build=7
           mkdir ~/temp
