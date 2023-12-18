@@ -134,13 +134,13 @@ private:
 	 * @brief Map from an entity ID to an array index
 	 * 
 	 */
-	std::unordered_map<Entity, size_t> _entityToIndex;
+	std::unordered_map<Entity, std::size_t> _entityToIndex;
 
 	/**
 	 * @brief Map from an array index to an entity ID
 	 * 
 	 */
-	std::unordered_map<size_t, Entity> _indexToEntity;
+	std::unordered_map<std::size_t, Entity> _indexToEntity;
 
 	/**
 	 * @brief Size of the array

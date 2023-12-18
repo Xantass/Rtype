@@ -17,6 +17,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <memory>
+#include <typeindex>
 
 #include "ComponentArray.hpp"
 #include "Entity.hpp"
@@ -38,11 +39,11 @@ public:
 	 */
 	template<typename T>
 	void RegisterComponent() {
-		const char* typeName = typeid(T).name();
+		std::type_index typeName = std::type_index(typeid(T));
 
-		if (this->_componentTypes.find(typeName) == this->_componentTypes.end()) {
+		// if (this->_componentTypes.find(typeName) == this->_componentTypes.end()) {
 			// ERROR : "Registering component type more than once."
-		}
+		// }
 
 		// Add this component type to the component type map
 		this->_componentTypes.insert({typeName, this->_nextComponentType});
@@ -62,11 +63,11 @@ public:
 	 */
 	template<typename T>
 	ComponentType GetComponentType() {
-		const char* typeName = typeid(T).name();
+		std::type_index typeName = std::type_index(typeid(T));
 
-		if (this->_componentTypes.find(typeName) == this->_componentTypes.end()) {
+		// if (this->_componentTypes.find(typeName) == this->_componentTypes.end()) {
 			// ERROR : "Component not registered before use."
-		}
+		// }
 
 		// Return this component's type - used for creating signatures
 		return this->_componentTypes[typeName];
@@ -125,13 +126,13 @@ private:
 	 * @brief Map to store the type of the components registered
 	 * 
 	 */
-	std::unordered_map<std::string, ComponentType> _componentTypes;
+	std::unordered_map<std::type_index, ComponentType> _componentTypes;
 
 	/**
 	 * @brief Map to store a reference the component arrays
 	 * 
 	 */
-	std::unordered_map<const char*, std::shared_ptr<IComponentArray>> _componentArrays{};
+	std::unordered_map<std::type_index, std::shared_ptr<IComponentArray>> _componentArrays{};
 
 	/**
 	 * @brief Component type to be assigned to the next registered component
@@ -149,11 +150,11 @@ private:
 	 */
 	template<typename T>
 	std::shared_ptr<ComponentArray<T>> GetComponentArray() {
-		const char* typeName = typeid(T).name();
+		std::type_index typeName = std::type_index(typeid(T));
 
-		if (_componentTypes.find(typeName) == _componentTypes.end()) {
+		// if (_componentTypes.find(typeName) == _componentTypes.end()) {
 			// ERROR : "Component not registered before use."
-		}
+		// }
 
 		return std::static_pointer_cast<ComponentArray<T>>(_componentArrays[typeName]);
 	}

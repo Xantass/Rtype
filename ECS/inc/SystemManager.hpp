@@ -16,6 +16,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <typeindex>
 
 #include "Entity.hpp"
 #include "Signature.hpp"
@@ -37,11 +38,11 @@ public:
 	 */
 	template<typename T>
 	std::shared_ptr<T> RegisterSystem() {
-		const char* typeName = typeid(T).name();
+		std::type_index typeName = std::type_index(typeid(T));
 
-		if (this->_systems.find(typeName) == this->_systems.end()) {
+		// if (this->_systems[typeName] == this->_systems[this->_systems.end()]) {
 			// ERROR : "Registering system more than once."
-		}
+		// }
 
 		// Create a pointer to the system and return it so it can be used externally
 		auto system = std::make_shared<T>();
@@ -58,11 +59,11 @@ public:
 	 */
 	template<typename T>
 	void SetSignature(Signature signature) {
-		const char* typeName = typeid(T).name();
+		std::type_index typeName = typeid(T);
 
-		if (this->_systems.find(typeName) == this->_systems.end()) {
+		// if (this->_systems[typeName] == this->_systems.end()) {
 			// ERROR : "System used before registered."
-		}
+		// }
 
 		_signatures.insert({typeName, signature});
 	}
@@ -108,13 +109,13 @@ private:
 	 * @brief Map to store the signatures of the systems registered
 	 * 
 	 */
-	std::unordered_map<const char*, Signature> _signatures{};
+	std::unordered_map<std::type_index, Signature> _signatures{};
 
 	/**
 	 * @brief Map to store the systems registered
 	 * 
 	 */
-	std::unordered_map<const char*, std::shared_ptr<System>> _systems{};
+	std::unordered_map<std::type_index, std::shared_ptr<System>> _systems{};
 };
 
 #endif /* !SYSTEMMANAGER_HPP_ */
