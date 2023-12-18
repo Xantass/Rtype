@@ -2,21 +2,6 @@
 
 Welcome to the contribution guide for the R-Type project! We're excited that you want to contribute to our project. Your contributions are essential to enhance and evolve R-Type. Before you begin, please follow these steps to ensure that your contribution is smooth and effective.
 
-## Table of Contents
-- [Contribution Guide](#contribution-guide)
-  - [Table of Contents](#table-of-contents)
-  - [Basic Rules](#basic-rules)
-    - [Branches](#branches)
-    - [Commits](#commits)
-  - [Contribute to Code](#contribute-to-code)
-    - [Clone the Repository](#clone-the-repository)
-    - [Create a Branch](#create-a-branch)
-    - [Develop the Feature](#develop-the-feature)
-    - [Tests](#tests)
-    - [Pull Request](#pull-request)
-  - [Contribute to Documentation](#contribute-to-documentation)
-  - [Report Issues](#report-issues)
-
 ## Basic Rules
 
 ### Branches
