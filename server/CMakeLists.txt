@@ -33,10 +33,8 @@ set(SOURCES
 
 add_executable(r-type_server ${SOURCES})
 
-target_link_libraries(r-type_server PRIVATE asio)
-
 if(WIN32)
-    target_link_libraries(r-type_server Ws2_32.lib)
+    target_link_libraries(r-type_server Ws2_32.lib PRIVATE asio)
 endif()
 
 if(MSVC)
@@ -45,6 +43,7 @@ endif()
 
 if (APPLE AND UNIX)
     SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++17")
+    target_link_libraries(r-type_server PRIVATE asio)
 endif()
 
 if(UNIX AND NOT APPLE)
