@@ -13,11 +13,11 @@
 #ifndef CLIENT_HPP_
 #define CLIENT_HPP_
 
-#include <boost/asio.hpp>
+#include <asio.hpp>
 #include <string>
 
-using namespace boost::asio;
-using boost::asio::ip::udp;
+using namespace asio;
+using asio::ip::udp;
 
 /**
  * @class Client

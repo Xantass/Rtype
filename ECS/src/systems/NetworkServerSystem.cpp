@@ -59,13 +59,13 @@ std::string NetworkServerSystem::vectorToString(const std::vector<int>& data)
     return myString;
 }
 
-unsigned short NetworkServerSystem::findValidPort(boost::asio::io_service& service)
+unsigned short NetworkServerSystem::findValidPort(asio::io_context& service)
 {
-    boost::asio::ip::udp::socket socket(service);
+    asio::ip::udp::socket socket(service);
 
     for (unsigned short port = 1024; port < 65535; ++port) {
         try {
-            boost::asio::ip::udp::endpoint endpoint(boost::asio::ip::udp::v4(), port);
+            asio::ip::udp::endpoint endpoint(asio::ip::udp::v4(), port);
             socket.open(endpoint.protocol());
             socket.bind(endpoint);
             return port;
@@ -136,7 +136,7 @@ void NetworkServerSystem::connect(std::vector<int>& data, udp::endpoint& clientE
     for (auto client : _clients) {
         if (client.getUsername() == username) {
             std::vector<unsigned char> buffer = encode(_FAIL_CONNECT);
-            _socket.send_to(boost::asio::buffer(buffer), clientEndpoint);
+            _socket.send_to(asio::buffer(buffer), clientEndpoint);
             return;
         }
     }
@@ -145,7 +145,7 @@ void NetworkServerSystem::connect(std::vector<int>& data, udp::endpoint& clientE
     std::cout << _clients.at(_clients.size() - 1).getClientEndpoint() << std::endl;
     std::vector<int> tmp = {_clients.at(_clients.size() - 1).getID()};
     std::vector<unsigned char> buffer = encode(tmp);
-    _socket.send_to(boost::asio::buffer(buffer), clientEndpoint);
+    _socket.send_to(asio::buffer(buffer), clientEndpoint);
 }
 
 void NetworkServerSystem::ping()
@@ -168,7 +168,7 @@ void NetworkServerSystem::ping()
     );
     for (auto client : _clients) {
         std::vector<unsigned char> buffer = encode(_PING);
-        _socket.send_to(boost::asio::buffer(buffer), client.getClientEndpoint());
+        _socket.send_to(asio::buffer(buffer), client.getClientEndpoint());
     }
 }
 
@@ -183,7 +183,7 @@ void NetworkServerSystem::pong(std::vector<int>& data, udp::endpoint& clientEndp
     }
     std::cout << "CLIENT ID ALIVE: " << data.at(0) << std::endl;
     std::vector<unsigned char> buffer = encode(_PASS);
-    _socket.send_to(boost::asio::buffer(buffer), _clients.at(index).getClientEndpoint());
+    _socket.send_to(asio::buffer(buffer), _clients.at(index).getClientEndpoint());
     _clients.at(index).setAlive(true);
 }
 
@@ -197,13 +197,13 @@ void NetworkServerSystem::handleCmd(std::vector<int> data, udp::endpoint clientE
     }
     else {
         std::vector<unsigned char> buffer = encode(_UNKNOW);
-        _socket.send_to(boost::asio::buffer(buffer), clientEndpoint);
+        _socket.send_to(asio::buffer(buffer), clientEndpoint);
     }
 }
 
 void NetworkServerSystem::processReceiveData(const std::vector<unsigned char>& data, udp::endpoint clientEndpoint, std::size_t bytesReceived)
 {
-    if (clientEndpoint != boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string("0.0.0.0"), 0)) {
+    if (clientEndpoint != asio::ip::udp::endpoint(asio::ip::make_address("0.0.0.0"), 0)) {
         std::vector<int> res = decode(data, bytesReceived);
         for (auto i : res)
             std::cout << i << std::endl;
@@ -220,11 +220,13 @@ void NetworkServerSystem::Update(Coordinator &coordinator)
     std::chrono::steady_clock::duration elapsedTime = currentTime - _startTime;
     std::vector<unsigned char> data(1024);
     udp::endpoint clientEndpoint;
-    boost::system::error_code error;
 
-    size_t length = _socket.receive_from(boost::asio::buffer(data), clientEndpoint, 0, error);
+    try {
+        size_t length = _socket.receive_from(asio::buffer(data), clientEndpoint, 0);
+        processReceiveData(data, clientEndpoint, length);
+    } catch (const std::system_error& e) {
 
-    processReceiveData(data, clientEndpoint, length);
+    }
     if (elapsedTime >= interval) {
         std::cout << "PING PACKET" << std::endl;
         ping();

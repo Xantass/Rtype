@@ -15,7 +15,6 @@
 #define COORDINATOR_HPP_
 
 #include <memory>
-
 #include "ComponentManager.hpp"
 #include "EntityManager.hpp"
 #include "SystemManager.hpp"

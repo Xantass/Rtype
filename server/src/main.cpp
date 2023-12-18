@@ -5,8 +5,8 @@
 ** main
 */
 
+#include <memory>
 #include "main.hpp"
-
 #include "Coordinator.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"

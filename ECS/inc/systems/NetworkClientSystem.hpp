@@ -13,15 +13,15 @@
 #ifndef NETWORKCLIENTSYSTEM_HPP_
 #define NETWORKCLIENTSYSTEM_HPP_
 
-#include <boost/asio.hpp>
+#include <asio.hpp>
 #include "System.hpp"
 #include "Coordinator.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
 #include "EnumProtocol.hpp"
 
-using namespace boost::asio;
-using boost::asio::ip::udp;
+using namespace asio;
+using asio::ip::udp;
 
 /**
  * @class NetworkClientSystem
@@ -39,7 +39,7 @@ public:
      * @param service The io_service to use for port validation.
      * @return An unsigned short representing the valid port.
      */
-    unsigned short findValidPort(boost::asio::io_service& service);
+    unsigned short findValidPort(asio::io_context& service);
 
     /**
      * @brief Encodes a vector of integers into a vector of bytes.
@@ -91,7 +91,7 @@ public:
 
 protected:
 private:
-    io_service _service; /**< The Boost ASIO io_service. */
+    io_context _service; /**< The Boost ASIO io_service. */
     udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v4(), findValidPort(_service))); /**< The UDP socket for communication. */
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
     std::function<void(std::vector<int>&)> _functions[8]; /**< Array of function pointers. */

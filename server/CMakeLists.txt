@@ -3,33 +3,18 @@ cmake_minimum_required(VERSION 3.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Spécifiez le chemin vers vcpkg
-set(VCPKG_ROOT "${CMAKE_CURRENT_BINARY_DIR}/vcpkg") # Remplacez par votre chemin absolu vers vcpkg
-set(Boost_INCLUDE_DIR "${VCPKG_ROOT}/installed/arm64-osx/include/") # Remplacez par votre chemin absolu vers vcpkg
+include(FetchContent)
 
-# Assurez-vous que vcpkg a été correctement installé
-if(NOT EXISTS "${VCPKG_ROOT}/vcpkg")
-    message("Clonage de Vcpkg...")
-    execute_process(
-        COMMAND git clone https://github.com/microsoft/vcpkg.git
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-    execute_process(
-        COMMAND ${CMAKE_CURRENT_BINARY_DIR}/vcpkg/bootstrap-vcpkg.sh
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/vcpkg
-    )
-endif()
-
-# Installation d'Asio et Interprocess de Boost via vcpkg
-execute_process(
-    COMMAND ${VCPKG_ROOT}/vcpkg install boost-asio boost-interprocess
+FetchContent_Declare(
+  asiocmake
+  GIT_REPOSITORY "https://github.com/OlivierLDff/asio.cmake"
+  GIT_TAG        "main"
 )
-
-set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+FetchContent_MakeAvailable(asiocmake)
 
 project(r-type_server)
 
-include_directories("./inc/" ${Boost_INCLUDE_DIR} "./../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
+include_directories("./inc/" "./../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
 
 set(SOURCES
     src/Server.cpp
@@ -48,7 +33,7 @@ set(SOURCES
 
 add_executable(r-type_server ${SOURCES})
 
-target_link_libraries(r-type_server ${Boost_LIBRARIES})
+target_link_libraries(r-type_server PRIVATE asio)
 
 if(WIN32)
     target_link_libraries(r-type_server Ws2_32.lib)

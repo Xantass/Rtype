@@ -13,10 +13,9 @@ void NetworkClientSystem::Init()
     _serverEndpoint = *resolver.resolve(udp::v4(), "10.68.252.3", "4242").begin();
     std::vector<int> tmp = mergeVectors(_CONNECT, stringToVector("THEO"));
     std::vector<unsigned char> buffer = encode(tmp);
-    _socket.send_to(boost::asio::buffer(buffer), _serverEndpoint);
-    boost::system::error_code error;
+    _socket.send_to(asio::buffer(buffer), _serverEndpoint);
     std::vector<unsigned char> data(1024);
-    size_t length = _socket.receive_from(boost::asio::buffer(data), _serverEndpoint, 0, error);
+    size_t length = _socket.receive_from(asio::buffer(data), _serverEndpoint, 0);
     tmp = decode(data, length);
     _id = tmp.at(0);
     std::cout << "id: " << _id << std::endl;
@@ -31,13 +30,13 @@ void NetworkClientSystem::Init()
     _socket.non_blocking(true);
 }
 
-unsigned short NetworkClientSystem::findValidPort(boost::asio::io_service& service)
+unsigned short NetworkClientSystem::findValidPort(asio::io_context& service)
 {
-    boost::asio::ip::udp::socket socket(service);
+    asio::ip::udp::socket socket(service);
 
     for (unsigned short port = 1024; port < 65535; ++port) {
         try {
-            boost::asio::ip::udp::endpoint endpoint(boost::asio::ip::udp::v4(), port);
+            asio::ip::udp::endpoint endpoint(asio::ip::udp::v4(), port);
             socket.open(endpoint.protocol());
             socket.bind(endpoint);
             return port;
@@ -68,7 +67,7 @@ void NetworkClientSystem::ping(std::vector<int>& data)
     std::cout << "SEND PONG" << std::endl;
     std::vector<int> tmp = {_id};
     std::vector<unsigned char> buffer = encode(mergeVectors(_PONG, tmp));
-    _socket.send_to(boost::asio::buffer(buffer), _serverEndpoint);  
+    _socket.send_to(asio::buffer(buffer), _serverEndpoint);  
 }
 
 void NetworkClientSystem::handleCmd(std::vector<int> data)
@@ -84,7 +83,7 @@ void NetworkClientSystem::handleCmd(std::vector<int> data)
     }
     else {
         std::vector<unsigned char> buffer = encode(_UNKNOW);
-        _socket.send_to(boost::asio::buffer(buffer), _serverEndpoint);
+        _socket.send_to(asio::buffer(buffer), _serverEndpoint);
     }
 }
 
@@ -138,13 +137,12 @@ void NetworkClientSystem::Update(Coordinator &coordinator)
 {
     std::vector<unsigned char> data(1024);
     udp::endpoint receiveEndpoint;
-    boost::system::error_code error;
-    size_t length = _socket.receive_from(boost::asio::buffer(data), receiveEndpoint, 0, error);
 
-    if (error && error != boost::asio::error::message_size) {
-        //std::cerr << "Error in receiving response: " << error.message() << std::endl;
-    } else {
+    try {
+        size_t length = _socket.receive_from(asio::buffer(data), receiveEndpoint, 0);
         std::vector<int> res = decode(data, length);
         handleCmd(res);
+    } catch (const std::system_error& e) {
+
     }
 }

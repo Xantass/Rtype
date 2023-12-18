@@ -5,6 +5,7 @@
 ** ClientMain
 */
 
+#include <memory>
 #include "ClientMain.hpp"
 #include "Coordinator.hpp"
 #include "components/Position.hpp"
