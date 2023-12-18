@@ -156,7 +156,6 @@ void NetworkServerSystem::ping()
             _clients.end(),
             [](Client& client) {
                 if (!client.getAlive()) {
-                    std::cout << "DELETE CLIENT ID: " << client.getID() << std::endl;
                     return true; // Supprime les clients dont getAlive() retourne false
                 } else {
                     client.setAlive(false);
@@ -174,14 +173,11 @@ void NetworkServerSystem::ping()
 
 void NetworkServerSystem::pong(std::vector<int>& data, udp::endpoint& clientEndpoint)
 {
-    std::cout << "RECEIVE PONG" << std::endl;
-    std::cout << "CLIENT ID ALIVE: " << data.at(0) << std::endl;
     int index = getClient(data.at(0));
 
     if (index == -1) {
         return;
     }
-    std::cout << "CLIENT ID ALIVE: " << data.at(0) << std::endl;
     std::vector<unsigned char> buffer = encode(_PASS);
     _socket.send_to(asio::buffer(buffer), _clients.at(index).getClientEndpoint());
     _clients.at(index).setAlive(true);

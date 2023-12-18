@@ -10,7 +10,7 @@
 void NetworkClientSystem::Init()
 {
     udp::resolver resolver(_service);
-    _serverEndpoint = *resolver.resolve(udp::v4(), "10.68.252.3", "4242").begin();
+    _serverEndpoint = *resolver.resolve(udp::v4(), "172.20.10.4", "4242").begin();
     std::vector<int> tmp = mergeVectors(_CONNECT, stringToVector("THEO"));
     std::vector<unsigned char> buffer = encode(tmp);
     _socket.send_to(asio::buffer(buffer), _serverEndpoint);
@@ -64,7 +64,6 @@ std::vector<int> NetworkClientSystem::stringToVector(const std::string& str) {
 
 void NetworkClientSystem::ping(std::vector<int>& data)
 {
-    std::cout << "SEND PONG" << std::endl;
     std::vector<int> tmp = {_id};
     std::vector<unsigned char> buffer = encode(mergeVectors(_PONG, tmp));
     _socket.send_to(asio::buffer(buffer), _serverEndpoint);  
@@ -72,7 +71,6 @@ void NetworkClientSystem::ping(std::vector<int>& data)
 
 void NetworkClientSystem::handleCmd(std::vector<int> data)
 {
-    std::cout << "HERE" << std::endl;
     int index = data.at(0);
 
     for (auto i : data)
