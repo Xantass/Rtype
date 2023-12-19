@@ -1,0 +1,227 @@
+Table of Contents
+
+    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .
+    2.  Basic structures  . . . . . . . . . . . . . . . . . . . . . .
+      2.1.  Packet header . . . . . . . . . . . . . . . . . . . . . .
+    3.  Protocol packets definition . . . . . . . . . . . . . . . . .
+      3.1.  Response packet . . . . . . . . . . . . . . . . . . . . .
+      3.2.  Connect packet  . . . . . . . . . . . . . . . . . . . . .
+      3.3. 	Parameters packet   . . . . . . . . . . . . . . . . . . .
+      3.4.  Action packet   . . . . . . . . . . . . . . . . . . . . .
+      3.5.  Position packet . . . . . . . . . . . . . . . . . . . . .
+      3.6.  Ping packet   . . . . . . . . . . . . . . . . . . . . . .
+      3.7.  Pong packet   . . . . . . . . . . . . . . . . . . . . . .
+      3.8.  Disconnect packet . . . . . . . . . . . . . . . . . . . .
+ 
+1.  Introduction
+
+    This document describe the network protocol used in the ECS.
+
+    This protocol version is 1.
+
+
+2.  Basic structures
+
+    This section will define some basic structures used by the network
+    protocol.
+
+    All size are in octet.
+
+    uintX_t is a unsigned integer of X bit
+
+2.1.  Packet header
+
+    This structure is present before any packet described in this
+    protocol.
+
+    Each packet MUST be assigned to an opcode, as defined in each packet
+    description sections.
+
+    The maximum size of the data MUST be "2^16-1"
+
+    +--------+----------+--------------+
+    | Name   | type     | Description  |
+    +--------+----------+--------------+
+    | opcode | uint8_t  | Opcode       |
+    | size   | uint16_t | Size of data |
+    +--------+----------+--------------+
+
+      Table 3: Packet header structure
+
+    * opcode : It's identify what is the packet type
+
+    * size : It's the number of argument after header.
+
+3.  Protocol packets definition
+
+3.1.  Response packet
+
+    The "Response" packet is used in response of any packet, containing the
+    result of the operations.
+
+    +--------+-------+
+    | Name   | Value |
+    +--------+-------+
+    | opcode | 0     |
+    | size   | 1     |
+    +--------+-------+
+
+      Table 4: Result packet header structure
+
+    +-------+---------+--------------+
+    | Name  | type    | Description  |
+    +-------+---------+--------------+
+    | error | uint8_t | Error code   |
+    +-------+---------+--------------+
+
+      Table 5: Result packet data structure
+
+    +------------+---------------------------------------+
+    | Error code | Description                           |
+    +------------+---------------------------------------+
+    | 0          | No error                              |
+    | 1          | Ignored                               |
+    | 2          | Unknown error                         |
+    | 3          | Client already started                |
+    | 4          | Client already stopped                |
+    | 5          | Connect fail                          |
+    | 6          | Start fail                            |
+    +------------+---------------------------------------+
+  
+      Table 6: error code definition
+
+3.2.  Connect packet
+
+    The "Connect" packet is used by a client to connect to a server.
+
+    If the server has enough information to identify the client, he accept
+    the connection.
+
+    +--------+-------+
+    | Name   | Value |
+    +--------+-------+
+    | opcode | 1     |
+    | size   | 1     |
+    +--------+-------+
+
+      Table 7: Connect packet header structure
+
+3.3.  Parameters packet
+
+    The "Parameters" packet is used to send the parameters of the client
+    game.
+
+    Each client must send it to begin a game.
+
+    +--------+-------+
+    | Name   | Value |
+    +--------+-------+
+    | Opcode | 2     |
+    | size   | 2     |
+    +--------+-------+
+
+      Table 8: Parameters packet header structure
+
+    +------------+------------+----------------------------------+
+    | Name       | Data type  | Description                      |
+    +------------+------------+----------------------------------+
+    | difficulty | uint8_t    | the difficulty of the game       |
+    | nbPlayer   | uint8_t    | the number of player in game     |
+    +------------+------------+----------------------------------+
+
+      Table 9: the parameters packet data structure
+
+3.4.  Action packet
+
+    The "Action" packet is used to send the action of the client
+
+    Each client must send each time an action is done.
+
+    +--------+-------+
+    | Name   | Value |
+    +--------+-------+
+    | Opcode | 3     |
+    | size   | 2     |
+    +--------+-------+
+
+      Table 10: Action packet header structure
+
+    +--------+------------+------------------------+
+    |  Name  | Data type  | Description            |
+    +--------+------------+------------------------+
+    | action |  uint8_t   | the action of the game |
+    | nbGame |  uint8_t   | the number of the game |
+    +--------+------------+------------------------+
+
+      Table 11: the action packet data structure
+
+3.5.  Position packet
+
+    The "Position" packet is used to send the position of each sprite which has moved.
+
+    Each position is composed of the name of the sprite, its position and its size.
+
+    +--------+-------+
+    | Name   | Value |
+    +--------+-------+
+    | Opcode | 4     |
+    | size   | 12    |
+    +--------+-------+
+
+      Table 12: Position packet header structure
+
+    +--------+------------+------------------------------+
+    | Name   | Data type  | Description                  |
+    +--------+------------+------------------------------+
+    | pos_x  | uint16_t   | the x position of the sprite |
+    | pos_y  | uint16_t   | the y position of the sprite |
+    | size_x | uint16_t   | the x size of the sprite     |
+    | size_y | uint16_t   | the y size of the sprite     |
+    | sprite | string     | the sprite                   |
+    +--------+------------+------------------------------+
+
+      Table 13: the Positon packet data structure
+
+3.6.  Ping packet
+
+    When a "Ping" packet is sent, a "Pong" packet MUST be sent back to
+    the sender.
+
+    This packet is used to check if the other end of the connection is
+    able to process packets or not.
+
+    +--------+-------+
+    | Name   | Value |
+    +--------+-------+
+    | Opcode | 5     |
+    | size   | 0     |
+    +--------+-------+
+
+      Table 14: Ping packet header structure
+
+3.7.  Pong packet
+
+    +--------+-------+
+    | Name   | Value |
+    +--------+-------+
+    | Opcode | 6     |
+    | size   | 0     |
+    | id     | ?     |
+    +--------+-------+
+
+      Table 15: Pong packet header structure
+
+3.8.  Disconnect packet
+
+    The "Disconnect" packet is used by a client to disconnect to a server.
+
+    This packet must be send if a client want to disconnect from server.
+
+    +--------+-------+
+    | Name   | Value |
+    +--------+-------+
+    | opcode | 7     |
+    | size   | 0     |
+    +--------+-------+
+
+      Table 16: Disconnect packet header structure
