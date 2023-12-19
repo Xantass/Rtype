@@ -20,8 +20,8 @@
  * 
  */
 struct Position {
-    float x; ///< X position
-    float y; ///< Y position
+    float _x; ///< X position
+    float _y; ///< Y position
 };
 
 #endif /* !POSITION_HPP_ */

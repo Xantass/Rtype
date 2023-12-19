@@ -20,19 +20,19 @@ void PhysicSystem::Update(Coordinator &coordinator) {
             auto& pos2 = coordinator.GetComponent<Position>(entity2);
             auto& hitbox2 = coordinator.GetComponent<Hitbox>(entity2);
 
-            if (pos.x + hitbox.x + hitbox.width >= pos2.x + hitbox2.x &&
-                pos.x + hitbox.x <= pos2.x + hitbox2.x + hitbox2.width &&
-                pos.y + hitbox.y + hitbox.height >= pos2.y + hitbox2.y &&
-                pos.y + hitbox.y <= pos2.y + hitbox2.y + hitbox2.height &&
+            if (pos._x + hitbox._x + hitbox.width >= pos2._x + hitbox2._x &&
+                pos._x + hitbox._x <= pos2._x + hitbox2._x + hitbox2.width &&
+                pos._y + hitbox._y + hitbox.height >= pos2._y + hitbox2._y &&
+                pos._y + hitbox._y <= pos2._y + hitbox2._y + hitbox2.height &&
                 hitbox.type == PLAYER && hitbox2.type == PLAYER) {
                 std::cout << "Collision with " << entity2 << " detected, idling velocity of entity " << entity << std::endl; // TEST - TO BE REMOVED
-                vel.x = 0;
-                vel.y = 0;
+                vel._x = 0;
+                vel._y = 0;
             }
-            if (pos.x + hitbox.x + hitbox.width >= pos2.x + hitbox2.x &&
-                pos.x + hitbox.x <= pos2.x + hitbox2.x + hitbox2.width &&
-                pos.y + hitbox.y + hitbox.height >= pos2.y + hitbox2.y &&
-                pos.y + hitbox.y <= pos2.y + hitbox2.y + hitbox2.height &&
+            if (pos._x + hitbox._x + hitbox.width >= pos2._x + hitbox2._x &&
+                pos._x + hitbox._x <= pos2._x + hitbox2._x + hitbox2.width &&
+                pos._y + hitbox._y + hitbox.height >= pos2._y + hitbox2._y &&
+                pos._y + hitbox._y <= pos2._y + hitbox2._y + hitbox2.height &&
                 hitbox.type == PLAYER && hitbox2.type == ENNEMY) {
                 std::cout << "Collision with " << entity2 << " detected, destroying entity " << entity << std::endl; // TEST - TO BE REMOVED
                 coordinator.DestroyEntity(entity);
@@ -40,9 +40,9 @@ void PhysicSystem::Update(Coordinator &coordinator) {
             }
         }
 
-        pos.x += vel.x;
-        pos.y += vel.y;
+        pos._x += vel._x;
+        pos._y += vel._y;
 
-        std::cout << "Entity "<< entity << " position : " << pos.x << " " << pos.y << std::endl; // TEST - TO BE REMOVED
+        std::cout << "Entity "<< entity << " position : " << pos._x << " " << pos._y << std::endl; // TEST - TO BE REMOVED
     }
 }
