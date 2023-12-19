@@ -16,6 +16,7 @@
 
 #include <array>
 #include <unordered_map>
+#include <cstddef>
 
 #include "Entity.hpp"
 #include "components/Position.hpp"

@@ -63,7 +63,7 @@ class EntityManager {
 	 * @brief Queue of available entities
 	 * 
 	 */
-	std::queue<Entity> _availableEntities{};
+	std::vector<Entity> _availableEntities{};
 	/**
 	 * @brief Number of living entities
 	 * 

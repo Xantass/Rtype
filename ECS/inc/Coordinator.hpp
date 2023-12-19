@@ -15,10 +15,11 @@
 #define COORDINATOR_HPP_
 
 #include <memory>
-
+#include <queue>
 #include "ComponentManager.hpp"
 #include "EntityManager.hpp"
 #include "SystemManager.hpp"
+#include "Event.hpp"
 
 /**
  * @class Coordinator
