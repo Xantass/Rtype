@@ -18,6 +18,7 @@
 #include "Coordinator.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
+#include "components/Hitbox.hpp"
 #include "EnumProtocol.hpp"
 
 using namespace asio;
@@ -31,8 +32,9 @@ class NetworkClientSystem : public System {
 public:
     /**
      * @brief Initializes the NetworkClientSystem.
+     * @param coordinator The Coordinator reference.
      */
-    void Init();
+    void Init(Coordinator &coordinator);
 
     /**
      * @brief Finds a valid port to use.
@@ -73,15 +75,28 @@ public:
 
     /**
      * @brief Handles the received command data.
-     * @param data The vector of integers representing the command data.
+     * @param decodedIntegers The vector of integers representing the command data.
      */
-    void handleCmd(std::vector<int> data);
+    void handleCmd(std::vector<int>& decodedIntegers);
 
     /**
      * @brief Sends a ping request.
-     * @param data The vector of integers for ping request data.
+     * @param decodedIntegers The vector of integers for ping request data.
      */
-    void ping(std::vector<int>& data);
+    void ping(std::vector<int>& decodedIntegers);
+
+    /**
+     * @brief Sends position data.
+     * @param decodedIntegers The vector of integers for position data.
+     */
+    void pos(std::vector<int>& decodedIntegers);
+
+    /**
+     * @brief Creates entities based on decoded data.
+     * @param decodedIntegers The vector of integers representing entity data.
+     * @param coordinator The Coordinator reference.
+     */
+    void createEntities(std::vector<int> decodedIntegers, Coordinator &coordinator);
 
     /**
      * @brief Updates the NetworkClientSystem.

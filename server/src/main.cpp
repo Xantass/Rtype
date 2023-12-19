@@ -10,6 +10,7 @@
 #include "Coordinator.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
+#include "components/Hitbox.hpp"
 #include "systems/PhysicSystem.hpp"
 #include "systems/NetworkServerSystem.hpp"
 #include "Signature.hpp"
@@ -17,16 +18,6 @@
 
 int main(int argc, char **argv)
 {
-    // Server server(12346);
-
-    // if (!server.start()) {
-    //     return -1;
-    // }
-
-    // server.loop();
-
-    // server.closeSockets();
-
     Coordinator coordinator;
 
     coordinator.Init();
@@ -51,16 +42,14 @@ int main(int argc, char **argv)
     coordinator.AddComponent<Velocity>(entity, {0, 0});
     coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
 
-    // physicSystem->Update(coordinator);
-
-
+    physicSystem->Update(coordinator);
 
     Entity entity2 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(entity2, {0, 0});
     coordinator.AddComponent<Velocity>(entity2, {1, 0});
     coordinator.AddComponent<Hitbox>(entity2, {0, 0, 1, 1, ENNEMY});
 
-    // physicSystem->Update(coordinator);
+    physicSystem->Update(coordinator);
 
     networkServerSystem->Init();
     while (1) {

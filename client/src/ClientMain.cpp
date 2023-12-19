@@ -22,6 +22,7 @@ int main()
 
     coordinator.RegisterComponent<Position>();
     coordinator.RegisterComponent<Velocity>();
+    coordinator.RegisterComponent<Hitbox>();
 
     auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
     auto networkClientSystem = coordinator.RegisterSystem<NetworkClientSystem>();
@@ -30,22 +31,11 @@ int main()
 
     signature.set(coordinator.GetComponentType<Position>());
     signature.set(coordinator.GetComponentType<Velocity>());
+    signature.set(coordinator.GetComponentType<Hitbox>());
     coordinator.SetSystemSignature<PhysicSystem>(signature);
     coordinator.SetSystemSignature<NetworkClientSystem>(signature);
 
-    Entity entity = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity, {1, 1});
-    coordinator.AddComponent<Velocity>(entity, {1, 2});
-
-    // physicSystem->Update(coordinator);
-
-    Entity entity2 = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity2, {1, 1});
-    coordinator.AddComponent<Velocity>(entity2, {1, 2});
-
-    // physicSystem->Update(coordinator);
-
-    networkClientSystem->Init();
+    networkClientSystem->Init(coordinator);
     while (1) {
         networkClientSystem->Update(coordinator);
     }

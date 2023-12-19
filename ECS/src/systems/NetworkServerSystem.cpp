@@ -6,17 +6,20 @@
 */
 
 #include "NetworkServerSystem.hpp"
+#include "components/Position.hpp"
+#include "components/Velocity.hpp"
+#include "components/Hitbox.hpp"
 
 void NetworkServerSystem::Init()
 {
     _socket.non_blocking(true);
-    _functions[0] = std::bind(&NetworkServerSystem::response, this, std::placeholders::_1, std::placeholders::_2);
-    _functions[1] = std::bind(&NetworkServerSystem::connect, this, std::placeholders::_1, std::placeholders::_2);
+    _functions[0] = std::bind(&NetworkServerSystem::response, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    _functions[1] = std::bind(&NetworkServerSystem::connect, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[2] = nullptr;
     _functions[3] = nullptr;
     _functions[4] = nullptr;
     _functions[5] = nullptr;
-    _functions[6] = std::bind(&NetworkServerSystem::pong, this, std::placeholders::_1, std::placeholders::_2);
+    _functions[6] = std::bind(&NetworkServerSystem::pong, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[7] = nullptr;
     _startTime = std::chrono::steady_clock::now();
 }
@@ -122,14 +125,14 @@ std::vector<int> NetworkServerSystem::decode(const std::vector<unsigned char>& e
     return decodedValues;
 }
 
-void NetworkServerSystem::response(std::vector<int>& data, udp::endpoint& clientEndpoint)
+void NetworkServerSystem::response(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
 {
     return;
 }
 
-void NetworkServerSystem::connect(std::vector<int>& data, udp::endpoint& clientEndpoint)
+void NetworkServerSystem::connect(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
 {
-    std::string username = vectorToString(data);
+    std::string username = vectorToString(decodedIntegers);
 
     std::cout << "username: " << username << std::endl;
 
@@ -146,6 +149,7 @@ void NetworkServerSystem::connect(std::vector<int>& data, udp::endpoint& clientE
     std::vector<int> tmp = {_clients.at(_clients.size() - 1).getID()};
     std::vector<unsigned char> buffer = encode(tmp);
     _socket.send_to(asio::buffer(buffer), clientEndpoint);
+    sendEcs(coordinator);
 }
 
 void NetworkServerSystem::ping()
@@ -171,9 +175,9 @@ void NetworkServerSystem::ping()
     }
 }
 
-void NetworkServerSystem::pong(std::vector<int>& data, udp::endpoint& clientEndpoint)
+void NetworkServerSystem::pong(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
 {
-    int index = getClient(data.at(0));
+    int index = getClient(decodedIntegers.at(0));
 
     if (index == -1) {
         return;
@@ -183,13 +187,13 @@ void NetworkServerSystem::pong(std::vector<int>& data, udp::endpoint& clientEndp
     _clients.at(index).setAlive(true);
 }
 
-void NetworkServerSystem::handleCmd(std::vector<int> data, udp::endpoint clientEndpoint)
+void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint, Coordinator &coordinator)
 {
-    int index = data.at(0);
+    int index = decodedIntegers.at(0);
 
     if (_functions[index] != nullptr) {
-        data.erase(data.begin(), data.begin() + 2);
-        _functions[index](data, clientEndpoint);
+        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
+        _functions[index](decodedIntegers, clientEndpoint, coordinator);
     }
     else {
         std::vector<unsigned char> buffer = encode(_UNKNOW);
@@ -197,21 +201,38 @@ void NetworkServerSystem::handleCmd(std::vector<int> data, udp::endpoint clientE
     }
 }
 
-void NetworkServerSystem::processReceiveData(const std::vector<unsigned char>& data, udp::endpoint clientEndpoint, std::size_t bytesReceived)
+void NetworkServerSystem::processReceiveData(const std::vector<unsigned char>& data, udp::endpoint clientEndpoint, std::size_t bytesReceived, Coordinator &coordinator)
 {
     if (clientEndpoint != asio::ip::udp::endpoint(asio::ip::make_address("0.0.0.0"), 0)) {
         std::vector<int> res = decode(data, bytesReceived);
-        for (auto i : res)
-            std::cout << i << std::endl;
-        handleCmd(res, clientEndpoint);
+
+        handleCmd(res, clientEndpoint, coordinator);
     } else {
         return;
     }
 }
 
+void NetworkServerSystem::sendEcs(Coordinator &coordinator)
+{
+    for (auto client : _clients) {
+        std::vector<int> res = {Cmd::POS};
+        for (auto entity : this->_entities) {
+            auto& pos = coordinator.GetComponent<Position>(entity);
+            auto& vel = coordinator.GetComponent<Velocity>(entity);
+            auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
+
+            std::vector<int> encode_ = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type};
+            for (auto i : encode_)
+                res.push_back(i);
+        }
+        std::vector<unsigned char> data = encode(res);
+        _socket.send_to(asio::buffer(data), client.getClientEndpoint());
+    }
+}
+
 void NetworkServerSystem::Update(Coordinator &coordinator)
 {
-    std::chrono::seconds interval(5);
+    std::chrono::seconds interval(10);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::duration elapsedTime = currentTime - _startTime;
     std::vector<unsigned char> data(1024);
@@ -219,13 +240,14 @@ void NetworkServerSystem::Update(Coordinator &coordinator)
 
     try {
         size_t length = _socket.receive_from(asio::buffer(data), clientEndpoint, 0);
-        processReceiveData(data, clientEndpoint, length);
+        processReceiveData(data, clientEndpoint, length, coordinator);
     } catch (const std::system_error& e) {
 
     }
     if (elapsedTime >= interval) {
         std::cout << "PING PACKET" << std::endl;
         ping();
+        sendEcs(coordinator);
         _startTime = currentTime;
     }
 }
