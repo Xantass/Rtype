@@ -1,20 +1,29 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.16.3)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include(FetchContent)
+
+FetchContent_Declare(
+  asiocmake
+  GIT_REPOSITORY "https://github.com/OlivierLDff/asio.cmake"
+  GIT_TAG        "main"
+)
+FetchContent_MakeAvailable(asiocmake)
+
 project(r-type_server)
 
-include_directories("./inc/")
-include_directories("../ECS/inc/")
+include_directories("./inc/" "./../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
 
 set(SOURCES
     src/Server.cpp
     src/main.cpp
     src/RoomManager.cpp
+    src/Client.cpp
 
     ../ECS/src/systems/PhysicSystem.cpp
-    ../ECS/src/systems/PhysicSystem.cpp
+    ../ECS/src/systems/NetworkServerSystem.cpp
     ../ECS/src/EntityManager.cpp
     ../ECS/src/ComponentArray.cpp
     ../ECS/src/ComponentManager.cpp
@@ -25,7 +34,7 @@ set(SOURCES
 add_executable(r-type_server ${SOURCES})
 
 if(WIN32)
-    target_link_libraries(r-type_server Ws2_32.lib)
+    target_link_libraries(r-type_server PRIVATE Ws2_32.lib asio)
 endif()
 
 if(MSVC)
@@ -33,11 +42,12 @@ if(MSVC)
 endif()
 
 if (APPLE AND UNIX)
-    SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++17")
+    SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++20")
+    target_link_libraries(r-type_server PRIVATE asio)
 endif()
 
 if(UNIX AND NOT APPLE)
-    target_compile_options(r-type_server PRIVATE -std=c++17 -Wall -Wextra -O3)
+    target_compile_options(r-type_server PRIVATE -std=c++2a -Wall -Wextra -O3)
     find_package(Threads REQUIRED)
-    target_link_libraries(r-type_server Threads::Threads)
+    target_link_libraries(r-type_server PRIVATE Threads::Threads asio)
 endif()
