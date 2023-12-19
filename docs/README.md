@@ -10,15 +10,20 @@ The project runs on Windows and Unix systems, using [CMake](https://cmake.org/).
 ## Usage
 The latest version from our game can be found in the [release section of the Github repository](https://github.com/EpitechPromo2026/B-FUN-500-PAR-5-1-glados-theo.fouque/releases).
 
-```
-Usage to be writen...
-```
-
 A local version can be compiled after cloning the repository or downloading the latest source code from the [release section of the Github repository](https://github.com/EpitechPromo2026/B-FUN-500-PAR-5-1-glados-theo.fouque/releases) and executing the following commands at the root of the repository :
 ```
 make
 ```
 
+### Client
+```
+./r-type_client
+```
+
+### Server
+```
+./r-type_server
+```
 ## Documentation
 ### In-code documentation
 Our in-code documentation can is written directly in our sources files and can be clearly formated with Doxygen by executing this command at the root of the repository once cloned :
