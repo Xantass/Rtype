@@ -70,7 +70,7 @@ jobs:
           sudo rm /etc/apt/trusted.gpg.d/kitware.gpg
           sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6AF7F09730B3F0A4
           sudo apt update
-          sudo apt install cmake -y
+          sudo apt install cmake libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev -y
 
       - name: "🔧 Install Windows dependencies"
         if: matrix.os == 'windows-latest'
