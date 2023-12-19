@@ -15,10 +15,11 @@
 #define COORDINATOR_HPP_
 
 #include <memory>
-
+#include <queue>
 #include "ComponentManager.hpp"
 #include "EntityManager.hpp"
 #include "SystemManager.hpp"
+#include "Event.hpp"
 
 /**
  * @class Coordinator
@@ -165,6 +166,26 @@ public:
 		this->_systemManager->SetSignature<T>(signature);
 	}
 
+	/**
+	 * @brief Add an event to the queue
+	 * 
+	 * @param event Event to add
+	 */
+	void AddEvent(Event event) {
+		this->_eventQueue.push(event);
+	}
+
+	/**
+	 * @brief Get the first event of the queue
+	 * 
+	 * @return Event First event of the queue
+	 */
+	Event GetEvent() {
+		Event event = this->_eventQueue.front();
+		this->_eventQueue.pop();
+		return event;
+	}
+
 private:
 
 	/**
@@ -184,6 +205,12 @@ private:
 	 * 
 	 */
 	std::unique_ptr<SystemManager> _systemManager;
+
+	/**
+	 * @brief Queue of events
+	 * 
+	 */
+	std::queue<Event> _eventQueue;
 };
 
 #endif /* !COORDINATOR_HPP_ */

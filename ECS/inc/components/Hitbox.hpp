@@ -31,8 +31,8 @@ enum HitboxType {
  *
  */
 struct Hitbox {
-    float x; ///< X difference with the entity position
-    float y; ///< Y difference with the entity position
+    float _x; ///< X difference with the entity position
+    float _y; ///< Y difference with the entity position
     float width; ///< Width of the hitbox
     float height; ///< Height of the hitbox
     HitboxType type; ///< Type of the hitbox
