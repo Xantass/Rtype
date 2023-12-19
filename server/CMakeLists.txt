@@ -42,11 +42,12 @@ if(MSVC)
 endif()
 
 if (APPLE AND UNIX)
+    SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++20")
     target_link_libraries(r-type_server PRIVATE asio)
 endif()
 
 if(UNIX AND NOT APPLE)
-    target_compile_options(r-type_server PRIVATE -std=c++20 -Wall -Wextra -O3)
+    target_compile_options(r-type_server PRIVATE -std=c++2a -Wall -Wextra -O3)
     find_package(Threads REQUIRED)
     target_link_libraries(r-type_server PRIVATE Threads::Threads asio)
 endif()
