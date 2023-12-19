@@ -16,7 +16,6 @@
 
 #include <memory>
 #include <queue>
-
 #include "ComponentManager.hpp"
 #include "EntityManager.hpp"
 #include "SystemManager.hpp"
