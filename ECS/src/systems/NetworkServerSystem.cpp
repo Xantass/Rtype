@@ -221,7 +221,6 @@ void NetworkServerSystem::sendEcs(Coordinator &coordinator)
             auto& vel = coordinator.GetComponent<Velocity>(entity);
             auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
 
-            pos.x++;
             std::vector<int> encode_ = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type};
             for (auto i : encode_)
                 res.push_back(i);
