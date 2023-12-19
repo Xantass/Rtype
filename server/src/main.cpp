@@ -10,22 +10,13 @@
 #include "Coordinator.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
+#include "components/Hitbox.hpp"
 #include "systems/PhysicSystem.hpp"
 #include "systems/NetworkServerSystem.hpp"
 #include "Signature.hpp"
 
 int main(int argc, char **argv)
 {
-    // Server server(12346);
-
-    // if (!server.start()) {
-    //     return -1;
-    // }
-
-    // server.loop();
-
-    // server.closeSockets();
-
     Coordinator coordinator;
 
     coordinator.Init();
