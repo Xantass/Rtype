@@ -78,6 +78,18 @@ void Coordinator::SetSystemSignature(Signature signature)
 	this->_systemManager->SetSignature<T>(signature);
 }
 
+void Coordinator::AddEvent(Event event)
+{
+	this->_eventQueue.push(event);
+}
+
+Event Coordinator::GetEvent()
+{
+	Event event = this->_eventQueue.front();
+	this->_eventQueue.pop();
+	return event;
+}
+
 //this is here to prevent the compiler being mad about templates.
 //Components
 template void Coordinator::RegisterComponent<Position>();

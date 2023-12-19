@@ -36,6 +36,13 @@ class EntityManager {
 		 */
 		Entity CreateEntity();
 		/**
+		 * @brief Create a Entity object with a specific id
+		 * 
+		 * @param id Id of the entity
+		 * @return Entity 
+		 */
+		Entity CreateEntity(int id);
+		/**
 		 * @brief Destroy an entity
 		 * 
 		 * @param entity Entity to be destroyed

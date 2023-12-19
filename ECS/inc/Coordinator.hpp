@@ -119,6 +119,21 @@ class Coordinator {
 		 */
 		template<typename T>
 		void SetSystemSignature(Signature signature);
+		
+		/* ----------------------------- Events methods ----------------------------- */
+	
+		/**
+	 	 * @brief Add an event to the queue
+	 	 * 
+	 	 * @param event Event to add
+	 	 */
+		void AddEvent(Event event);
+		/**
+		 * @brief Get the first event of the queue
+		 * 
+		 * @return Event First event of the queue
+		 */
+		Event GetEvent();
 	private:
 		/**
 		 * @brief Pointer to the component manager
@@ -135,6 +150,11 @@ class Coordinator {
 		 * 
 		 */
 		std::unique_ptr<SystemManager> _systemManager;
+		/**
+		 * @brief Queue of events
+		 * 
+		 */
+		std::queue<Event> _eventQueue;
 };
 
 #endif /* !COORDINATOR_HPP_ */
