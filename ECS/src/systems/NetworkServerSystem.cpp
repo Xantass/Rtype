@@ -214,10 +214,11 @@ void NetworkServerSystem::sendEcs(Coordinator &coordinator)
     for (auto client : _clients) {
         std::vector<int> res = {Cmd::POS};
         for (auto entity : this->_entities) {
-            Position& pos = coordinator.GetComponent<Position>(entity);
-            Velocity& vel = coordinator.GetComponent<Velocity>(entity);
-            Hitbox& hitbox = coordinator.GetComponent<Hitbox>(entity);
+            auto& pos = coordinator.GetComponent<Position>(entity);
+            auto& vel = coordinator.GetComponent<Velocity>(entity);
+            auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
 
+            pos.x++;
             std::vector<int> encode_ = {static_cast<int>(entity), static_cast<int>(pos.x * 10), static_cast<int>(pos.y * 10), static_cast<int>(vel.x * 10), static_cast<int>(vel.y * 10), static_cast<int>(hitbox.x * 10), static_cast<int>(hitbox.y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type};
             for (auto i : encode_)
                 res.push_back(i);
