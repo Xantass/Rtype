@@ -14,6 +14,6 @@ void GraphicalSystem::Update(Coordinator &coordinator)
         auto& pos = coordinator.GetComponent<Position>(entity);
         auto& sprite = coordinator.GetComponent<Sprite>(entity);
 
-        DrawTexture(sprite.texture, pos.x, pos.y, RAYWHITE);
+        DrawTexture(sprite.texture, pos._x, pos._y, RAYWHITE);
     }
 }

@@ -42,6 +42,7 @@ add_executable(r-type_client
     ../ECS/src/systems/GraphicalSystem.cpp
     ../ECS/src/systems/ParallaxSystem.cpp
     ../ECS/src/systems/NetworkClientSystem.cpp
+    ../ECS/src/systems/MovableSystem.cpp
     ../ECS/src/EntityManager.cpp
     ../ECS/src/ComponentArray.cpp
     ../ECS/src/ComponentManager.cpp

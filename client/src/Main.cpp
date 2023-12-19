@@ -14,6 +14,7 @@
 #include "systems/PhysicSystem.hpp"
 #include "systems/GraphicalSystem.hpp"
 #include "systems/ParallaxSystem.hpp"
+#include "systems/MovableSystem.hpp"
 #include "Signature.hpp"
 
 int main(int ac, char **av)
@@ -28,10 +29,12 @@ int main(int ac, char **av)
     coordinator.RegisterComponent<Velocity>();
     coordinator.RegisterComponent<Sprite>();
     coordinator.RegisterComponent<Hitbox>();
+    coordinator.RegisterComponent<Movable>();
 
     auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
     auto graphicSystem = coordinator.RegisterSystem<GraphicalSystem>();
     auto parallaxSystem = coordinator.RegisterSystem<ParallaxSystem>();
+    auto movableSystem = coordinator.RegisterSystem<MovableSystem>();
 
     Signature signature;
 
@@ -52,6 +55,12 @@ int main(int ac, char **av)
     signature3.set(coordinator.GetComponentType<Velocity>());
     signature3.set(coordinator.GetComponentType<Hitbox>());
     coordinator.SetSystemSignature<PhysicSystem>(signature3);
+
+    Signature signature4;
+
+    signature4.set(coordinator.GetComponentType<Movable>());
+    signature4.set(coordinator.GetComponentType<Velocity>());
+    coordinator.SetSystemSignature<MovableSystem>(signature4);
 
 
     Entity entity2 = coordinator.CreateEntity();
@@ -82,10 +91,13 @@ int main(int ac, char **av)
     coordinator.AddComponent<Position>(entity, {400, 400});
     coordinator.AddComponent<Velocity>(entity, {0, 0});
     coordinator.AddComponent<Hitbox>(entity, {0, 0, 0, 0, OTHER});
+    coordinator.AddComponent<Movable>(entity, {NONE});
     coordinator.AddComponent<Sprite>(entity, {LoadTexture("assets/planet.png")});
+
     while (!client.shouldCloseWindow()) {
         BeginDrawing();
         ClearBackground(BLACK);
+        movableSystem->Update(coordinator);
         physicSystem->Update(coordinator);
         parallaxSystem->Update(coordinator);
         graphicSystem->Update(coordinator);

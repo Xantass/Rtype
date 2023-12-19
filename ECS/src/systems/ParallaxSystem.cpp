@@ -14,7 +14,7 @@ void ParallaxSystem::Update(Coordinator &coordinator)
         auto& pos = coordinator.GetComponent<Position>(entity);
         auto& sprite = coordinator.GetComponent<Sprite>(entity);
 
-        if (pos.x + sprite.texture.width < 0)
-            pos.x = 1920;
+        if (pos._x + sprite.texture.width < 0)
+            pos._x = 1920;
     }
 }
