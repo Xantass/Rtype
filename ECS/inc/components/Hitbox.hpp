@@ -20,8 +20,9 @@
  *
  */
 enum HitboxType {
-    ENNEMY = 0,
-    PLAYER = 1
+    ENNEMY,
+    PLAYER,
+    OTHER
 };
 
 /**

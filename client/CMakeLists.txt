@@ -14,14 +14,35 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(asiocmake)
 
+
+# Adding Raylib
+set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # don't build the supplied examples
+set(BUILD_GAMES    OFF CACHE BOOL "" FORCE) # don't build the supplied example games
+
+FetchContent_Declare(
+    raylib
+    GIT_REPOSITORY "https://github.com/raysan5/raylib.git"
+    GIT_TAG "master"
+    GIT_PROGRESS TRUE
+)
+
+FetchContent_MakeAvailable(raylib)
+
 include_directories("./inc/" "../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
+# # Include raylib
+# find_package(raylib CONFIG REQUIRED PATHS ${raylib_DIR}/lib64/cmake/raylib/)
 
+
+# Your project source files
 add_executable(r-type_client
-    src/ClientMain.cpp
+    src/Main.cpp
 
-    
+
     ../ECS/src/systems/PhysicSystem.cpp
+    ../ECS/src/systems/GraphicalSystem.cpp
+    ../ECS/src/systems/ParallaxSystem.cpp
     ../ECS/src/systems/NetworkClientSystem.cpp
+    ../ECS/src/systems/MovableSystem.cpp
     ../ECS/src/EntityManager.cpp
     ../ECS/src/ComponentArray.cpp
     ../ECS/src/ComponentManager.cpp
@@ -29,4 +50,9 @@ add_executable(r-type_client
     ../ECS/src/Coordinator.cpp
     )
 
+target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 target_link_libraries(r-type_client PRIVATE asio)
+
+# Link your project with raylib
+# target_link_libraries(r-type_client PRIVATE ${raylib_LIBRARIES})
+# target_include_directories(r-type_client PRIVATE ${raylib_INCLUDE_DIRS})
