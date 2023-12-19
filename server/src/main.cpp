@@ -13,6 +13,7 @@
 #include "systems/PhysicSystem.hpp"
 #include "systems/NetworkServerSystem.hpp"
 #include "Signature.hpp"
+#include "Event.hpp"
 
 int main(int argc, char **argv)
 {
@@ -65,6 +66,12 @@ int main(int argc, char **argv)
     while (1) {
         networkServerSystem->Update(coordinator);
     }
+
+    coordinator.AddEvent(Event{Event::actions::MOVE, entity,std::any(Velocity{1, 0})});
+
+    auto events = coordinator.GetEvent();
+
+    std::cout << std::any_cast<Position>(events._data)._x << std::endl;
 
     return 0;
 }

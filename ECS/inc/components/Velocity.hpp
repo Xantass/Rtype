@@ -20,8 +20,8 @@
  * 
  */
 struct Velocity {
-    float x;
-    float y;
+    float _x;
+    float _y;
 };
 
 #endif /* !VELOCITY_HPP_ */
