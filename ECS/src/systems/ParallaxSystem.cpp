@@ -2,18 +2,19 @@
 ** EPITECH PROJECT, 2023
 ** B-CPP-500-PAR-5-2-rtype-jules.gresset
 ** File description:
-** GraphicalSystem
+** ParallaxSystem
 */
 
-#include "systems/GraphicalSystem.hpp"
+#include "systems/ParallaxSystem.hpp"
 
-void GraphicalSystem::Update(Coordinator &coordinator)
+void ParallaxSystem::Update(Coordinator &coordinator)
 {
-    std::cout << "GraphicalSystem update :" << std::endl;
+    std::cout << "ParallaxSystem update :" << std::endl;
     for (auto &entity : this->_entities) {
         auto& pos = coordinator.GetComponent<Position>(entity);
         auto& sprite = coordinator.GetComponent<Sprite>(entity);
 
-        DrawTexture(sprite.texture, pos.x, pos.y, RAYWHITE);
+        if (pos.x + sprite.texture.width < 0)
+            pos.x = 1920;
     }
 }

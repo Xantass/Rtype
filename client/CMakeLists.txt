@@ -33,11 +33,13 @@ include_directories("../ECS/inc/")
 
 # Your project source files
 add_executable(r-type_client
-    src/ClientMain.cpp
+    src/Main.cpp
+    # src/Client.cpp
 
 
     ../ECS/src/systems/PhysicSystem.cpp
     ../ECS/src/systems/GraphicalSystem.cpp
+    ../ECS/src/systems/ParallaxSystem.cpp
     ../ECS/src/EntityManager.cpp
     ../ECS/src/ComponentArray.cpp
     ../ECS/src/ComponentManager.cpp
