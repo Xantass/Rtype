@@ -55,6 +55,17 @@ public:
 	}
 
 	/**
+	 * @brief Create an entity with a specific id
+	 * @details This method creates an entity by calling the CreateEntity method of the EntityManager.
+	 * 
+	 * @param id Id of the entity
+	 * @return Entity Entity created
+	 */
+	Entity CreateEntity(int id) {
+		return this->_entityManager->CreateEntity(id);
+	}
+
+	/**
 	 * @brief Destroy an entity
 	 * @details This method destroys an entity by calling the DestroyEntity method of the EntityManager and the EntityDestroyed method of the ComponentManager and the SystemManager.
 	 * 
