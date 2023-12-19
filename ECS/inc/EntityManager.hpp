@@ -38,6 +38,14 @@ public:
 	Entity CreateEntity();
 
 	/**
+	 * @brief Create a Entity object with a specific id
+	 * 
+	 * @param id Id of the entity
+	 * @return Entity 
+	 */
+	Entity CreateEntity(int id);
+
+	/**
 	 * @brief Destroy an entity
 	 * 
 	 * @param entity Entity to be destroyed
@@ -69,7 +77,7 @@ private:
 	 * @brief Queue of available entities
 	 * 
 	 */
-	std::queue<Entity> _availableEntities{};
+	std::vector<Entity> _availableEntities{};
 
 	/**
 	 * @brief Number of living entities
