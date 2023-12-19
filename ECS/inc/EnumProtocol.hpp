@@ -55,6 +55,11 @@ enum Error {
     FAIL_START = 6 /**< Failed to start error. */
 };
 
+enum class DataType {
+    INTEGER,
+    FLOAT,
+};
+
 /** 
  * @brief Vector representing a CONNECT command.
  */

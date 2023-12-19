@@ -50,16 +50,14 @@ int main(int argc, char **argv)
     coordinator.AddComponent<Velocity>(entity, {0, 0});
     coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
 
-    // physicSystem->Update(coordinator);
-
-
+    physicSystem->Update(coordinator);
 
     Entity entity2 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(entity2, {0, 0});
     coordinator.AddComponent<Velocity>(entity2, {1, 0});
     coordinator.AddComponent<Hitbox>(entity2, {0, 0, 1, 1, ENNEMY});
 
-    // physicSystem->Update(coordinator);
+    physicSystem->Update(coordinator);
 
     networkServerSystem->Init();
     while (1) {
