@@ -21,6 +21,7 @@
 #include "Coordinator.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
+#include "components/Hitbox.hpp"
 #include "EnumProtocol.hpp"
 #include "Client.hpp"
 
@@ -73,7 +74,7 @@ public:
      * @param clientEndpoint The endpoint of the client.
      * @param bytesReceived The number of bytes received.
      */
-    void processReceiveData(const std::vector<unsigned char>& data, udp::endpoint clientEndpoint, std::size_t bytesReceived);
+    void processReceiveData(const std::vector<unsigned char>& data, udp::endpoint clientEndpoint, std::size_t bytesReceived, Coordinator &coordinator);
 
     /**
      * @brief Merges two vectors of integers into a single vector.
@@ -102,33 +103,39 @@ public:
      * @param data The vector of integers representing the command data.
      * @param clientEndpoint The endpoint of the client sending the command.
      */
-    void handleCmd(std::vector<int> data, udp::endpoint clientEndpoint);
+    void handleCmd(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint, Coordinator &coordinator);
 
     /**
      * @brief Sends a response to a client.
      * @param data The vector of integers for the response data.
      * @param clientEndpoint The endpoint of the client to respond to.
      */
-    void response(std::vector<int>& data, udp::endpoint& clientEndpoint);
+    void response(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     /**
      * @brief Establishes a connection with a client.
      * @param data The vector of integers representing connection data.
      * @param clientEndpoint The endpoint of the client attempting to connect.
      */
-    void connect(std::vector<int>& data, udp::endpoint& clientEndpoint);
+    void connect(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     /**
      * @brief Sends a pong response to a ping request.
      * @param data The vector of integers representing the pong response data.
      * @param clientEndpoint The endpoint of the client requesting pong.
      */
-    void pong(std::vector<int>& data, udp::endpoint& clientEndpoint);
+    void pong(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     /**
      * @brief Sends a ping request to all connected clients.
      */
     void ping();
+
+    /**
+     * @brief Send Ecs to all clients.
+     * @param coordinator The Coordinator reference.
+     */
+    void sendEcs(Coordinator &coordinator);
 
     /**
      * @brief Updates the NetworkServerSystem.
@@ -141,7 +148,7 @@ private:
     io_context _service; /**< The Boost ASIO io_service. */
     udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v4(), 4242)); /**< The UDP socket for communication. */
     std::vector<Client> _clients; /**< Vector storing information about connected clients. */
-    std::function<void(std::vector<int>&, udp::endpoint&)> _functions[8]; /**< Array of function pointers. */
+    std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[8]; /**< Array of function pointers. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
     int _id = 0; /**< The ID of the server. */
 };
