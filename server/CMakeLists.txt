@@ -42,7 +42,6 @@ if(MSVC)
 endif()
 
 if (APPLE AND UNIX)
-    SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++20")
     target_link_libraries(r-type_server PRIVATE asio)
 endif()
 
