@@ -9,7 +9,7 @@
 
 EntityManager::EntityManager() {
     for (Entity entity = 0; entity < MAX_ENTITIES; ++entity)
-        this->_availableEntities.push(entity);
+        this->_availableEntities.push_back(entity);
 }
 
 EntityManager::~EntityManager() {
@@ -21,7 +21,19 @@ Entity EntityManager::CreateEntity() {
     }
 
     Entity id = this->_availableEntities.front();
-    this->_availableEntities.pop();
+    this->_availableEntities.erase(this->_availableEntities.begin());
+    this->_livingEntityCount++;
+
+    return id;
+}
+
+Entity EntityManager::CreateEntity(int id) {
+    if (id >= MAX_ENTITIES) {
+        //ERROR : Entity out of range.
+    }
+
+    Entity entity = this->_availableEntities.at(id);
+    this->_availableEntities.erase(this->_availableEntities.begin() + id - 1);
     this->_livingEntityCount++;
 
     return id;
@@ -33,7 +45,7 @@ void EntityManager::DestroyEntity(Entity entity) {
     }
 
     this->_signatures[entity].reset();
-    this->_availableEntities.push(entity);
+    this->_availableEntities.insert(this->_availableEntities.begin(), entity);
     this->_livingEntityCount--;
 }
 
