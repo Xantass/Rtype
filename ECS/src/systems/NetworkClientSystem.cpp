@@ -23,6 +23,10 @@ void NetworkClientSystem::Init(Coordinator &coordinator)
     std::vector<int> decodedIntegers = decode(data, length);
     _id = decodedIntegers.at(0);
     std::cout << "id: " << _id << std::endl;
+    Entity entity = coordinator.CreateEntity(this->_id);
+    coordinator.AddComponent<Position>(entity, {1, 0});
+    coordinator.AddComponent<Velocity>(entity, {0, 0});
+    coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
     length = _socket.receive_from(asio::buffer(data), _serverEndpoint, 0);
     decodedIntegers = decode(data, length);
     createEntities(decodedIntegers, coordinator);

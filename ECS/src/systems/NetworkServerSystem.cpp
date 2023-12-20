@@ -143,8 +143,12 @@ void NetworkServerSystem::connect(std::vector<int>& decodedIntegers, udp::endpoi
             return;
         }
     }
-    _clients.push_back(Client(username, clientEndpoint, _id));
-    _id++;
+    Entity entity = coordinator.CreateEntity();
+    coordinator.AddComponent<Position>(entity, {1, 0});
+    coordinator.AddComponent<Velocity>(entity, {0, 0});
+    coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
+    _clients.push_back(Client(username, clientEndpoint, entity));
+    // _id++;
     std::cout << _clients.at(_clients.size() - 1).getClientEndpoint() << std::endl;
     std::vector<int> tmp = {_clients.at(_clients.size() - 1).getID()};
     std::vector<unsigned char> buffer = encode(tmp);
