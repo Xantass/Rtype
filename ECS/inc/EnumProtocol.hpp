@@ -35,10 +35,10 @@ enum Cmd {
  * @brief Enumerates different action types.
  */
 enum Action {
-    READY = 0, /**< Ready action. */
-    START = 1, /**< Start action. */
-    SHOOT = 2, /**< Shoot action. */
-    MOVE = 3 /**< Move action. */
+    READY = 8, /**< Ready action. */
+    START = 9, /**< Start action. */
+    SHOOT = 10, /**< Shoot action. */
+    MOVE = 11 /**< Move action. */
 };
 
 /**
@@ -94,5 +94,7 @@ static const std::vector<int> _OK = {Cmd::RESPONSE, 1, Error::OK};
  * @brief Vector representing a PASS response.
  */
 static const std::vector<int> _PASS = {Cmd::RESPONSE, 1, Error::PASS};
+
+static const std::vector<int> _MOVE = {Action::MOVE, 2};
 
 #endif /* !ENUMPROTOCOL_HPP_ */

@@ -21,6 +21,10 @@ void NetworkServerSystem::Init()
     _functions[5] = nullptr;
     _functions[6] = std::bind(&NetworkServerSystem::pong, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[7] = nullptr;
+    _functions[8] = nullptr;
+    _functions[9] = nullptr;
+    _functions[10] = nullptr;
+    _functions[11] = std::bind(&NetworkServerSystem::move, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _startTime = std::chrono::steady_clock::now();
 }
 
@@ -171,6 +175,7 @@ void NetworkServerSystem::ping()
     );
     for (auto client : _clients) {
         std::vector<unsigned char> buffer = encode(_PING);
+        std::cout << "SEND TO: " << client.getClientEndpoint() << std::endl;
         _socket.send_to(asio::buffer(buffer), client.getClientEndpoint());
     }
 }
@@ -187,10 +192,29 @@ void NetworkServerSystem::pong(std::vector<int>& decodedIntegers, udp::endpoint&
     _clients.at(index).setAlive(true);
 }
 
+void NetworkServerSystem::move(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
+{
+    std::cout << "MOVE CLIENT" << std::endl;
+    for (auto entity : this->_entities) {
+        if (entity == decodedIntegers.at(0)) {
+            auto& vel = coordinator.GetComponent<Velocity>(entity);
+
+            vel._x = decodedIntegers.at(1);
+            vel._y = decodedIntegers.at(2);
+            std::vector<unsigned char> buffer = encode(_PASS);
+            _socket.send_to(asio::buffer(buffer), clientEndpoint);
+            return;
+        }
+    }
+    std::vector<unsigned char> buffer = encode(_UNKNOW);
+    _socket.send_to(asio::buffer(buffer), clientEndpoint);
+}
+
 void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint, Coordinator &coordinator)
 {
     int index = decodedIntegers.at(0);
 
+    std::cout << "INDEX: " << index << std::endl;
     if (_functions[index] != nullptr) {
         decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
         _functions[index](decodedIntegers, clientEndpoint, coordinator);
@@ -232,7 +256,7 @@ void NetworkServerSystem::sendEcs(Coordinator &coordinator)
 
 void NetworkServerSystem::Update(Coordinator &coordinator)
 {
-    std::chrono::seconds interval(10);
+    std::chrono::seconds interval(1);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::duration elapsedTime = currentTime - _startTime;
     std::vector<unsigned char> data(1024);
@@ -247,7 +271,7 @@ void NetworkServerSystem::Update(Coordinator &coordinator)
     if (elapsedTime >= interval) {
         std::cout << "PING PACKET" << std::endl;
         ping();
-        sendEcs(coordinator);
         _startTime = currentTime;
+        sendEcs(coordinator);
     }
 }

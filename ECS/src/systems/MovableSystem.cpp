@@ -6,11 +6,10 @@
 */
 
 #include "systems/MovableSystem.hpp"
-#include "raylib.h"
 
 void MovableSystem::Update(Coordinator &coordinator)
 {
-    std::cout << "MovableSystem update :" << std::endl;
+    // std::cout << "MovableSystem update :" << std::endl;
     for (auto &entity : this->_entities) {
         auto& mov = coordinator.GetComponent<Movable>(entity);
         auto& vel = coordinator.GetComponent<Velocity>(entity);
