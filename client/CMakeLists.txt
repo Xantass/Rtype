@@ -50,8 +50,7 @@ add_executable(r-type_client
     ../ECS/src/Coordinator.cpp
     )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
-target_link_libraries(r-type_client PRIVATE asio)
+target_link_libraries(r-type_client PRIVATE raylib asio)
 
 # Link your project with raylib
 # target_link_libraries(r-type_client PRIVATE ${raylib_LIBRARIES})
