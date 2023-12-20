@@ -9,6 +9,12 @@
 #define CLIENT_HPP_
 
 #include <iostream>
+#if defined(_WIN32)         
+	#define CloseWindow RaylibCloseWindow
+    #define ShowCursor RaylibShowCursor
+    #undef CloseWindow
+    #undef ShowCursor           // All USER defines and routines
+#endif
 #include "raylib.h"
 
 /**
