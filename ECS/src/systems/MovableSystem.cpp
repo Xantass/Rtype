@@ -7,8 +7,8 @@
 
 #include "systems/MovableSystem.hpp"
 #if defined(_WIN32)           
-	#define NOGDI             // All GDI defines and routines
-	#define NOUSER            // All USER defines and routines
+	#define CloseWindow rl_CloseWindow            // All GDI defines and routines
+	#define CloseWindow rl_ShowCursor           // All USER defines and routines
 #endif
 
 #include "raylib.h" // or any library that uses Windows.h
