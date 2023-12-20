@@ -6,6 +6,9 @@
 */
 
 #include "NetworkClientSystem.hpp"
+#include "components/Sprite.hpp"
+#include "../components/Movable.hpp"
+#include "Graphic.hpp"
 
 #define CHECK_ZERO(x) x == 0 ? static_cast<float>(x) : static_cast<float>(x) / 10
 #define CHECK_TYPE(x) x == 0 ? PLAYER : ENNEMY
@@ -24,10 +27,6 @@ void NetworkClientSystem::Init(Coordinator &coordinator, std::string host, std::
     std::vector<int> decodedIntegers = decode(data, length);
     _id = decodedIntegers.at(0);
     std::cout << "id: " << _id << std::endl;
-    Entity entity = coordinator.CreateEntity(this->_id);
-    coordinator.AddComponent<Position>(entity, {1, 0});
-    coordinator.AddComponent<Velocity>(entity, {0, 0});
-    coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
     length = _socket.receive_from(asio::buffer(data), _serverEndpoint, 0);
     decodedIntegers = decode(data, length);
     createEntities(decodedIntegers, coordinator);
@@ -50,6 +49,10 @@ void NetworkClientSystem::createEntities(std::vector<int> decodedInteger, Coordi
     while (decodedInteger.empty() == false) {
         //ADD INT FOR ID ENTITY
         Entity entity = coordinator.CreateEntity(decodedInteger.at(0));
+        if (entity == _id) {
+            coordinator.AddComponent<Movable>(entity, {NONE});
+            coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
+        }
         coordinator.AddComponent<Position>(entity, {CHECK_ZERO(decodedInteger.at(1)), CHECK_ZERO(decodedInteger.at(2))});
         coordinator.AddComponent<Velocity>(entity, {CHECK_ZERO(decodedInteger.at(3)), CHECK_ZERO(decodedInteger.at(4))});
         coordinator.AddComponent<Hitbox>(entity, {CHECK_ZERO(decodedInteger.at(5)), CHECK_ZERO(decodedInteger.at(6)), CHECK_ZERO(decodedInteger.at(7)), CHECK_ZERO(decodedInteger.at(8)), CHECK_TYPE(decodedInteger.at(9))});

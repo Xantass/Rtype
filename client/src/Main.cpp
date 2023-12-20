@@ -94,26 +94,29 @@ int main(int ac, char **av)
     coordinator.AddComponent<Hitbox>(entity5, {0, 0, 0, 0, OTHER});
     coordinator.AddComponent<Sprite>(entity5, {Graphic::loadTexture("assets/parallax-space-stars.png")});
 
-    Entity entity = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity, {400, 400});
-    coordinator.AddComponent<Velocity>(entity, {0, 0});
-    coordinator.AddComponent<Hitbox>(entity, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Movable>(entity, {NONE});
-    coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
-
     std::string host = av[1];
     std::string port = av[2];
     networkClientSystem->Init(coordinator, host, port);
     Graphic::playMusic(music);
+    std::chrono::milliseconds interval(10);
+    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::duration elapsedTime;
+    physicSystem->Update(coordinator);
     while (!Graphic::shouldCloseWindow()) {
         Graphic::updateMusic(music);
         Graphic::beginDrawing();
         Graphic::clearBackground(RBLACK);
+        currentTime = std::chrono::steady_clock::now();
+        elapsedTime = currentTime - startTime; 
         movableSystem->Update(coordinator);
-        physicSystem->Update(coordinator);
         parallaxSystem->Update(coordinator);
         graphicSystem->Update(coordinator);
         networkClientSystem->Update(coordinator);
+        if (elapsedTime >= interval) {
+            physicSystem->Update(coordinator);
+            startTime = currentTime;
+        }
         Graphic::endDrawing();
     }
     Graphic::unloadMusic(music);

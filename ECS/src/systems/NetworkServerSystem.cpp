@@ -216,8 +216,6 @@ int NetworkServerSystem::checkMove(Position& pos, Velocity& vel, Hitbox& hitbox,
             (pos._y + vel._y) + hitbox._y + hitbox.height >= pos2._y + hitbox2._y &&
             (pos._y + vel._y) + hitbox._y <= pos2._y + hitbox2._y + hitbox2.height &&
             hitbox.type == PLAYER && hitbox2.type == ENNEMY) {
-            std::cout << "Collision with " << entity2 << " detected, destroying entity " << entity << std::endl; // TEST - TO BE REMOVED
-            coordinator.DestroyEntity(entity);
             return -1;
         }
     }
@@ -297,9 +295,6 @@ void NetworkServerSystem::sendEcs(Coordinator &coordinator)
 
 void NetworkServerSystem::Update(Coordinator &coordinator)
 {
-    std::chrono::seconds interval(2);
-    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
-    std::chrono::steady_clock::duration elapsedTime = currentTime - _startTime;
     std::vector<unsigned char> data(1024);
     udp::endpoint clientEndpoint;
 
@@ -309,10 +304,6 @@ void NetworkServerSystem::Update(Coordinator &coordinator)
     } catch (const std::system_error& e) {
 
     }
-    if (elapsedTime >= interval) {
-        std::cout << "PING PACKET" << std::endl;
-        ping();
-        _startTime = currentTime;
-        sendEcs(coordinator);
-    }
+    ping();
+    sendEcs(coordinator);
 }
