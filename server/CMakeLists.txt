@@ -12,6 +12,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(asiocmake)
 
+FetchContent_Declare(
+    raylib
+    GIT_REPOSITORY "https://github.com/raysan5/raylib.git"
+    GIT_TAG "master"
+    GIT_PROGRESS TRUE
+)
+
+FetchContent_MakeAvailable(raylib)
+
 project(r-type_server)
 
 include_directories("./inc/" "./../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
@@ -32,6 +41,9 @@ set(SOURCES
 )
 
 add_executable(r-type_server ${SOURCES})
+
+
+target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
 if(WIN32)
     target_link_libraries(r-type_server PRIVATE Ws2_32.lib asio)
