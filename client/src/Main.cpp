@@ -68,32 +68,32 @@ int main(int ac, char **av)
     coordinator.AddComponent<Position>(entity2, {1920, 0});
     coordinator.AddComponent<Velocity>(entity2, {-2, 0});
     coordinator.AddComponent<Hitbox>(entity2, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity2, {LoadTexture("assets/parallax-space-big-planet.png")});
+    coordinator.AddComponent<Sprite>(entity2, {Graphic::loadTexture("assets/parallax-space-big-planet.png")});
 
     Entity entity3 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(entity3, {1920, 0});
     coordinator.AddComponent<Velocity>(entity3, {-2.3, 0});
     coordinator.AddComponent<Hitbox>(entity3, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity3, {LoadTexture("assets/parallax-space-far-planets.png")});
+    coordinator.AddComponent<Sprite>(entity3, {Graphic::loadTexture("assets/parallax-space-far-planets.png")});
 
     Entity entity4 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(entity4, {1920, 0});
     coordinator.AddComponent<Velocity>(entity4, {-2.6, 0});
     coordinator.AddComponent<Hitbox>(entity4, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity4, {LoadTexture("assets/parallax-space-ring-planet.png")});
+    coordinator.AddComponent<Sprite>(entity4, {Graphic::loadTexture("assets/parallax-space-ring-planet.png")});
 
     Entity entity5 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(entity5, {1920, 0});
     coordinator.AddComponent<Velocity>(entity5, {-2.9, 0});
     coordinator.AddComponent<Hitbox>(entity5, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity5, {LoadTexture("assets/parallax-space-stars.png")});
+    coordinator.AddComponent<Sprite>(entity5, {Graphic::loadTexture("assets/parallax-space-stars.png")});
 
     Entity entity = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(entity, {400, 400});
     coordinator.AddComponent<Velocity>(entity, {0, 0});
     coordinator.AddComponent<Hitbox>(entity, {0, 0, 0, 0, OTHER});
     coordinator.AddComponent<Movable>(entity, {NONE});
-    coordinator.AddComponent<Sprite>(entity, {LoadTexture("assets/planet.png")});
+    coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/planet.png")});
 
     while (!Graphic::shouldCloseWindow()) {
         Graphic::beginDrawing();

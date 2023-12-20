@@ -50,6 +50,9 @@ class Graphic {
         static bool isKeyUp(int key) {
             return IsKeyUp(key);
         }
+        static Texture loadTexture(std::string path) {
+            return LoadTexture(path.c_str());
+        }
 };
 
 #endif /* !GRAPHIC_HPP_ */
