@@ -31,8 +31,8 @@ void NetworkClientSystem::Init(Coordinator &coordinator)
     _functions[1] = nullptr;
     _functions[2] = nullptr;
     _functions[3] = nullptr;
-    _functions[4] = std::bind(&NetworkClientSystem::pos, this, std::placeholders::_1);
-    _functions[5] = std::bind(&NetworkClientSystem::ping, this, std::placeholders::_1);
+    _functions[4] = std::bind(&NetworkClientSystem::pos, this, std::placeholders::_1, std::placeholders::_2);
+    _functions[5] = std::bind(&NetworkClientSystem::ping, this, std::placeholders::_1, std::placeholders::_2);
     _functions[6] = nullptr;
     _functions[7] = nullptr;
     _socket.non_blocking(true);
@@ -85,7 +85,7 @@ std::vector<int> NetworkClientSystem::stringToVector(const std::string& str) {
     return result;
 }
 
-void NetworkClientSystem::ping(std::vector<int>& decodedIntegers)
+void NetworkClientSystem::ping(std::vector<int>& decodedIntegers, Coordinator &coordinator)
 {
     std::cout << "PING" << std::endl;
     std::vector<int> tmp = {_id};
@@ -93,12 +93,34 @@ void NetworkClientSystem::ping(std::vector<int>& decodedIntegers)
     _socket.send_to(asio::buffer(buffer), _serverEndpoint);  
 }
 
-void NetworkClientSystem::pos(std::vector<int>& decodedIntegers)
+void NetworkClientSystem::pos(std::vector<int>& decodedIntegers, Coordinator &coordinator)
 {
-    
+    while (decodedIntegers.empty() == false) {
+        for (auto entity : this->_entities) {
+            if (entity == decodedIntegers.at(0)) {
+                auto& pos = coordinator.GetComponent<Position>(entity);
+                auto& vel = coordinator.GetComponent<Velocity>(entity);
+                auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
+
+                pos._x = CHECK_ZERO(decodedIntegers.at(1));
+                pos._y = CHECK_ZERO(decodedIntegers.at(2));
+                vel._x = CHECK_ZERO(decodedIntegers.at(3));
+                vel._y = CHECK_ZERO(decodedIntegers.at(4));
+                hitbox._x = CHECK_ZERO(decodedIntegers.at(5));
+                hitbox._y = CHECK_ZERO(decodedIntegers.at(6));
+                hitbox.width = CHECK_ZERO(decodedIntegers.at(7));
+                hitbox.height = CHECK_ZERO(decodedIntegers.at(8));
+                hitbox.type = CHECK_TYPE(decodedIntegers.at(9));
+                break;
+            }
+        }
+        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 10);
+    }
+    std::vector<unsigned char> buffer = encode(mergeVectors(_OK, {_id}));
+    _socket.send_to(asio::buffer(buffer), _serverEndpoint);
 }
 
-void NetworkClientSystem::handleCmd(std::vector<int>& decodedIntegers)
+void NetworkClientSystem::handleCmd(std::vector<int>& decodedIntegers, Coordinator &coordinator)
 {
     int index = decodedIntegers.at(0);
 
@@ -106,7 +128,7 @@ void NetworkClientSystem::handleCmd(std::vector<int>& decodedIntegers)
         std::cout << i << std::endl;
     if (_functions[index] != nullptr) {
         decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
-        _functions[index](decodedIntegers);
+        _functions[index](decodedIntegers, coordinator);
     }
     else {
         std::vector<unsigned char> buffer = encode(_UNKNOW);
@@ -186,7 +208,7 @@ void NetworkClientSystem::Update(Coordinator &coordinator)
     try {
         size_t length = _socket.receive_from(asio::buffer(data), receiveEndpoint, 0);
         std::vector<int> decodedIntegers = decode(data, length);
-        handleCmd(decodedIntegers);
+        handleCmd(decodedIntegers, coordinator);
     } catch (const std::system_error& e) {
 
     }
