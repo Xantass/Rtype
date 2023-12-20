@@ -28,6 +28,7 @@ void MovableSystem::Update(Coordinator &coordinator)
             coordinator.AddEvent(Event{Event::actions::MOVE, entity, std::any(Velocity{-1, 0})});
             vel = {-1, vel._y};
         } else if (Graphic::isKeyUp(KEY_W) || Graphic::isKeyUp(KEY_D) || Graphic::isKeyUp(KEY_S) || Graphic::isKeyUp(KEY_A)) {
+            coordinator.AddEvent(Event{Event::actions::MOVE, entity, std::any(Velocity{0, 0})});
             vel = {0, 0};
         }
     }
