@@ -5,13 +5,19 @@
 ** ParallaxSystem
 */
 
+/**
+ * @file ParallaxSystem.hpp
+ * @brief File containing the ParallaxSystem class
+ *
+ */
+
+#ifndef PARALLAXSYSTEM_HPP_
+#define PARALLAXSYSTEM_HPP_
+
 #include "../System.hpp"
 #include "../Coordinator.hpp"
 #include "../components/Position.hpp"
 #include "../components/Sprite.hpp"
-
-#ifndef PARALLAXSYSTEM_HPP_
-#define PARALLAXSYSTEM_HPP_
 
 /**
  * @class ParallaxSystem
