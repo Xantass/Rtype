@@ -98,6 +98,8 @@ public:
      */
     void createEntities(std::vector<int> decodedIntegers, Coordinator &coordinator);
 
+    void checkEvent(Coordinator &coordinator);
+
     /**
      * @brief Updates the NetworkClientSystem.
      * @param coordinator The Coordinator reference.

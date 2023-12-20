@@ -9,7 +9,7 @@
 
 void GraphicalSystem::Update(Coordinator &coordinator)
 {
-    std::cout << "GraphicalSystem update :" << std::endl;
+    // std::cout << "GraphicalSystem update :" << std::endl;
     for (auto &entity : this->_entities) {
         auto& pos = coordinator.GetComponent<Position>(entity);
         auto& sprite = coordinator.GetComponent<Sprite>(entity);

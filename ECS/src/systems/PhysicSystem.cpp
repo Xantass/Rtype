@@ -8,7 +8,7 @@
 #include "systems/PhysicSystem.hpp"
 
 void PhysicSystem::Update(Coordinator &coordinator) {
-    std::cout << "----------------------" << std::endl << "PhysicSystem update :" << std::endl; // TEST - TO BE REMOVED
+    // std::cout << "----------------------" << std::endl << "PhysicSystem update :" << std::endl; // TEST - TO BE REMOVED
     for (auto entity : this->_entities) {
         auto& pos = coordinator.GetComponent<Position>(entity);
         auto& vel = coordinator.GetComponent<Velocity>(entity);
@@ -43,6 +43,6 @@ void PhysicSystem::Update(Coordinator &coordinator) {
         pos._x += vel._x;
         pos._y += vel._y;
 
-        std::cout << "Entity "<< entity << " position : " << pos._x << " " << pos._y << std::endl; // TEST - TO BE REMOVED
+        // std::cout << "Entity "<< entity << " position : " << pos._x << " " << pos._y << std::endl; // TEST - TO BE REMOVED
     }
 }

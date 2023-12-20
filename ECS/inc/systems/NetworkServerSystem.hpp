@@ -126,6 +126,8 @@ public:
      */
     void pong(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
+    void move(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
+
     /**
      * @brief Sends a ping request to all connected clients.
      */
@@ -148,7 +150,7 @@ private:
     io_context _service; /**< The Boost ASIO io_service. */
     udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v4(), 4242)); /**< The UDP socket for communication. */
     std::vector<Client> _clients; /**< Vector storing information about connected clients. */
-    std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[8]; /**< Array of function pointers. */
+    std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[12]; /**< Array of function pointers. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
     int _id = 0; /**< The ID of the server. */
 };
