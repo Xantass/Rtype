@@ -7,18 +7,12 @@
 
 #include "systems/MovableSystem.hpp"
 #if defined(_WIN32)           
-	#define CloseWindow rl_CloseWindow            // All GDI defines and routines
-	#define ShowCursor rl_ShowCursor           // All USER defines and routines
+	#define CloseWindow RaylibCloseWindow
+    #define ShowCursor RaylibShowCursor
+    #undef CloseWindow
+    #undef ShowCursor           // All USER defines and routines
 #endif
-
-#include "raylib.h" // or any library that uses Windows.h
-
-#if defined(_WIN32)           // raylib uses these names as function parameters
-	#undef near
-	#undef far
-	#undef CloseWindow
-	#undef ShowCursor
-#endif
+#include "raylib.h"
 
 void MovableSystem::Update(Coordinator &coordinator)
 {
