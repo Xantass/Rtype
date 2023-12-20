@@ -6,6 +6,10 @@
 */
 
 #include "systems/PhysicSystem.hpp"
+#include "systems/GraphicalSystem.hpp"
+#include "systems/ParallaxSystem.hpp"
+#include "systems/MovableSystem.hpp"
+#include "systems/NetworkServerSystem.hpp"
 
 void Coordinator::Init()
 {
@@ -82,14 +86,37 @@ void Coordinator::SetSystemSignature(Signature signature)
 //Components
 template void Coordinator::RegisterComponent<Position>();
 template void Coordinator::RegisterComponent<Velocity>();
+template void Coordinator::RegisterComponent<Hitbox>();
+template void Coordinator::RegisterComponent<Sprite>();
+template void Coordinator::RegisterComponent<Movable>();
 template void Coordinator::AddComponent<Position>(Entity entity, Position component);
 template void Coordinator::AddComponent<Velocity>(Entity entity, Velocity component);
+template void Coordinator::AddComponent<Hitbox>(Entity entity, Hitbox component);
+template void Coordinator::AddComponent<Sprite>(Entity entity, Sprite component);
+template void Coordinator::AddComponent<Movable>(Entity entity, Movable component);
 template void Coordinator::RemoveComponent<Position>(Entity entity);
 template void Coordinator::RemoveComponent<Velocity>(Entity entity);
+template void Coordinator::RemoveComponent<Hitbox>(Entity entity);
+template void Coordinator::RemoveComponent<Sprite>(Entity entity);
+template void Coordinator::RemoveComponent<Movable>(Entity entity);
 template Position& Coordinator::GetComponent<Position>(Entity entity);
 template Velocity& Coordinator::GetComponent<Velocity>(Entity entity);
+template Hitbox& Coordinator::GetComponent<Hitbox>(Entity entity);
+template Sprite& Coordinator::GetComponent<Sprite>(Entity entity);
+template Movable& Coordinator::GetComponent<Movable>(Entity entity);
 template ComponentType Coordinator::GetComponentType<Position>();
 template ComponentType Coordinator::GetComponentType<Velocity>();
+template ComponentType Coordinator::GetComponentType<Hitbox>();
+template ComponentType Coordinator::GetComponentType<Sprite>();
+template ComponentType Coordinator::GetComponentType<Movable>();
 //Systems
 template std::shared_ptr<PhysicSystem> Coordinator::RegisterSystem<PhysicSystem>();
+template std::shared_ptr<GraphicalSystem> Coordinator::RegisterSystem<GraphicalSystem>();
+template std::shared_ptr<ParallaxSystem> Coordinator::RegisterSystem<ParallaxSystem>();
+template std::shared_ptr<MovableSystem> Coordinator::RegisterSystem<MovableSystem>();
+template std::shared_ptr<NetworkServerSystem> Coordinator::RegisterSystem<NetworkServerSystem>();
 template void Coordinator::SetSystemSignature<PhysicSystem>(Signature signature);
+template void Coordinator::SetSystemSignature<ParallaxSystem>(Signature signature);
+template void Coordinator::SetSystemSignature<GraphicalSystem>(Signature signature);
+template void Coordinator::SetSystemSignature<MovableSystem>(Signature signature);
+template void Coordinator::SetSystemSignature<NetworkServerSystem>(Signature signature);

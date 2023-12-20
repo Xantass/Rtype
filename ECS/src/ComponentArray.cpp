@@ -60,3 +60,6 @@ void ComponentArray<T>::EntityDestroyed(Entity entity)
 
 template class ComponentArray<Position>;
 template class ComponentArray<Velocity>;
+template class ComponentArray<Sprite>;
+template class ComponentArray<Hitbox>;
+template class ComponentArray<Movable>;

@@ -63,11 +63,26 @@ void ComponentManager::EntityDestroyed(Entity entity)
 
 template void ComponentManager::RegisterComponent<Position>();
 template void ComponentManager::RegisterComponent<Velocity>();
+template void ComponentManager::RegisterComponent<Sprite>();
+template void ComponentManager::RegisterComponent<Hitbox>();
+template void ComponentManager::RegisterComponent<Movable>();
 template ComponentType ComponentManager::GetComponentType<Position>();
 template ComponentType ComponentManager::GetComponentType<Velocity>();
+template ComponentType ComponentManager::GetComponentType<Sprite>();
+template ComponentType ComponentManager::GetComponentType<Hitbox>();
+template ComponentType ComponentManager::GetComponentType<Movable>();
 template void ComponentManager::AddComponent<Position>(Entity entity, Position component);
 template void ComponentManager::AddComponent<Velocity>(Entity entity, Velocity component);
+template void ComponentManager::AddComponent<Sprite>(Entity entity, Sprite component);
+template void ComponentManager::AddComponent<Hitbox>(Entity entity, Hitbox component);
+template void ComponentManager::AddComponent<Movable>(Entity entity, Movable component);
 template void ComponentManager::RemoveComponent<Position>(Entity entity);
 template void ComponentManager::RemoveComponent<Velocity>(Entity entity);
+template void ComponentManager::RemoveComponent<Sprite>(Entity entity);
+template void ComponentManager::RemoveComponent<Hitbox>(Entity entity);
+template void ComponentManager::RemoveComponent<Movable>(Entity entity);
 template Position& ComponentManager::GetComponent<Position>(Entity entity);
 template Velocity& ComponentManager::GetComponent<Velocity>(Entity entity);
+template Sprite& ComponentManager::GetComponent<Sprite>(Entity entity);
+template Hitbox& ComponentManager::GetComponent<Hitbox>(Entity entity);
+template Movable& ComponentManager::GetComponent<Movable>(Entity entity);

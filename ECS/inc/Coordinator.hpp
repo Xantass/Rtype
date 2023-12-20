@@ -44,9 +44,7 @@ public:
 	 * 
 	 * @return Entity Entity created
 	 */
-	Entity CreateEntity() {
-		return this->_entityManager->CreateEntity();
-	}
+	Entity CreateEntity();
 
 	/**
 	 * @brief Create an entity with a specific id
@@ -58,14 +56,6 @@ public:
 	Entity CreateEntity(int id) {
 		return this->_entityManager->CreateEntity(id);
 	}
-		/* ----------------------------- Entity methods ----------------------------- */
-		/**
-		 * @brief Create an entity
-		 * @details This method creates an entity by calling the CreateEntity method of the EntityManager.
-		 * 
-		 * @return Entity Entity created
-		 */
-		Entity CreateEntity();
 
 	/**
 	 * @brief Destroy an entity
@@ -84,6 +74,7 @@ public:
 	 */
 	template<typename T>
 	void RegisterComponent();
+
 	/**
 	 * @brief Add a component to an entity
 	 * @details This method also update the signature of the entity with the new Component added.
@@ -94,6 +85,7 @@ public:
 	 */
 	template<typename T>
 	void AddComponent(Entity entity, T component);
+
 	/**
 	 * @brief Remove a component from an entity
 	 * @details This method also update the signature of the entity with the Component removed.
@@ -103,6 +95,7 @@ public:
 	 */
 	template<typename T>
 	void RemoveComponent(Entity entity);
+
 	/**
 	 * @brief Get a reference of a component from an entity
 	 * @details This can be use to get the values of a component from an entity.
@@ -113,6 +106,7 @@ public:
 	 */
 	template<typename T>
 	T& GetComponent(Entity entity);
+
 	/**
 	 * @brief Get the Component Type object
 	 * 
@@ -132,6 +126,7 @@ public:
 	 */
 	template<typename T>
 	std::shared_ptr<T> RegisterSystem();
+
 	/**
 	 * @brief Set the System Signature object
 	 * @details This method set the signature of the system with the signature passed in parameter.
@@ -141,6 +136,26 @@ public:
 	 */
 	template<typename T>
 	void SetSystemSignature(Signature signature);
+
+	/**
+	 * @brief Add an event to the queue
+	 * 
+	 * @param event Event to add
+	 */
+	void AddEvent(Event event) {
+		this->_eventQueue.push(event);
+	}
+
+	/**
+	 * @brief Get the first event of the queue
+	 * 
+	 * @return Event First event of the queue
+	 */
+	Event GetEvent() {
+		Event event = this->_eventQueue.front();
+		this->_eventQueue.pop();
+		return event;
+	}
 
 private:
 	/**
@@ -158,6 +173,12 @@ private:
 	 * 
 	 */
 	std::unique_ptr<SystemManager> _systemManager;
+
+	/**
+	 * @brief Queue of events
+	 * 
+	 */
+	std::queue<Event> _eventQueue;
 };
 
 #endif /* !COORDINATOR_HPP_ */

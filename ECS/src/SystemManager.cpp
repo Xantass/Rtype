@@ -5,7 +5,12 @@
 ** SystemManager
 */
 
+#include "SystemManager.hpp"
 #include "systems/PhysicSystem.hpp"
+#include "systems/GraphicalSystem.hpp"
+#include "systems/MovableSystem.hpp"
+#include "systems/ParallaxSystem.hpp"
+#include "systems/NetworkServerSystem.hpp"
 
 template<typename T>
 std::shared_ptr<T> SystemManager::RegisterSystem()
@@ -55,4 +60,12 @@ void SystemManager::EntitySignatureChanged(Entity entity, Signature entitySignat
 }
 
 template std::shared_ptr<PhysicSystem> SystemManager::RegisterSystem<PhysicSystem>();
+template std::shared_ptr<MovableSystem> SystemManager::RegisterSystem<MovableSystem>();
+template std::shared_ptr<ParallaxSystem> SystemManager::RegisterSystem<ParallaxSystem>();
+template std::shared_ptr<GraphicalSystem> SystemManager::RegisterSystem<GraphicalSystem>();
+template std::shared_ptr<NetworkServerSystem> SystemManager::RegisterSystem<NetworkServerSystem>();
 template void SystemManager::SetSignature<PhysicSystem>(Signature signature);
+template void SystemManager::SetSignature<MovableSystem>(Signature signature);
+template void SystemManager::SetSignature<ParallaxSystem>(Signature signature);
+template void SystemManager::SetSignature<GraphicalSystem>(Signature signature);
+template void SystemManager::SetSignature<NetworkServerSystem>(Signature signature);

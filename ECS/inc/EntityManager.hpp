@@ -26,41 +26,6 @@
  * 
  */
 class EntityManager {
-<<<<<<< HEAD
-	public:
-	    EntityManager();
-	    ~EntityManager();
-		/**
-		 * @brief Create a Entity object
-		 * 
-		 * @return Entity 
-		 */
-		Entity CreateEntity();
-		/**
-		 * @brief Destroy an entity
-		 * 
-		 * @param entity Entity to be destroyed
-		 */
-		void DestroyEntity(Entity entity);
-		/**
-		 * @brief Set the Signature object
-		 * @details The signature is a bitset that contains the components of the entity. If the entity has the components 0, 1 and 3, the signature will be 1011.
-		 * 
-		 * 
-		 * @param entity Entity to set the signature to
-		 * @param signature Signature to set
-		 */
-		void SetSignature(Entity entity, Signature signature);
-		/**
-		 * @brief Get the Signature object
-		 * 
-		 * @param entity Entity to get the signature from
-		 * @return Signature Signature of the entity
-		 */
-		Signature GetSignature(Entity entity);
-	protected:
-	private:
-=======
 public:
     EntityManager();
     ~EntityManager();
@@ -108,17 +73,12 @@ public:
 protected:
 private:
 
->>>>>>> develop
 	/**
 	 * @brief Queue of available entities
 	 * 
 	 */
-<<<<<<< HEAD
-	std::queue<Entity> _availableEntities{};
-=======
 	std::vector<Entity> _availableEntities{};
 
->>>>>>> develop
 	/**
 	 * @brief Number of living entities
 	 * 
