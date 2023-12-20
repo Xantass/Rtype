@@ -13,6 +13,7 @@
 #include "../components/Movable.hpp"
 #include "../components/Velocity.hpp"
 #include "../Event.hpp"
+#include "raylib.h"
 
 /**
  * @class MovableSystem

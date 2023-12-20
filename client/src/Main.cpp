@@ -15,6 +15,7 @@
 #include "systems/GraphicalSystem.hpp"
 #include "systems/ParallaxSystem.hpp"
 #include "systems/MovableSystem.hpp"
+#include "systems/NetworkClientSystem.hpp"
 #include "Signature.hpp"
 #include "Graphic.hpp"
 
@@ -37,6 +38,7 @@ int main(int ac, char **av)
     auto graphicSystem = coordinator.RegisterSystem<GraphicalSystem>();
     auto parallaxSystem = coordinator.RegisterSystem<ParallaxSystem>();
     auto movableSystem = coordinator.RegisterSystem<MovableSystem>();
+    auto networkClientSystem = coordinator.RegisterSystem<NetworkClientSystem>();
 
     Signature signature;
 
@@ -57,6 +59,7 @@ int main(int ac, char **av)
     signature3.set(coordinator.GetComponentType<Velocity>());
     signature3.set(coordinator.GetComponentType<Hitbox>());
     coordinator.SetSystemSignature<PhysicSystem>(signature3);
+    coordinator.SetSystemSignature<NetworkClientSystem>(signature3);
 
     Signature signature4;
 
@@ -95,6 +98,8 @@ int main(int ac, char **av)
     coordinator.AddComponent<Hitbox>(entity, {0, 0, 0, 0, OTHER});
     coordinator.AddComponent<Movable>(entity, {NONE});
     coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
+
+    networkClientSystem->Init(coordinator);
     Graphic::playMusic(music);
     while (!Graphic::shouldCloseWindow()) {
         Graphic::updateMusic(music);
@@ -104,6 +109,7 @@ int main(int ac, char **av)
         physicSystem->Update(coordinator);
         parallaxSystem->Update(coordinator);
         graphicSystem->Update(coordinator);
+        networkClientSystem->Update(coordinator);
         Graphic::endDrawing();
     }
     Graphic::unloadMusic(music);

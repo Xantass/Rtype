@@ -28,8 +28,9 @@
  */
 struct Event {
     enum actions {
-        MOVE,
-        SHOOT,
+        MOVE = 11,
+        SHOOT = 10,
+        EMPTY = 0,
     };
 
     /**
