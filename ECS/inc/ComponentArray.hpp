@@ -32,19 +32,21 @@
  * 
  */
 class IComponentArray {
-	public:
-		/**
-		 * @brief Destroy the IComponentArray object
-		 * 
-		 */
-		virtual ~IComponentArray() = default;
-		/**
-		 * @brief Called when an entity is destroyed so that the component array can update its references
-		 * 
-		 * @param entity Entity to be destroyed
-		 */
-		virtual void EntityDestroyed(Entity entity) = 0;
+public:
+	/**
+	 * @brief Destroy the IComponentArray object
+	 * 
+	 */
+	virtual ~IComponentArray() = default;
+
+	/**
+	 * @brief Called when an entity is destroyed so that the component array can update its references
+	 * 
+	 * @param entity Entity to be destroyed
+	 */
+	virtual void EntityDestroyed(Entity entity) = 0;
 };
+
 /**
  * @class ComponentArray
  * @brief Class of the component array
@@ -54,54 +56,61 @@ class IComponentArray {
  */
 template<typename T>
 class ComponentArray : public IComponentArray {
-	public:
-		/**
-		 * @brief Link a new component to an entity
-		 * 
-		 * @param entity Entity to link the component to
-		 * @param component Component to link to the entity
-		 */
-		void InsertData(Entity entity, T component);
-		/**
-		 * @brief Remove an entity and its components
-		 * 
-		 * @param entity Entity to remove
-		 */
-		void RemoveData(Entity entity);
-		/**
-		 * @brief Get the component of an entity
-		 * 
-		 * @param entity Entity to get the component from
-		 * @return T& Reference to the component
-		 */
-		T& GetData(Entity entity);
-		/**
-		 * @brief Called when an entity is destroyed so that the component array can update its references
-		 * 
-		 * @param entity Entity destroyed
-		 */
-		void EntityDestroyed(Entity entity) override;
-	private:
-		/**
-		 * @brief Array of components for each type T
-		 * 
-		 */
-		std::array<T, MAX_ENTITIES> _componentArray;
-		/**
-		 * @brief Map from an entity ID to an array index
-		 * 
-		 */
-		std::unordered_map<Entity, std::size_t> _entityToIndex;
-		/**
-		 * @brief Map from an array index to an entity ID
-		 * 
-		 */
-		std::unordered_map<std::size_t, Entity> _indexToEntity;
-		/**
-		 * @brief Size of the array
-		 * 
-		 */
-		std::size_t _arraySize;
+public:
+	/**
+	 * @brief Link a new component to an entity
+	 * 
+	 * @param entity Entity to link the component to
+	 * @param component Component to link to the entity
+	 */
+	void InsertData(Entity entity, T component);
+
+	/**
+	 * @brief Remove an entity and its components
+	 * 
+	 * @param entity Entity to remove
+	 */
+	void RemoveData(Entity entity);
+
+	/**
+	 * @brief Get the component of an entity
+	 * 
+	 * @param entity Entity to get the component from
+	 * @return T& Reference to the component
+	 */
+	T& GetData(Entity entity);
+
+	/**
+	 * @brief Called when an entity is destroyed so that the component array can update its references
+	 * 
+	 * @param entity Entity destroyed
+	 */
+	void EntityDestroyed(Entity entity) override;
+
+private:
+	/**
+	 * @brief Array of components for each type T
+	 * 
+	 */
+	std::array<T, MAX_ENTITIES> _componentArray;
+
+	/**
+	 * @brief Map from an entity ID to an array index
+	 * 
+	 */
+	std::unordered_map<Entity, std::size_t> _entityToIndex;
+
+	/**
+	 * @brief Map from an array index to an entity ID
+	 * 
+	 */
+	std::unordered_map<std::size_t, Entity> _indexToEntity;
+
+	/**
+	 * @brief Size of the array
+	 * 
+	 */
+	std::size_t _arraySize;
 };
 
 #endif /* !COMPONENTARRAY_HPP_ */
