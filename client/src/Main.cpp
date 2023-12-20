@@ -24,7 +24,8 @@ int main(int ac, char **av)
     Coordinator coordinator;
 
     coordinator.Init();
-    Graphic::initWindow(1920, 1080, "R-Type");
+    Graphic::init(1920, 1080, "R-Type");
+    Music music = Graphic::loadMusic("assets/Theme.mp3");
 
     coordinator.RegisterComponent<Position>();
     coordinator.RegisterComponent<Velocity>();
@@ -93,9 +94,10 @@ int main(int ac, char **av)
     coordinator.AddComponent<Velocity>(entity, {0, 0});
     coordinator.AddComponent<Hitbox>(entity, {0, 0, 0, 0, OTHER});
     coordinator.AddComponent<Movable>(entity, {NONE});
-    coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/planet.png")});
-
+    coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
+    Graphic::playMusic(music);
     while (!Graphic::shouldCloseWindow()) {
+        Graphic::updateMusic(music);
         Graphic::beginDrawing();
         Graphic::clearBackground(RBLACK);
         movableSystem->Update(coordinator);
@@ -104,6 +106,7 @@ int main(int ac, char **av)
         graphicSystem->Update(coordinator);
         Graphic::endDrawing();
     }
-    Graphic::closeWindow();
+    Graphic::unloadMusic(music);
+    Graphic::close();
     return 0;
 }
