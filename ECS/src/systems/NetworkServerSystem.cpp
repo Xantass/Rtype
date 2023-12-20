@@ -210,6 +210,23 @@ void NetworkServerSystem::move(std::vector<int>& decodedIntegers, udp::endpoint&
     _socket.send_to(asio::buffer(buffer), clientEndpoint);
 }
 
+void NetworkServerSystem::shoot(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
+{
+    std::cout << "PLAYER SHOOT CLIENT" << std::endl;
+    // if () {
+        Entity bullet = coordinator.CreateEntity(decodedIntegers.at(0));
+        coordinator.AddComponent<Position>(bullet, coordinator.GetComponent<Position>(decodedIntegers.at(1)));
+        coordinator.AddComponent<Velocity>(bullet, {1, 0});
+        coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, OTHER});
+        std::vector<unsigned char> buffer = encode(_PASS);
+        _socket.send_to(asio::buffer(buffer), clientEndpoint);
+        return;
+    // }
+    // std::vector<unsigned char> buffer = encode(_UNKNOW);
+    // _socket.send_to(asio::buffer(buffer), clientEndpoint);
+}
+
+
 void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint, Coordinator &coordinator)
 {
     int index = decodedIntegers.at(0);

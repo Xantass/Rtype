@@ -97,6 +97,7 @@ int main(int ac, char **av)
     coordinator.AddComponent<Movable>(entity, {NONE});
     coordinator.AddComponent<Sprite>(entity, {LoadTexture("assets/planet.png")});
 
+    std::cout << "IN EVENTS" << std::endl;
     networkClientSystem->Init(coordinator);
 
     while (!client.shouldCloseWindow()) {

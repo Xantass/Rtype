@@ -14,7 +14,9 @@ void MovableSystem::Update(Coordinator &coordinator)
         auto& mov = coordinator.GetComponent<Movable>(entity);
         auto& vel = coordinator.GetComponent<Velocity>(entity);
 
-        if (IsKeyPressed(KEY_W)) {
+        if (IsKeyPressed(KEY_SPACE)) {
+            coordinator.AddEvent(Event{Event::actions::SHOOT, 0, std::any(Velocity{1, 0})});
+        } else if (IsKeyPressed(KEY_W)) {
             coordinator.AddEvent(Event{Event::actions::MOVE, entity, std::any(Velocity{0, -1})});
             vel = {0, -1};
         } else if (IsKeyPressed(KEY_D)) {

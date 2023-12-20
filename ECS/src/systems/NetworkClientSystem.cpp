@@ -14,7 +14,7 @@
 void NetworkClientSystem::Init(Coordinator &coordinator)
 {
     udp::resolver resolver(_service);
-    _serverEndpoint = *resolver.resolve(udp::v4(), "192.168.1.189", "4242").begin();
+    _serverEndpoint = *resolver.resolve(udp::v4(), "127.0.0.1", "4242").begin();
     std::vector<int> tmp = mergeVectors(_CONNECT, stringToVector("THEO"));
     std::vector<unsigned char> buffer = encode(tmp);
     _socket.send_to(asio::buffer(buffer), _serverEndpoint);
@@ -190,12 +190,31 @@ void NetworkClientSystem::checkEvent(Coordinator &coordinator)
         if (event._type == Event::EMPTY) {
             break;
         }
+        if (event._type == Event::MOVE) {
+            std::vector<int> tmp = mergeVectors({CHECK_ACTION(event._type), 3}, {static_cast<int>(event._entity), static_cast<int>(std::any_cast<Velocity>(event._data)._x * 10), static_cast<int>(std::any_cast<Velocity>(event._data)._y * 10)});
+            for (auto i : tmp)
+                std::cout << i << std::endl;
+            std::vector<unsigned char> buffer = encode(tmp);
+            _socket.send_to(asio::buffer(buffer), _serverEndpoint); 
+        }
+        if (event._type == Event::SHOOT) {
+            for (auto entity : _entities) {
+                if (this->_id == entity) {
+                    Entity bullet = coordinator.CreateEntity();
+                    coordinator.AddComponent<Position>(bullet, coordinator.GetComponent<Position>(entity));
+                    coordinator.AddComponent<Velocity>(bullet, {1, 0});
+                    coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, OTHER});
+                    std::vector<int> tmp = mergeVectors({CHECK_ACTION(event._type), 2}, {static_cast<int>(bullet), static_cast<int>(entity)});
+                    for (auto i : tmp)
+                        std::cout << i << std::endl;
+                    std::vector<unsigned char> buffer = encode(tmp);
+                    _socket.send_to(asio::buffer(buffer), _serverEndpoint);
+                    coordinator.AddComponent<Sprite>(bullet, {LoadTexture("assets/planet.png")});
+                    break;
+                }
+            }
+        }
         std::cout << "EVENT" << std::endl;
-        std::vector<int> tmp = mergeVectors({CHECK_ACTION(event._type), 3}, {static_cast<int>(event._entity), static_cast<int>(std::any_cast<Velocity>(event._data)._x * 10), static_cast<int>(std::any_cast<Velocity>(event._data)._y * 10)});
-        for (auto i : tmp)
-            std::cout << i << std::endl;
-        std::vector<unsigned char> buffer = encode(tmp);
-        _socket.send_to(asio::buffer(buffer), _serverEndpoint);
     }
 }
 
