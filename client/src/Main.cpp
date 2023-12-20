@@ -5,7 +5,7 @@
 ** Main
 */
 
-#if defined(_WIN32) && (_WIN64)          
+#if defined(_WIN32)         
 	#define CloseWindow RaylibCloseWindow
     #define ShowCursor RaylibShowCursor
     #undef CloseWindow
