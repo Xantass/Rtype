@@ -140,6 +140,8 @@ public:
     
     void shoot(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
+    int checkMove(Position& pos, Velocity& vel, Hitbox& hitbox, Entity entity, Coordinator& coordinator);
+
     /**
      * @brief Sends a ping request to all connected clients.
      */

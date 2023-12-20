@@ -17,7 +17,7 @@ make
 
 ### Client
 ```
-./r-type_client
+./r-type_client [port]
 ```
 
 ### Server
@@ -38,8 +38,8 @@ All other documentations (including RFC protocol between client and server) can 
 ## Contribution
 To contribute to this project, check our [Contribution Guidelines](https://github.com/EpitechPromo2026/B-CPP-500-PAR-5-2-rtype-jules.gresset/blob/main/docs/CONTRIBUTING.md).
 
-## Authors
-- [alecorver](https://github.com/alecorvec)
-- [JulesGresset](https://github.com/JulesGresset)
-- [Lucaslgd02](https://github.com/Lucaslgd02)
-- [Xantas](https://github.com/Xantass)
+## Authors and contact
+- [alecorver](https://github.com/alecorvec) adrien.le-corvec@epitech.eu
+- [JulesGresset](https://github.com/JulesGresset) jules.gresset@epitech.eu
+- [Lucaslgd02](https://github.com/Lucaslgd02) lucas.guiard@epitech.eu
+- [Xantas](https://github.com/Xantass) theo.fouque@epitech.eu

@@ -6,6 +6,7 @@
 */
 
 #include "systems/GraphicalSystem.hpp"
+#include "Graphic.hpp"
 
 void GraphicalSystem::Update(Coordinator &coordinator)
 {
@@ -14,6 +15,6 @@ void GraphicalSystem::Update(Coordinator &coordinator)
         auto& pos = coordinator.GetComponent<Position>(entity);
         auto& sprite = coordinator.GetComponent<Sprite>(entity);
 
-        DrawTexture(sprite.texture, pos._x, pos._y, RAYWHITE);
+        Graphic::drawTexture(sprite.texture, pos._x, pos._y, WHITE);
     }
 }

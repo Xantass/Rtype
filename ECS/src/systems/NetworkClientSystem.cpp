@@ -11,15 +11,15 @@
 #define CHECK_TYPE(x) x == 0 ? PLAYER : ENNEMY
 #define CHECK_ACTION(x) x == Event::MOVE ? 11 : 10
 
-void NetworkClientSystem::Init(Coordinator &coordinator)
+void NetworkClientSystem::Init(Coordinator &coordinator, std::string host, std::string port)
 {
     udp::resolver resolver(_service);
-    _serverEndpoint = *resolver.resolve(udp::v4(), "127.0.0.1", "4242").begin();
+    _serverEndpoint = *resolver.resolve(udp::v4(), host, port).begin();
     std::vector<int> tmp = mergeVectors(_CONNECT, stringToVector("THEO"));
     std::vector<unsigned char> buffer = encode(tmp);
     _socket.send_to(asio::buffer(buffer), _serverEndpoint);
     std::vector<unsigned char> data(1024);
-    //CREATE ENTITY AFTER RECEIVE FROM
+    std::cout << "CREATE ENTITY AFTER RECEIVE FROM" << std::endl;
     size_t length = _socket.receive_from(asio::buffer(data), _serverEndpoint, 0);
     std::vector<int> decodedIntegers = decode(data, length);
     this->_id = decodedIntegers.at(0);
@@ -51,11 +51,7 @@ void NetworkClientSystem::createEntities(std::vector<int> decodedInteger, Coordi
     std::cout << "SIZE: " << decodedInteger.size() << std::endl;
     while (decodedInteger.empty() == false) {
         //ADD INT FOR ID ENTITY
-        Entity entity = coordinator.CreateEntity();
-        if (decodedInteger.at(0) == this->_id) {
-            coordinator.AddComponent<Movable>(entity, {NONE});
-            coordinator.AddComponent<Sprite>(entity, {LoadTexture("assets/planet.png")});
-        }
+        Entity entity = coordinator.CreateEntity(decodedInteger.at(0));
         coordinator.AddComponent<Position>(entity, {CHECK_ZERO(decodedInteger.at(1)), CHECK_ZERO(decodedInteger.at(2))});
         coordinator.AddComponent<Velocity>(entity, {CHECK_ZERO(decodedInteger.at(3)), CHECK_ZERO(decodedInteger.at(4))});
         coordinator.AddComponent<Hitbox>(entity, {CHECK_ZERO(decodedInteger.at(5)), CHECK_ZERO(decodedInteger.at(6)), CHECK_ZERO(decodedInteger.at(7)), CHECK_ZERO(decodedInteger.at(8)), CHECK_TYPE(decodedInteger.at(9))});
@@ -97,15 +93,18 @@ std::vector<int> NetworkClientSystem::stringToVector(const std::string& str) {
 
 void NetworkClientSystem::ping(std::vector<int>& decodedIntegers, Coordinator &coordinator)
 {
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
     std::cout << "PING" << std::endl;
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
     std::vector<int> tmp = {_id};
     std::vector<unsigned char> buffer = encode(mergeVectors(_PONG, tmp));
-    _socket.send_to(asio::buffer(buffer), _serverEndpoint);  
+    _socket.send_to(asio::buffer(buffer), _serverEndpoint);
 }
 
 void NetworkClientSystem::pos(std::vector<int>& decodedIntegers, Coordinator &coordinator)
 {
+    std::cout << "POS" << std::endl;
+    std::cout << "SIZE: " << decodedIntegers.size() << std::endl;
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
     while (decodedIntegers.empty() == false) {
         for (auto entity : this->_entities) {
@@ -139,7 +138,6 @@ void NetworkClientSystem::handleCmd(std::vector<int>& decodedIntegers, Coordinat
     for (auto i : decodedIntegers)
         std::cout << i << std::endl;
     if (_functions[index] != nullptr) {
-        // decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
         _functions[index](decodedIntegers, coordinator);
     }
     else {

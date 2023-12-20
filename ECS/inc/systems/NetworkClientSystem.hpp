@@ -46,7 +46,7 @@ public:
      * @brief Initializes the NetworkClientSystem.
      * @param coordinator The Coordinator reference.
      */
-    void Init(Coordinator &coordinator);
+    void Init(Coordinator &coordinator, std::string host, std::string port);
 
     /**
      * @brief Finds a valid port to use.
