@@ -13,12 +13,6 @@
 #include "../components/Movable.hpp"
 #include "../components/Velocity.hpp"
 #include "../Event.hpp"
-#if defined(_WIN32)           
-	#define CloseWindow RaylibCloseWindow
-    #define ShowCursor RaylibShowCursor
-    #undef CloseWindow
-    #undef ShowCursor           // All USER defines and routines
-#endif
 #include "raylib.h"
 
 class MovableSystem : public System {

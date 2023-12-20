@@ -5,6 +5,12 @@
 ** Main
 */
 
+#if defined(_WIN32) && (_WIN64)          
+	#define CloseWindow RaylibCloseWindow
+    #define ShowCursor RaylibShowCursor
+    #undef CloseWindow
+    #undef ShowCursor           // All USER defines and routines
+#endif
 #include "Client.cpp"
 #include "Coordinator.hpp"
 #include "components/Position.hpp"
