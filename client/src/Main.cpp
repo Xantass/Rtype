@@ -21,6 +21,8 @@
 
 int main(int ac, char **av)
 {
+    if (ac != 3)
+        return -84;
     Client client("127.0.0.1", "4242");
     Coordinator coordinator;
 
@@ -99,7 +101,9 @@ int main(int ac, char **av)
     coordinator.AddComponent<Movable>(entity, {NONE});
     coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
 
-    networkClientSystem->Init(coordinator);
+    std::string host = av[1];
+    std::string port = av[2];
+    networkClientSystem->Init(coordinator, host, port);
     Graphic::playMusic(music);
     while (!Graphic::shouldCloseWindow()) {
         Graphic::updateMusic(music);

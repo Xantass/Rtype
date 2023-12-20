@@ -11,10 +11,10 @@
 #define CHECK_TYPE(x) x == 0 ? PLAYER : ENNEMY
 #define CHECK_ACTION(x) x == Event::MOVE ? 11 : 10
 
-void NetworkClientSystem::Init(Coordinator &coordinator)
+void NetworkClientSystem::Init(Coordinator &coordinator, std::string host, std::string port)
 {
     udp::resolver resolver(_service);
-    _serverEndpoint = *resolver.resolve(udp::v4(), "10.68.252.3", "4242").begin();
+    _serverEndpoint = *resolver.resolve(udp::v4(), host, port).begin();
     std::vector<int> tmp = mergeVectors(_CONNECT, stringToVector("THEO"));
     std::vector<unsigned char> buffer = encode(tmp);
     _socket.send_to(asio::buffer(buffer), _serverEndpoint);
