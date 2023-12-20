@@ -35,9 +35,6 @@ include_directories("./inc/" "../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc
 
 # Your project source files
 add_executable(r-type_client
-    src/Main.cpp
-
-
     ../ECS/src/systems/PhysicSystem.cpp
     ../ECS/src/systems/GraphicalSystem.cpp
     ../ECS/src/systems/ParallaxSystem.cpp
@@ -48,6 +45,8 @@ add_executable(r-type_client
     ../ECS/src/ComponentManager.cpp
     ../ECS/src/SystemManager.cpp
     ../ECS/src/Coordinator.cpp
+
+    src/Main.cpp
     )
 
 if(WIN32)
@@ -64,8 +63,8 @@ if (APPLE AND UNIX)
 endif()
 
 if(UNIX AND NOT APPLE)
-    target_compile_options(r-type_server PRIVATE -std=c++2a -Wall -Wextra -O3)
-    target_link_libraries(r-type_server PRIVATE raylib asio)
+    target_compile_options(r-type_client PRIVATE -std=c++2a -Wall -Wextra -O3)
+    target_link_libraries(r-type_client PRIVATE raylib asio)
 endif()
 
 # Link your project with raylib
