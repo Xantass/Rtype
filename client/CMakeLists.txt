@@ -63,7 +63,7 @@ if (APPLE AND UNIX)
 endif()
 
 if(UNIX AND NOT APPLE)
-    target_compile_options(r-type_client PRIVATE -std=c++2a -Wall -Wextra -O3)
+    target_compile_options(r-type_client PRIVATE -std=c++2a -Wall -Wextra -O3 -g3)
     target_link_libraries(r-type_client PRIVATE raylib asio)
 endif()
 

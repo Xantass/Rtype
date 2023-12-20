@@ -9,6 +9,7 @@
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
 #include "components/Hitbox.hpp"
+#include "components/Movable.hpp"
 
 void NetworkServerSystem::Init()
 {
@@ -23,7 +24,7 @@ void NetworkServerSystem::Init()
     _functions[7] = nullptr;
     _functions[8] = nullptr;
     _functions[9] = nullptr;
-    _functions[10] = nullptr;
+    _functions[10] = std::bind(&NetworkServerSystem::shoot, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[11] = std::bind(&NetworkServerSystem::move, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _startTime = std::chrono::steady_clock::now();
 }

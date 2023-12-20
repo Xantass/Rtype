@@ -90,12 +90,12 @@ int main(int ac, char **av)
     coordinator.AddComponent<Hitbox>(entity5, {0, 0, 0, 0, OTHER});
     coordinator.AddComponent<Sprite>(entity5, {LoadTexture("assets/parallax-space-stars.png")});
 
-    Entity entity = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity, {400, 400});
-    coordinator.AddComponent<Velocity>(entity, {0, 0});
-    coordinator.AddComponent<Hitbox>(entity, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Movable>(entity, {NONE});
-    coordinator.AddComponent<Sprite>(entity, {LoadTexture("assets/planet.png")});
+    // Entity entity = coordinator.CreateEntity();
+    // coordinator.AddComponent<Position>(entity, {400, 400});
+    // coordinator.AddComponent<Velocity>(entity, {0, 0});
+    // coordinator.AddComponent<Hitbox>(entity, {0, 0, 0, 0, OTHER});
+    // coordinator.AddComponent<Movable>(entity, {NONE});
+    // coordinator.AddComponent<Sprite>(entity, {LoadTexture("assets/planet.png")});
 
     std::cout << "IN EVENTS" << std::endl;
     networkClientSystem->Init(coordinator);
