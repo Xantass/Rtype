@@ -16,6 +16,7 @@
 #include "systems/ParallaxSystem.hpp"
 #include "systems/MovableSystem.hpp"
 #include "Signature.hpp"
+#include "Graphic.hpp"
 
 int main(int ac, char **av)
 {
@@ -23,7 +24,7 @@ int main(int ac, char **av)
     Coordinator coordinator;
 
     coordinator.Init();
-    client.initWindow(1920, 1080, "R-Type");
+    Graphic::initWindow(1920, 1080, "R-Type");
 
     coordinator.RegisterComponent<Position>();
     coordinator.RegisterComponent<Velocity>();
@@ -94,15 +95,15 @@ int main(int ac, char **av)
     coordinator.AddComponent<Movable>(entity, {NONE});
     coordinator.AddComponent<Sprite>(entity, {LoadTexture("assets/planet.png")});
 
-    while (!client.shouldCloseWindow()) {
-        BeginDrawing();
-        ClearBackground(BLACK);
+    while (!Graphic::shouldCloseWindow()) {
+        Graphic::beginDrawing();
+        Graphic::clearBackground(RBLACK);
         movableSystem->Update(coordinator);
         physicSystem->Update(coordinator);
         parallaxSystem->Update(coordinator);
         graphicSystem->Update(coordinator);
-        EndDrawing();
+        Graphic::endDrawing();
     }
-    client.destroyWindow();
+    Graphic::closeWindow();
     return 0;
 }
