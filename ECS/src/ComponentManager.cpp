@@ -60,14 +60,3 @@ void ComponentManager::EntityDestroyed(Entity entity)
 		component->EntityDestroyed(entity);
 	}
 }
-
-template void ComponentManager::RegisterComponent<Position>();
-template void ComponentManager::RegisterComponent<Velocity>();
-template ComponentType ComponentManager::GetComponentType<Position>();
-template ComponentType ComponentManager::GetComponentType<Velocity>();
-template void ComponentManager::AddComponent<Position>(Entity entity, Position component);
-template void ComponentManager::AddComponent<Velocity>(Entity entity, Velocity component);
-template void ComponentManager::RemoveComponent<Position>(Entity entity);
-template void ComponentManager::RemoveComponent<Velocity>(Entity entity);
-template Position& ComponentManager::GetComponent<Position>(Entity entity);
-template Velocity& ComponentManager::GetComponent<Velocity>(Entity entity);

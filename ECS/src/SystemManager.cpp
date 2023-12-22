@@ -5,7 +5,7 @@
 ** SystemManager
 */
 
-#include "systems/PhysicSystem.hpp"
+#include "SystemManager.hpp"
 
 template<typename T>
 std::shared_ptr<T> SystemManager::RegisterSystem()
@@ -53,6 +53,3 @@ void SystemManager::EntitySignatureChanged(Entity entity, Signature entitySignat
 			system->_entities.erase(entity); // Entity signature does not match system signature - erase from set
 	}
 }
-
-template std::shared_ptr<PhysicSystem> SystemManager::RegisterSystem<PhysicSystem>();
-template void SystemManager::SetSignature<PhysicSystem>(Signature signature);

@@ -5,7 +5,7 @@
 ** Coordinator
 */
 
-#include "systems/PhysicSystem.hpp"
+#include "Coordinator.hpp"
 
 void Coordinator::Init()
 {
@@ -89,19 +89,3 @@ Event Coordinator::GetEvent()
 	this->_eventQueue.pop();
 	return event;
 }
-
-//this is here to prevent the compiler being mad about templates.
-//Components
-template void Coordinator::RegisterComponent<Position>();
-template void Coordinator::RegisterComponent<Velocity>();
-template void Coordinator::AddComponent<Position>(Entity entity, Position component);
-template void Coordinator::AddComponent<Velocity>(Entity entity, Velocity component);
-template void Coordinator::RemoveComponent<Position>(Entity entity);
-template void Coordinator::RemoveComponent<Velocity>(Entity entity);
-template Position& Coordinator::GetComponent<Position>(Entity entity);
-template Velocity& Coordinator::GetComponent<Velocity>(Entity entity);
-template ComponentType Coordinator::GetComponentType<Position>();
-template ComponentType Coordinator::GetComponentType<Velocity>();
-//Systems
-template std::shared_ptr<PhysicSystem> Coordinator::RegisterSystem<PhysicSystem>();
-template void Coordinator::SetSystemSignature<PhysicSystem>(Signature signature);

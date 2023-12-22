@@ -5,17 +5,9 @@
 ** Main
 */
 
-#include "Client.cpp"
-#include "Coordinator.hpp"
-#include "components/Position.hpp"
-#include "components/Velocity.hpp"
-#include "components/Sprite.hpp"
-#include "components/Hitbox.hpp"
-#include "systems/PhysicSystem.hpp"
-#include "systems/GraphicalSystem.hpp"
-#include "systems/ParallaxSystem.hpp"
-#include "systems/MovableSystem.hpp"
-#include "Signature.hpp"
+#include "../inc/Client.hpp"
+#include "../../ECS/ECS.hpp"
+#include "../../ECS/inc/systems/NetworkClientSystem.hpp"
 
 int main(int ac, char **av)
 {

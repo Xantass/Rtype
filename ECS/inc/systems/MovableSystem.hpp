@@ -8,11 +8,17 @@
 #ifndef MOVABLESYSTEM_HPP_
 #define MOVABLESYSTEM_HPP_
 
-#include "../Coordinator.hpp"
-#include "../System.hpp"
-#include "../components/Movable.hpp"
-#include "../components/Velocity.hpp"
-#include "../Event.hpp"
+#include "raylib.h"
+
+// class Coordinator {};
+
+#include "System.hpp"
+#include "components/Position.hpp"
+#include "components/Velocity.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Sprite.hpp"
+#include "components/Movable.hpp"
+
 
 class MovableSystem : public System {
     public:
@@ -22,5 +28,7 @@ class MovableSystem : public System {
     protected:
     private:
 };
+
+#include "../../src/systems/MovableSystem.cpp"
 
 #endif /* !MOVABLESYSTEM_HPP_ */

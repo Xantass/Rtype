@@ -12,6 +12,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(asiocmake)
 
+FetchContent_Declare(
+    raylib
+    GIT_REPOSITORY "https://github.com/raysan5/raylib.git"
+    GIT_TAG "master"
+    GIT_PROGRESS TRUE
+)
+
+FetchContent_MakeAvailable(raylib)
+
 project(r-type_server)
 
 include_directories("./inc/" "./../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
@@ -21,17 +30,12 @@ set(SOURCES
     src/main.cpp
     src/RoomManager.cpp
     src/Client.cpp
-
-    ../ECS/src/systems/PhysicSystem.cpp
-    ../ECS/src/systems/NetworkServerSystem.cpp
-    ../ECS/src/EntityManager.cpp
-    ../ECS/src/ComponentArray.cpp
-    ../ECS/src/ComponentManager.cpp
-    ../ECS/src/SystemManager.cpp
-    ../ECS/src/Coordinator.cpp
 )
 
 add_executable(r-type_server ${SOURCES})
+
+
+target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
 if(WIN32)
     target_link_libraries(r-type_server PRIVATE Ws2_32.lib asio)

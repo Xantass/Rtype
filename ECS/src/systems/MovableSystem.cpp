@@ -6,7 +6,6 @@
 */
 
 #include "systems/MovableSystem.hpp"
-#include "raylib.h"
 
 void MovableSystem::Update(Coordinator &coordinator)
 {

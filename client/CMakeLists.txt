@@ -36,18 +36,7 @@ include_directories("./inc/" "../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc
 # Your project source files
 add_executable(r-type_client
     src/Main.cpp
-
-
-    ../ECS/src/systems/PhysicSystem.cpp
-    ../ECS/src/systems/GraphicalSystem.cpp
-    ../ECS/src/systems/ParallaxSystem.cpp
-    ../ECS/src/systems/NetworkClientSystem.cpp
-    ../ECS/src/systems/MovableSystem.cpp
-    ../ECS/src/EntityManager.cpp
-    ../ECS/src/ComponentArray.cpp
-    ../ECS/src/ComponentManager.cpp
-    ../ECS/src/SystemManager.cpp
-    ../ECS/src/Coordinator.cpp
+    src/Client.cpp
     )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)

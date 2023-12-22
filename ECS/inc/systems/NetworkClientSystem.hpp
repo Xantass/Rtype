@@ -14,12 +14,17 @@
 #define NETWORKCLIENTSYSTEM_HPP_
 
 #include <asio.hpp>
+#include "EnumProtocol.hpp"
+
+// class Coordinator {};
+
 #include "System.hpp"
-#include "Coordinator.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
 #include "components/Hitbox.hpp"
-#include "EnumProtocol.hpp"
+#include "components/Sprite.hpp"
+#include "components/Movable.hpp"
+
 
 using namespace asio;
 using asio::ip::udp;
@@ -112,5 +117,7 @@ private:
     std::function<void(std::vector<int>&)> _functions[8]; /**< Array of function pointers. */
     int _id; /**< The ID of the client. */
 };
+
+#include "../../src/systems/NetworkClientSystem.cpp"
 
 #endif /* NETWORKCLIENTSYSTEM_HPP_ */

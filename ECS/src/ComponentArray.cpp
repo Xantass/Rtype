@@ -57,6 +57,3 @@ void ComponentArray<T>::EntityDestroyed(Entity entity)
 	if (this->_entityToIndex.find(entity) == this->_entityToIndex.end())
 		RemoveData(entity);
 }
-
-template class ComponentArray<Position>;
-template class ComponentArray<Velocity>;

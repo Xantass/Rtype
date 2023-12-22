@@ -5,7 +5,7 @@
 ** Client
 */
 
-#include "Client.hpp"
+#include "../inc/Client.hpp"
 
 Client::Client(std::string ip, std::string port) : _ip(ip), _port(port)
 {
