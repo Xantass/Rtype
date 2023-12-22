@@ -17,7 +17,7 @@ make
 
 ### Client
 ```
-./r-type_client [port]
+./r-type_client [IP] [port]
 ```
 
 ### Server
