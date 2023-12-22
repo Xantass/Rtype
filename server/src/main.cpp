@@ -45,8 +45,8 @@ int main(int argc, char **argv)
     while (1) {
         currentTime = std::chrono::steady_clock::now();
         elapsedTime = currentTime - startTime;
-        networkServerSystem->Update(coordinator);
         if (elapsedTime >= interval) {
+            networkServerSystem->Update(coordinator);
             physicSystem->Update(coordinator);
             startTime = currentTime;
         }
