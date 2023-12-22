@@ -22,8 +22,7 @@ void NetworkClientSystem::Init(Coordinator &coordinator, std::string host, std::
     _socket.close();
     _socket.open(endpoint.protocol());
     _socket.bind(endpoint);
-    udp::resolver resolver(_service);
-    _serverEndpoint = *resolver.resolve(udp::v4(), host, port).begin();
+    _serverEndpoint = udp::endpoint(asio::ip::make_address(host), atoi(port.c_str()));
     std::vector<int> tmp = mergeVectors(_CONNECT, stringToVector(name));
     std::vector<unsigned char> buffer = encode(tmp);
     _socket.send_to(asio::buffer(buffer), _serverEndpoint);

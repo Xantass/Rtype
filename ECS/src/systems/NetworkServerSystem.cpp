@@ -305,6 +305,7 @@ void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, udp::endp
 
 void NetworkServerSystem::processReceiveData(const std::vector<unsigned char>& data, udp::endpoint clientEndpoint, std::size_t bytesReceived, Coordinator &coordinator)
 {
+    std::cout << clientEndpoint << std::endl;
     if (clientEndpoint != asio::ip::udp::endpoint(asio::ip::make_address("0.0.0.0"), 0)) {
         std::vector<int> res = decode(data, bytesReceived);
         handleCmd(res, clientEndpoint, coordinator);
@@ -346,7 +347,7 @@ void NetworkServerSystem::Update(Coordinator &coordinator)
         try {
             size_t length = _socket.receive_from(asio::buffer(data), clientEndpoint, 0);
             processReceiveData(data, clientEndpoint, length, coordinator);
-        } catch (const std::system_error& e) {
+        } catch (...) {
             break;
         }
     }
