@@ -31,16 +31,10 @@ class Client {
          */
         ~Client();
 
-        void initWindow(int width, int height, std::string title);
-        bool shouldCloseWindow(void);
-        void destroyWindow(void);
-
     protected:
     private:
         std::string _ip; ///< The server's ip
         std::string _port; ///< The server's port
-        int _screenWidth;
-        int _screenHeight;
 };
 
 #endif /* !CLIENT_HPP_ */

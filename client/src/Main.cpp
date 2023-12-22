@@ -11,11 +11,14 @@
 
 int main(int ac, char **av)
 {
+    if (ac != 3)
+        return -84;
     Client client("127.0.0.1", "4242");
     Coordinator coordinator;
 
     coordinator.Init();
-    client.initWindow(1920, 1080, "R-Type");
+    Graphic::init(1920, 1080, "R-Type");
+    Music music = Graphic::loadMusic("assets/Theme.mp3");
 
     coordinator.RegisterComponent<Position>();
     coordinator.RegisterComponent<Velocity>();
@@ -27,6 +30,7 @@ int main(int ac, char **av)
     auto graphicSystem = coordinator.RegisterSystem<GraphicalSystem>();
     auto parallaxSystem = coordinator.RegisterSystem<ParallaxSystem>();
     auto movableSystem = coordinator.RegisterSystem<MovableSystem>();
+    auto networkClientSystem = coordinator.RegisterSystem<NetworkClientSystem>();
 
     Signature signature;
 
@@ -47,6 +51,7 @@ int main(int ac, char **av)
     signature3.set(coordinator.GetComponentType<Velocity>());
     signature3.set(coordinator.GetComponentType<Hitbox>());
     coordinator.SetSystemSignature<PhysicSystem>(signature3);
+    coordinator.SetSystemSignature<NetworkClientSystem>(signature3);
 
     Signature signature4;
 
@@ -59,42 +64,52 @@ int main(int ac, char **av)
     coordinator.AddComponent<Position>(entity2, {1920, 0});
     coordinator.AddComponent<Velocity>(entity2, {-2, 0});
     coordinator.AddComponent<Hitbox>(entity2, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity2, {LoadTexture("assets/parallax-space-big-planet.png")});
+    coordinator.AddComponent<Sprite>(entity2, {Graphic::loadTexture("assets/parallax-space-big-planet.png")});
 
     Entity entity3 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(entity3, {1920, 0});
     coordinator.AddComponent<Velocity>(entity3, {-2.3, 0});
     coordinator.AddComponent<Hitbox>(entity3, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity3, {LoadTexture("assets/parallax-space-far-planets.png")});
+    coordinator.AddComponent<Sprite>(entity3, {Graphic::loadTexture("assets/parallax-space-far-planets.png")});
 
     Entity entity4 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(entity4, {1920, 0});
     coordinator.AddComponent<Velocity>(entity4, {-2.6, 0});
     coordinator.AddComponent<Hitbox>(entity4, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity4, {LoadTexture("assets/parallax-space-ring-planet.png")});
+    coordinator.AddComponent<Sprite>(entity4, {Graphic::loadTexture("assets/parallax-space-ring-planet.png")});
 
     Entity entity5 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(entity5, {1920, 0});
     coordinator.AddComponent<Velocity>(entity5, {-2.9, 0});
     coordinator.AddComponent<Hitbox>(entity5, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity5, {LoadTexture("assets/parallax-space-stars.png")});
+    coordinator.AddComponent<Sprite>(entity5, {Graphic::loadTexture("assets/parallax-space-stars.png")});
 
-    Entity entity = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity, {400, 400});
-    coordinator.AddComponent<Velocity>(entity, {0, 0});
-    coordinator.AddComponent<Hitbox>(entity, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Movable>(entity, {NONE});
-    coordinator.AddComponent<Sprite>(entity, {LoadTexture("assets/planet.png")});
-
-    while (!client.shouldCloseWindow()) {
-        BeginDrawing();
-        ClearBackground(BLACK);
+    std::string host = av[1];
+    std::string port = av[2];
+    networkClientSystem->Init(coordinator, host, port);
+    Graphic::playMusic(music);
+    std::chrono::milliseconds interval(10);
+    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::duration elapsedTime;
+    physicSystem->Update(coordinator);
+    while (!Graphic::shouldCloseWindow()) {
+        Graphic::updateMusic(music);
+        Graphic::beginDrawing();
+        Graphic::clearBackground(RBLACK);
+        currentTime = std::chrono::steady_clock::now();
+        elapsedTime = currentTime - startTime; 
         movableSystem->Update(coordinator);
-        physicSystem->Update(coordinator);
         parallaxSystem->Update(coordinator);
         graphicSystem->Update(coordinator);
-        EndDrawing();
+        networkClientSystem->Update(coordinator);
+        if (elapsedTime >= interval) {
+            physicSystem->Update(coordinator);
+            startTime = currentTime;
+        }
+        Graphic::endDrawing();
     }
-    client.destroyWindow();
+    Graphic::unloadMusic(music);
+    Graphic::close();
     return 0;
 }

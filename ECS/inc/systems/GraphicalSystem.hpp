@@ -8,8 +8,6 @@
 #ifndef GRAPHICALSYSTEM_HPP_
 #define GRAPHICALSYSTEM_HPP_
 
-// class Coordinator {};
-
 #include "System.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"

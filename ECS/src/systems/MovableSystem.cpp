@@ -6,27 +6,29 @@
 */
 
 #include "systems/MovableSystem.hpp"
+#include "Graphic.hpp"
 
 void MovableSystem::Update(Coordinator &coordinator)
 {
-    std::cout << "MovableSystem update :" << std::endl;
+    // std::cout << "MovableSystem update :" << std::endl;
     for (auto &entity : this->_entities) {
         auto& mov = coordinator.GetComponent<Movable>(entity);
         auto& vel = coordinator.GetComponent<Velocity>(entity);
 
-        if (IsKeyPressed(KEY_W)) {
+        if (Graphic::isKeyDown(KEY_W)) {
             coordinator.AddEvent(Event{Event::actions::MOVE, entity, std::any(Velocity{0, -1})});
-            vel = {0, -1};
-        } else if (IsKeyPressed(KEY_D)) {
+            vel = {vel._x, -1};
+        } else if (Graphic::isKeyDown(KEY_D)) {
             coordinator.AddEvent(Event{Event::actions::MOVE, entity, std::any(Velocity{1, 0})});
-            vel = {1, 0};
-        } else if (IsKeyPressed(KEY_S)) {
+            vel = {1, vel._y};
+        } else if (Graphic::isKeyDown(KEY_S)) {
             coordinator.AddEvent(Event{Event::actions::MOVE, entity, std::any(Velocity{0, 1})});
-            vel = {0, 1};
-        } else if (IsKeyPressed(KEY_A)) {
+            vel = {vel._x, 1};
+        } else if (Graphic::isKeyDown(KEY_A)) {
             coordinator.AddEvent(Event{Event::actions::MOVE, entity, std::any(Velocity{-1, 0})});
-            vel = {-1, 0};
-        } else if (IsKeyReleased(KEY_W) || IsKeyReleased(KEY_D) || IsKeyReleased(KEY_S) || IsKeyReleased(KEY_A)) {
+            vel = {-1, vel._y};
+        } else if (Graphic::isKeyUp(KEY_W) || Graphic::isKeyUp(KEY_D) || Graphic::isKeyUp(KEY_S) || Graphic::isKeyUp(KEY_A)) {
+            coordinator.AddEvent(Event{Event::actions::MOVE, entity, std::any(Velocity{0, 0})});
             vel = {0, 0};
         }
     }

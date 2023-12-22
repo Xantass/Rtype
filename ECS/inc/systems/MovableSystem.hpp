@@ -10,8 +10,6 @@
 
 #include "raylib.h"
 
-// class Coordinator {};
-
 #include "System.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
@@ -20,9 +18,17 @@
 #include "components/Movable.hpp"
 
 
+/**
+ * @class MovableSystem
+ * @brief Class of the Movable system
+ *
+ */
 class MovableSystem : public System {
     public:
-
+        /**
+         * @brief Update the movable system using the entities stocker in the coordinator
+         * @param coordinator : The coordinator of the ECS
+         */
         void Update(Coordinator &coordinator);
 
     protected:

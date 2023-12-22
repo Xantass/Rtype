@@ -39,8 +39,23 @@ add_executable(r-type_client
     src/Client.cpp
     )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
-target_link_libraries(r-type_client PRIVATE asio)
+if(WIN32)
+    target_link_libraries(r-type_client PRIVATE Ws2_32.lib raylib asio)
+endif()
+
+if(MSVC)
+  add_compile_options(/Wv:17)
+endif()
+
+if (APPLE AND UNIX)
+    SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++20")
+    target_link_libraries(r-type_client PRIVATE raylib asio)
+endif()
+
+if(UNIX AND NOT APPLE)
+    target_compile_options(r-type_client PRIVATE -std=c++2a -Wall -Wextra -O3)
+    target_link_libraries(r-type_client PRIVATE raylib asio)
+endif()
 
 # Link your project with raylib
 # target_link_libraries(r-type_client PRIVATE ${raylib_LIBRARIES})

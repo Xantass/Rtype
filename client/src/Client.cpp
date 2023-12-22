@@ -5,6 +5,12 @@
 ** Client
 */
 
+#if defined(_WIN32)         
+	#define CloseWindow RaylibCloseWindow
+    #define ShowCursor RaylibShowCursor
+    #undef CloseWindow
+    #undef ShowCursor           // All USER defines and routines
+#endif
 #include "../inc/Client.hpp"
 
 Client::Client(std::string ip, std::string port) : _ip(ip), _port(port)
@@ -13,22 +19,4 @@ Client::Client(std::string ip, std::string port) : _ip(ip), _port(port)
 
 Client::~Client()
 {
-}
-
-void Client::initWindow(int width, int height, std::string title)
-{
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(width, height, title.c_str());
-    _screenWidth = width;
-    _screenHeight = height;
-}
-
-bool Client::shouldCloseWindow(void)
-{
-    return WindowShouldClose();
-}
-
-void Client::destroyWindow(void)
-{
-    CloseWindow();
 }

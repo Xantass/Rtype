@@ -31,30 +31,19 @@ int main(int argc, char **argv)
     coordinator.SetSystemSignature<PhysicSystem>(signature);
     coordinator.SetSystemSignature<NetworkServerSystem>(signature);
 
-    Entity entity = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity, {1, 0});
-    coordinator.AddComponent<Velocity>(entity, {0, 0});
-    coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
-
-    physicSystem->Update(coordinator);
-
-    Entity entity2 = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity2, {0, 0});
-    coordinator.AddComponent<Velocity>(entity2, {1, 0});
-    coordinator.AddComponent<Hitbox>(entity2, {0, 0, 1, 1, ENNEMY});
-
-    physicSystem->Update(coordinator);
-
     networkServerSystem->Init();
+    std::chrono::milliseconds interval(10);
+    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::duration elapsedTime;
     while (1) {
+        currentTime = std::chrono::steady_clock::now();
+        elapsedTime = currentTime - startTime;
         networkServerSystem->Update(coordinator);
+        if (elapsedTime >= interval) {
+            physicSystem->Update(coordinator);
+            startTime = currentTime;
+        }
     }
-
-    coordinator.AddEvent(Event{Event::actions::MOVE, entity,std::any(Velocity{1, 0})});
-
-    auto events = coordinator.GetEvent();
-
-    std::cout << std::any_cast<Position>(events._data)._x << std::endl;
-
     return 0;
 }

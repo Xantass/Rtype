@@ -9,7 +9,7 @@
 
 void ParallaxSystem::Update(Coordinator &coordinator)
 {
-    std::cout << "ParallaxSystem update :" << std::endl;
+    // std::cout << "ParallaxSystem update :" << std::endl;
     for (auto &entity : this->_entities) {
         auto& pos = coordinator.GetComponent<Position>(entity);
         auto& sprite = coordinator.GetComponent<Sprite>(entity);

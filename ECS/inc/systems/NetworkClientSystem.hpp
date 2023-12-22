@@ -13,10 +13,17 @@
 #ifndef NETWORKCLIENTSYSTEM_HPP_
 #define NETWORKCLIENTSYSTEM_HPP_
 
-#include <asio.hpp>
-#include "EnumProtocol.hpp"
+#if defined(_WIN32)           
+	#define NOGDI             // All GDI defines and routines
+	#define NOUSER            // All USER defines and routines
+#endif
 
-// class Coordinator {};
+#include <asio.hpp> // or any library that uses Windows.h
+
+#if defined(_WIN32)           // raylib uses these names as function parameters
+	#undef near
+	#undef far
+#endif
 
 #include "System.hpp"
 #include "components/Position.hpp"
@@ -24,6 +31,7 @@
 #include "components/Hitbox.hpp"
 #include "components/Sprite.hpp"
 #include "components/Movable.hpp"
+#include "EnumProtocol.hpp"
 
 
 using namespace asio;
@@ -39,7 +47,7 @@ public:
      * @brief Initializes the NetworkClientSystem.
      * @param coordinator The Coordinator reference.
      */
-    void Init(Coordinator &coordinator);
+    void Init(Coordinator &coordinator, std::string host, std::string port);
 
     /**
      * @brief Finds a valid port to use.
@@ -82,19 +90,19 @@ public:
      * @brief Handles the received command data.
      * @param decodedIntegers The vector of integers representing the command data.
      */
-    void handleCmd(std::vector<int>& decodedIntegers);
+    void handleCmd(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
     /**
      * @brief Sends a ping request.
      * @param decodedIntegers The vector of integers for ping request data.
      */
-    void ping(std::vector<int>& decodedIntegers);
+    void ping(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
     /**
      * @brief Sends position data.
      * @param decodedIntegers The vector of integers for position data.
      */
-    void pos(std::vector<int>& decodedIntegers);
+    void pos(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
     /**
      * @brief Creates entities based on decoded data.
@@ -102,6 +110,8 @@ public:
      * @param coordinator The Coordinator reference.
      */
     void createEntities(std::vector<int> decodedIntegers, Coordinator &coordinator);
+
+    void checkEvent(Coordinator &coordinator);
 
     /**
      * @brief Updates the NetworkClientSystem.
@@ -114,7 +124,7 @@ private:
     io_context _service; /**< The Boost ASIO io_service. */
     udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v4(), findValidPort(_service))); /**< The UDP socket for communication. */
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
-    std::function<void(std::vector<int>&)> _functions[8]; /**< Array of function pointers. */
+    std::function<void(std::vector<int>&, Coordinator &coordinator)> _functions[8]; /**< Array of function pointers. */
     int _id; /**< The ID of the client. */
 };
 

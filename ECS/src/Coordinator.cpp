@@ -85,7 +85,10 @@ void Coordinator::AddEvent(Event event)
 
 Event Coordinator::GetEvent()
 {
-	Event event = this->_eventQueue.front();
-	this->_eventQueue.pop();
-	return event;
+	if (this->_eventQueue.empty() != true) {
+		Event event = this->_eventQueue.front();
+		this->_eventQueue.pop();
+		return event;
+	}
+	return Event{Event::actions::EMPTY, 0, std::any(int(-1))};
 }
