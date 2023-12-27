@@ -44,7 +44,7 @@ public:
      * @brief Initializes the NetworkClientSystem.
      * @param coordinator The Coordinator reference.
      */
-    void Init(Coordinator &coordinator, std::string host, std::string port);
+    void Init(Coordinator &coordinator, std::string host, std::string port, std::string name, int portClient);
 
     /**
      * @brief Finds a valid port to use.
@@ -108,6 +108,10 @@ public:
      */
     void createEntities(std::vector<int> decodedIntegers, Coordinator &coordinator);
 
+    void createEntity(std::vector<int> decodedIntegers, Coordinator &coordinator);
+
+    void destroyEntity(std::vector<int> decodedIntegers, Coordinator &coordinator);
+
     void checkEvent(Coordinator &coordinator);
 
     /**
@@ -121,7 +125,7 @@ private:
     io_context _service; /**< The Boost ASIO io_service. */
     udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v4(), findValidPort(_service))); /**< The UDP socket for communication. */
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
-    std::function<void(std::vector<int>&, Coordinator &coordinator)> _functions[8]; /**< Array of function pointers. */
+    std::function<void(std::vector<int>&, Coordinator &coordinator)> _functions[14]; /**< Array of function pointers. */
     int _id; /**< The ID of the client. */
 };
 
