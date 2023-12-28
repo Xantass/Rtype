@@ -44,7 +44,7 @@ public:
      * @brief Initializes the NetworkClientSystem.
      * @param coordinator The Coordinator reference.
      */
-    void Init(Coordinator &coordinator, std::string host, std::string port, std::string name, int portClient);
+    void Init(std::string host, std::string port, std::string name, int portClient);
 
     /**
      * @brief Finds a valid port to use.
@@ -52,6 +52,8 @@ public:
      * @return An unsigned short representing the valid port.
      */
     unsigned short findValidPort(asio::io_context& service);
+
+    HitboxType deterType(int x);
 
     /**
      * @brief Encodes a vector of integers into a vector of bytes.
@@ -111,6 +113,10 @@ public:
     void createEntity(std::vector<int> decodedIntegers, Coordinator &coordinator);
 
     void destroyEntity(std::vector<int> decodedIntegers, Coordinator &coordinator);
+
+    void paramEvent(Event& event);
+
+    void joinEvent(Event& event, Coordinator& coordinator);
 
     void checkEvent(Coordinator &coordinator);
 

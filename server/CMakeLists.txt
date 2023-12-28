@@ -17,13 +17,13 @@ project(r-type_server)
 include_directories("./inc/" "./../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
 
 set(SOURCES
-    src/Server.cpp
     src/main.cpp
-    src/RoomManager.cpp
+    src/room.cpp
     src/Client.cpp
 
     ../ECS/src/systems/PhysicSystem.cpp
     ../ECS/src/systems/NetworkServerSystem.cpp
+    ../ECS/src/systems/NetworkRoomSystem.cpp
     ../ECS/src/EntityManager.cpp
     ../ECS/src/ComponentArray.cpp
     ../ECS/src/ComponentManager.cpp

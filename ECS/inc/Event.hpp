@@ -30,6 +30,8 @@ struct Event {
     enum actions {
         MOVE = 11,
         SHOOT = 10,
+        PARAM = 2,
+        JOIN = 1,
         EMPTY = 0,
     };
 

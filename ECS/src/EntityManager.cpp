@@ -28,13 +28,14 @@ Entity EntityManager::CreateEntity() {
 }
 
 Entity EntityManager::CreateEntity(int id) {
-    if (id >= MAX_ENTITIES) {
+    if (id >= static_cast<int>(MAX_ENTITIES)) {
         //ERROR : Entity out of range.
     }
 
     Entity entity = this->_availableEntities.at(id);
     this->_availableEntities.erase(this->_availableEntities.begin() + id - 1);
     this->_livingEntityCount++;
+    (void)entity;
 
     return id;
 }

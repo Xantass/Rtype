@@ -1,12 +1,12 @@
 /*
 ** EPITECH PROJECT, 2023
-** R-Type
+** RType [WSL: Fedora]
 ** File description:
-** main
+** room
 */
 
-#ifndef MAIN_HPP_
-#define MAIN_HPP_
+#ifndef ROOM_HPP_
+#define ROOM_HPP_
 
 #include <memory>
 #include "Coordinator.hpp"
@@ -14,8 +14,8 @@
 #include "components/Velocity.hpp"
 #include "components/Hitbox.hpp"
 #include "systems/PhysicSystem.hpp"
-#include "systems/NetworkServerSystem.hpp"
+#include "systems/NetworkRoomSystem.hpp"
 #include "Signature.hpp"
 #include "Event.hpp"
 
-#endif /* !MAIN_HPP_ */
+#endif /* !ROOM_HPP_ */

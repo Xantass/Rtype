@@ -11,7 +11,6 @@ Client::Client(std::string username, udp::endpoint clientEndpoint, int id)
 {
     _username = username;
     _clientEndpoint = clientEndpoint;
-    std::hash<std::string> hasher;
     _ID = id;
     _alive = true;
 }

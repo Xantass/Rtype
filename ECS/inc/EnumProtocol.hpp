@@ -28,8 +28,6 @@ enum Cmd {
     PING = 5, /**< Ping command. */
     PONG = 6, /**< Pong command. */
     QUIT = 7, /**< Quit command. */
-    DESTROY = 12, /**< Destroy command. */
-    CREATE = 13 /**< Create command. */
 };
 
 /**
@@ -40,7 +38,9 @@ enum Action {
     READY = 8, /**< Ready action. */
     START = 9, /**< Start action. */
     SHOOT = 10, /**< Shoot action. */
-    MOVE = 11 /**< Move action. */
+    MOVE = 11, /**< Move action. */
+    DESTROY = 12, /**< Destroy command. */
+    CREATE = 13 /**< Create command. */
 };
 
 /**

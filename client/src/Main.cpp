@@ -74,7 +74,7 @@ int main(int ac, char **av)
     std::string name = av[3];
     int portClient = atoi(av[4]);
 
-    networkClientSystem->Init(coordinator, host, port, name, portClient);
+    networkClientSystem->Init(host, port, name, portClient);
 
     Entity entity2 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(entity2, {1920, 0});

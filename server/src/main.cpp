@@ -5,36 +5,23 @@
 ** main
 */
 
-#include <memory>
+
 #include "main.hpp"
-#include "Coordinator.hpp"
-#include "components/Position.hpp"
-#include "components/Velocity.hpp"
-#include "components/Hitbox.hpp"
-#include "systems/PhysicSystem.hpp"
-#include "systems/NetworkServerSystem.hpp"
-#include "Signature.hpp"
-#include "Event.hpp"
 
 int main(int argc, char **argv)
 {
+    if (argc != 1)
+        return 84;
+    (void)argv;
+
     Coordinator coordinator;
 
     coordinator.Init();
 
-    coordinator.RegisterComponent<Position>();
-    coordinator.RegisterComponent<Velocity>();
-    coordinator.RegisterComponent<Hitbox>();
-
-    auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
     auto networkServerSystem = coordinator.RegisterSystem<NetworkServerSystem>();
 
     Signature signature;
 
-    signature.set(coordinator.GetComponentType<Position>());
-    signature.set(coordinator.GetComponentType<Velocity>());
-    signature.set(coordinator.GetComponentType<Hitbox>());
-    coordinator.SetSystemSignature<PhysicSystem>(signature);
     coordinator.SetSystemSignature<NetworkServerSystem>(signature);
 
     networkServerSystem->Init();
@@ -47,7 +34,6 @@ int main(int argc, char **argv)
         elapsedTime = currentTime - startTime;
         if (elapsedTime >= interval) {
             networkServerSystem->Update(coordinator);
-            physicSystem->Update(coordinator);
             startTime = currentTime;
         }
     }
