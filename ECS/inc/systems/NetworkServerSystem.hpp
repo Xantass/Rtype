@@ -28,6 +28,7 @@
 #endif
 #include <sstream>
 #include <fstream>
+#include <thread>
 #include "System.hpp"
 #include "Coordinator.hpp"
 #include "components/Position.hpp"
@@ -38,6 +39,8 @@
 
 using namespace asio;
 using asio::ip::udp;
+
+int room(int nbPlayer, int port);
 
 /**
  * @class NetworkServerSystem

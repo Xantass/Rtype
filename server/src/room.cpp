@@ -7,7 +7,7 @@
 
 #include "room.hpp"
 
-int room(int nbPlayer)
+int room(int nbPlayer, int port)
 {
     (void)nbPlayer;
     Coordinator coordinator;
@@ -29,7 +29,7 @@ int room(int nbPlayer)
     coordinator.SetSystemSignature<PhysicSystem>(signature);
     coordinator.SetSystemSignature<NetworkRoomSystem>(signature);
 
-    networkRoomSystem->Init();
+    networkRoomSystem->Init(port);
     std::chrono::milliseconds interval(10);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();

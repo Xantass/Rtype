@@ -151,6 +151,10 @@ void NetworkServerSystem::param(std::vector<int>& decodedIntegers, udp::endpoint
     if (fichier.is_open()) {
         fichier << std::to_string(_port) << "\t" << name << "\t" << std::to_string(nbPlayer) << std::endl;
         fichier.close();
+        std::thread Thread(room, nbPlayer, _port);
+        Thread.detach();
+        _port++;
+
     } else {
         std::cerr << "Impossible d'ouvrir le fichier." << std::endl;
     }

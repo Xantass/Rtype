@@ -124,14 +124,14 @@ public:
 
     void sendCreate(int entity, Coordinator &coordinator);
 
-    void Init();
+    void Init(int port);
 
     void Update(Coordinator& coordinator);
 
 protected:
 private:
     io_context _service; /**< The Boost ASIO io_service. */
-    udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v6(), findValidPort(_service))); /**< The UDP socket for communication. */
+    udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v6(), 0)); /**< The UDP socket for communication. */
     std::vector<Client> _clients; /**< Vector storing information about connected clients. */
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
     std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[14]; /**< Array of function pointers. */

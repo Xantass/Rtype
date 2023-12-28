@@ -302,8 +302,12 @@ void NetworkRoomSystem::sendEcs(Coordinator &coordinator)
     }
 }
 
-void NetworkRoomSystem::Init()
+void NetworkRoomSystem::Init(int port)
 {
+    udp::endpoint endpoint(udp::v4(), port);
+    _socket.close();
+    _socket.open(endpoint.protocol());
+    _socket.bind(endpoint);
     _socket.non_blocking(true);
     _functions[0] = std::bind(&NetworkRoomSystem::response, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[1] = std::bind(&NetworkRoomSystem::connect, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
