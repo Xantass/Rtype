@@ -53,6 +53,11 @@ public:
      */
     unsigned short findValidPort(asio::io_context& service);
 
+    /**
+     * @brief Determines the HitboxType based on the given integer.
+     * @param x The integer value used to determine the HitboxType.
+     * @return The HitboxType determined from the given integer.
+     */
     HitboxType deterType(int x);
 
     /**
@@ -110,14 +115,37 @@ public:
      */
     void createEntities(std::vector<int> decodedIntegers, Coordinator &coordinator);
 
+    /**
+     * @brief Creates an entity based on the provided decoded integers.
+     * @param decodedIntegers The vector of integers containing entity creation data.
+     * @param coordinator The Coordinator reference.
+     */
     void createEntity(std::vector<int> decodedIntegers, Coordinator &coordinator);
 
+    /**
+     * @brief Destroys an entity based on the provided decoded integers.
+     * @param decodedIntegers The vector of integers containing entity destruction data.
+     * @param coordinator The Coordinator reference.
+     */
     void destroyEntity(std::vector<int> decodedIntegers, Coordinator &coordinator);
 
+    /**
+     * @brief Handles a parameter event.
+     * @param event The Event object representing the parameter event.
+     */
     void paramEvent(Event& event);
 
+    /**
+     * @brief Handles a join event in the context of the coordinator.
+     * @param event The Event object representing the join event.
+     * @param coordinator The Coordinator reference.
+     */
     void joinEvent(Event& event, Coordinator& coordinator);
 
+    /**
+     * @brief Checks for pending events and handles them within the coordinator.
+     * @param coordinator The Coordinator reference.
+     */
     void checkEvent(Coordinator &coordinator);
 
     /**

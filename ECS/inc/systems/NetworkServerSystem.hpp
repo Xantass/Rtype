@@ -145,6 +145,12 @@ public:
      */
     void ping(Coordinator& coordinator);
 
+    /**
+     * @brief Handles parameter data received from a client.
+     * @param decodedIntegers The vector of integers representing the parameter data.
+     * @param clientEndpoint The endpoint of the client sending the parameter data.
+     * @param coordinator The Coordinator reference.
+     */
     void param(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     /**
