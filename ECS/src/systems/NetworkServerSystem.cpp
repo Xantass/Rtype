@@ -147,7 +147,7 @@ void NetworkServerSystem::param(std::vector<int>& decodedIntegers, udp::endpoint
     int nbPlayer = decodedIntegers.at(0);
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
     std::string name = vectorToString(decodedIntegers);
-    
+
     if (fichier.is_open()) {
         fichier << std::to_string(_port) << "\t" << name << "\t" << std::to_string(nbPlayer) << std::endl;
         fichier.close();

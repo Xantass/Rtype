@@ -27,7 +27,7 @@ enum Cmd {
     POS = 4, /**< Position command. */
     PING = 5, /**< Ping command. */
     PONG = 6, /**< Pong command. */
-    QUIT = 7, /**< Quit command. */
+    DISCONNECT = 7, /**< Quit command. */
 };
 
 /**
