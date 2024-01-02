@@ -289,8 +289,9 @@ void NetworkServerSystem::shoot(std::vector<int>& decodedIntegers, udp::endpoint
     // if () {
         Entity bullet = coordinator.CreateEntity(decodedIntegers.at(0));
         coordinator.AddComponent<Position>(bullet, coordinator.GetComponent<Position>(decodedIntegers.at(1)));
-        coordinator.AddComponent<Velocity>(bullet, {1, 0});
+        coordinator.AddComponent<Velocity>(bullet, {20, 0});
         coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, OTHER});
+        coordinator.AddComponent<Controllable>(bullet, {ENGINE});
         std::vector<unsigned char> buffer = encode(_PASS);
         _socket.send_to(asio::buffer(buffer), clientEndpoint);
         return;

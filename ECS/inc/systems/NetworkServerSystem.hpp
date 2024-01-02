@@ -35,6 +35,7 @@
 #include "components/Velocity.hpp"
 #include "components/Hitbox.hpp"
 #include "components/Movable.hpp"
+#include "components/Controllable.hpp"
 
 
 using namespace asio;

@@ -8,12 +8,14 @@
 #include "NetworkClientSystem.hpp"
 #include "components/Sprite.hpp"
 #include "../components/Movable.hpp"
+#include "../components/Controllable.hpp"
+#include "../components/Hitbox.hpp"
 #include "Graphic.hpp"
 
 using asio::ip::udp;
 
 #define CHECK_ZERO(x) x == 0 ? static_cast<float>(x) : static_cast<float>(x) / 10
-#define CHECK_TYPE(x) x == 1 ? PLAYER : ENNEMY
+#define CHECK_TYPE(x) x == 1 ? PLAYER : OTHER
 #define CHECK_ACTION(x) x == Event::MOVE ? 11 : 10
 
 void NetworkClientSystem::Init(Coordinator &coordinator, std::string host, std::string port, std::string name, int portClient)
@@ -260,19 +262,20 @@ void NetworkClientSystem::checkEvent(Coordinator &coordinator)
             _socket.send_to(asio::buffer(buffer), _serverEndpoint); 
         }
         if (event._type == Event::SHOOT) {
-            std::cout << "SHOOT" << std::endl;
             for (auto entity : _entities) {
                 if (this->_id == entity) {
                     Entity bullet = coordinator.CreateEntity();
+                    std::cout << "SHOOT and created bullet : " << bullet << std::endl;
                     coordinator.AddComponent<Position>(bullet, coordinator.GetComponent<Position>(entity));
-                    coordinator.AddComponent<Velocity>(bullet, {4, 0});
                     coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, OTHER});
+                    coordinator.AddComponent<Velocity>(bullet, {20, 0});
+                    // coordinator.AddComponent<Controllable>(bullet, {ENGINE});
                     std::vector<int> tmp = mergeVectors({CHECK_ACTION(event._type), 2}, {static_cast<int>(bullet), static_cast<int>(entity)});
                     for (auto i : tmp)
                         std::cout << i << std::endl;
                     std::vector<unsigned char> buffer = encode(tmp);
                     _socket.send_to(asio::buffer(buffer), _serverEndpoint);
-                    coordinator.AddComponent<Sprite>(bullet, {LoadTexture("assets/planet.png")});
+                    coordinator.AddComponent<Sprite>(bullet, {LoadTexture("assets/bullet.png")});
                     break;
                 }
             }

@@ -17,7 +17,7 @@ void MovableSystem::Update(Coordinator &coordinator)
 
         if (IsKeyPressed(KEY_SPACE)) {
             coordinator.AddEvent(Event{Event::actions::SHOOT, 0, std::any(Velocity{1, 0})});
-        } else if (IsKeyPressed(KEY_W)) {
+        } else if (Graphic::isKeyDown(KEY_W)) {
             coordinator.AddEvent(Event{Event::actions::MOVE, entity, std::any(Velocity{0, -1})});
             vel = {vel._x, -1};
         } else if (Graphic::isKeyDown(KEY_D)) {

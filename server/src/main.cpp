@@ -18,8 +18,10 @@ int main(int argc, char **argv)
     coordinator.RegisterComponent<Position>();
     coordinator.RegisterComponent<Velocity>();
     coordinator.RegisterComponent<Hitbox>();
+    coordinator.RegisterComponent<Controllable>();
 
     auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
+    auto controlSystem = coordinator.RegisterSystem<ControlSystem>();
     auto networkServerSystem = coordinator.RegisterSystem<NetworkServerSystem>();
 
     Signature signature;
@@ -29,6 +31,13 @@ int main(int argc, char **argv)
     signature.set(coordinator.GetComponentType<Hitbox>());
     coordinator.SetSystemSignature<PhysicSystem>(signature);
     coordinator.SetSystemSignature<NetworkServerSystem>(signature);
+    
+    Signature signature2;
+
+    signature2.set(coordinator.GetComponentType<Position>());
+    signature2.set(coordinator.GetComponentType<Velocity>());
+    signature2.set(coordinator.GetComponentType<Controllable>());
+    coordinator.SetSystemSignature<ControlSystem>(signature2);
 
     networkServerSystem->Init();
     std::chrono::milliseconds interval(10);
@@ -41,6 +50,7 @@ int main(int argc, char **argv)
         if (elapsedTime >= interval) {
             networkServerSystem->Update(coordinator);
             physicSystem->Update(coordinator);
+            controlSystem->Update(coordinator);
             startTime = currentTime;
         }
     }
