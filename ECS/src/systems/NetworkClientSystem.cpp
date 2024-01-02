@@ -119,7 +119,7 @@ void NetworkClientSystem::ping(std::vector<int>& decodedIntegers, Coordinator &c
     (void)coordinator;
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
     std::vector<int> tmp = {_id};
-    std::cout << "SEND PONG WITH ID: "<< _id << std::endl;
+    // std::cout << "SEND PONG WITH ID: "<< _id << std::endl;
     std::vector<unsigned char> buffer = encode(mergeVectors(_PONG, tmp));
     _socket.send_to(asio::buffer(buffer), _serverEndpoint);
 }

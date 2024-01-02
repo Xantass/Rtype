@@ -15,6 +15,8 @@
 
 #include <asio.hpp>
 #include <string>
+#include <map>
+#include <vector>
 
 using namespace asio;
 using asio::ip::udp;
@@ -102,6 +104,7 @@ private:
     int _ID; /**< The ID of the client. */
     udp::endpoint _clientEndpoint; /**< The UDP endpoint of the client. */
     bool _alive; /**< The status of the client (alive or not). */
+    std::map<int, std::vector<unsigned char>> _packets;
 };
 
 #endif /* !CLIENT_HPP_ */

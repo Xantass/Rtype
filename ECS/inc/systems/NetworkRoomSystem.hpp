@@ -5,6 +5,11 @@
 ** NetworkRoomSystem
 */
 
+/**
+ * @file NetworkRoomSystem.hpp
+ * @brief Header file defining the NetworkRoomSystem class.
+ */
+
 #ifndef NETWORKROOMSYSTEM_HPP_
 #define NETWORKROOMSYSTEM_HPP_
 
@@ -30,8 +35,14 @@
 #include "EnumProtocol.hpp"
 #include "Client.hpp"
 
+/**
+ * @class NetworkRoomSystem
+ * @brief Handles networking for room-related activities.
+ */
+
 class NetworkRoomSystem : public System {
 public:
+    // Methods
 
     /**
      * @brief Retrieves the client with the given ID.
@@ -60,6 +71,7 @@ public:
      * @param data The received data in vector format.
      * @param clientEndpoint The endpoint of the client.
      * @param bytesReceived The number of bytes received.
+     * @param coordinator The Coordinator reference.
      */
     void processReceiveData(const std::vector<unsigned char>& data, udp::endpoint clientEndpoint, std::size_t bytesReceived, Coordinator &coordinator);
 
@@ -79,27 +91,23 @@ public:
 
     /**
      * @brief Sends a pong response to a ping request.
-     * @param data The vector of integers representing the pong response data.
+     * @param decodedIntegers The vector of integers representing the pong response data.
      * @param clientEndpoint The endpoint of the client requesting pong.
+     * @param coordinator The Coordinator reference.
      */
     void pong(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     /**
-     * @brief Establishes a connection with a client.
-     * @param data The vector of integers representing connection data.
-     * @param clientEndpoint The endpoint of the client attempting to connect.
-     */
-    void connect(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
-
-    /**
      * @brief Sends a response to a client.
-     * @param data The vector of integers for the response data.
+     * @param decodedIntegers The vector of integers for the response data.
      * @param clientEndpoint The endpoint of the client to respond to.
+     * @param coordinator The Coordinator reference.
      */
     void response(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     /**
      * @brief Sends a ping request to all connected clients.
+     * @param coordinator The Coordinator reference.
      */
     void ping(Coordinator& coordinator);
 
@@ -111,21 +119,54 @@ public:
 
     /**
      * @brief Handles the received command data.
-     * @param data The vector of integers representing the command data.
+     * @param decodedIntegers The vector of integers representing the command data.
      * @param clientEndpoint The endpoint of the client sending the command.
+     * @param coordinator The Coordinator reference.
      */
     void handleCmd(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint, Coordinator &coordinator);
 
+    /**
+     * @brief Checks movement for an entity.
+     * @param pos The Position component.
+     * @param vel The Velocity component.
+     * @param hitbox The Hitbox component.
+     * @param entity The entity to check movement for.
+     * @param coordinator The Coordinator reference.
+     * @return An integer indicating the movement state.
+     */
     int checkMove(Position& pos, Velocity& vel, Hitbox& hitbox, Entity entity, Coordinator& coordinator);
 
+    /**
+     * @brief Moves an entity.
+     * @param decodedIntegers The vector of integers representing movement data.
+     * @param clientEndpoint The endpoint of the client requesting movement.
+     * @param coordinator The Coordinator reference.
+     */
     void move(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
+    /**
+     * @brief Sends a destroy signal for an entity.
+     * @param entity The entity to destroy.
+     */
     void sendDestroy(int entity);
 
+    /**
+     * @brief Sends a create signal for an entity.
+     * @param entity The entity to create.
+     * @param coordinator The Coordinator reference.
+     */
     void sendCreate(int entity, Coordinator &coordinator);
 
+    /**
+     * @brief Initializes the NetworkRoomSystem with a specific port.
+     * @param port The port to use for communication.
+     */
     void Init(int port);
 
+    /**
+     * @brief Updates the NetworkRoomSystem.
+     * @param coordinator The Coordinator reference.
+     */
     void Update(Coordinator& coordinator);
 
 protected:
