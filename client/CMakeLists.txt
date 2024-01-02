@@ -29,7 +29,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(raylib)
 
 include_directories("./inc/" "../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
-Include raylib
+
 find_package(raylib CONFIG REQUIRED PATHS ${raylib_DIR}/lib64/cmake/raylib/)
 
 
