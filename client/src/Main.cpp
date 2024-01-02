@@ -11,7 +11,7 @@
 
 int main(int ac, char **av)
 {
-    if (ac != 3)
+    if (ac != 5)
         return -84;
     Client client("127.0.0.1", "4242");
     Coordinator coordinator;
@@ -59,6 +59,12 @@ int main(int ac, char **av)
     signature4.set(coordinator.GetComponentType<Velocity>());
     coordinator.SetSystemSignature<MovableSystem>(signature4);
 
+    std::string host = av[1];
+    std::string port = av[2];
+    std::string name = av[3];
+    int portClient = atoi(av[4]);
+
+    networkClientSystem->Init(coordinator, host, port, name, portClient);
 
     Entity entity2 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(entity2, {1920, 0});
@@ -84,30 +90,31 @@ int main(int ac, char **av)
     coordinator.AddComponent<Hitbox>(entity5, {0, 0, 0, 0, OTHER});
     coordinator.AddComponent<Sprite>(entity5, {Graphic::loadTexture("assets/parallax-space-stars.png")});
 
-    std::string host = av[1];
-    std::string port = av[2];
-    networkClientSystem->Init(coordinator, host, port);
+    std::cout << "Entity 2: " << entity2 << std::endl;
+    std::cout << "Entity 3: " << entity3 << std::endl;
+    std::cout << "Entity 4: " << entity4 << std::endl;
+    std::cout << "Entity 5: " << entity5 << std::endl;
+
     Graphic::playMusic(music);
     std::chrono::milliseconds interval(10);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::duration elapsedTime;
-    physicSystem->Update(coordinator);
     while (!Graphic::shouldCloseWindow()) {
-        Graphic::updateMusic(music);
-        Graphic::beginDrawing();
-        Graphic::clearBackground(RBLACK);
         currentTime = std::chrono::steady_clock::now();
-        elapsedTime = currentTime - startTime; 
-        movableSystem->Update(coordinator);
-        parallaxSystem->Update(coordinator);
-        graphicSystem->Update(coordinator);
-        networkClientSystem->Update(coordinator);
+        elapsedTime = currentTime - startTime;
         if (elapsedTime >= interval) {
+            Graphic::updateMusic(music);
+            Graphic::beginDrawing();
+            Graphic::clearBackground(RBLACK); 
+            movableSystem->Update(coordinator);
+            parallaxSystem->Update(coordinator);
+            graphicSystem->Update(coordinator);
+            networkClientSystem->Update(coordinator);
             physicSystem->Update(coordinator);
             startTime = currentTime;
+            Graphic::endDrawing();
         }
-        Graphic::endDrawing();
     }
     Graphic::unloadMusic(music);
     Graphic::close();

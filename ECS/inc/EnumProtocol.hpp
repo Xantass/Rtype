@@ -27,7 +27,9 @@ enum Cmd {
     POS = 4, /**< Position command. */
     PING = 5, /**< Ping command. */
     PONG = 6, /**< Pong command. */
-    QUIT = 7 /**< Quit command. */
+    QUIT = 7, /**< Quit command. */
+    DESTROY = 12, /**< Destroy command. */
+    CREATE = 13 /**< Create command. */
 };
 
 /**
