@@ -30,9 +30,6 @@ FetchContent_MakeAvailable(raylib)
 
 include_directories("./inc/" "../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
 
-find_package(raylib CONFIG REQUIRED PATHS ${raylib_DIR}/lib64/cmake/raylib/)
-
-
 # Your project source files
 add_executable(r-type_client
     src/Main.cpp
