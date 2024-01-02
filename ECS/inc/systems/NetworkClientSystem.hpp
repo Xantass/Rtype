@@ -29,6 +29,8 @@
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
 #include "components/Hitbox.hpp"
+#include "components/Sprite.hpp"
+#include "components/Movable.hpp"
 #include "EnumProtocol.hpp"
 
 using namespace asio;

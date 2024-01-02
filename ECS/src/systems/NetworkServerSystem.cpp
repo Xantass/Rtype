@@ -9,6 +9,7 @@
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
 #include "components/Hitbox.hpp"
+#include "components/Movable.hpp"
 
 void NetworkServerSystem::Init()
 {
@@ -23,7 +24,7 @@ void NetworkServerSystem::Init()
     _functions[7] = nullptr;
     _functions[8] = nullptr;
     _functions[9] = nullptr;
-    _functions[10] = nullptr;
+    _functions[10] = std::bind(&NetworkServerSystem::shoot, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[11] = std::bind(&NetworkServerSystem::move, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[12] = nullptr;
     _functions[13] = nullptr;
@@ -285,6 +286,23 @@ void NetworkServerSystem::move(std::vector<int>& decodedIntegers, udp::endpoint&
     std::vector<unsigned char> buffer = encode(_UNKNOW);
     _socket.send_to(asio::buffer(buffer), clientEndpoint);
 }
+
+void NetworkServerSystem::shoot(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
+{
+    std::cout << "PLAYER SHOOT CLIENT" << std::endl;
+    // if () {
+        Entity bullet = coordinator.CreateEntity(decodedIntegers.at(0));
+        coordinator.AddComponent<Position>(bullet, coordinator.GetComponent<Position>(decodedIntegers.at(1)));
+        coordinator.AddComponent<Velocity>(bullet, {1, 0});
+        coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, OTHER});
+        std::vector<unsigned char> buffer = encode(_PASS);
+        _socket.send_to(asio::buffer(buffer), clientEndpoint);
+        return;
+    // }
+    // std::vector<unsigned char> buffer = encode(_UNKNOW);
+    // _socket.send_to(asio::buffer(buffer), clientEndpoint);
+}
+
 
 void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint, Coordinator &coordinator)
 {
