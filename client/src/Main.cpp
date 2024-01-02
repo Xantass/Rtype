@@ -6,8 +6,7 @@
 */
 
 #include "../inc/Client.hpp"
-#include "../../ECS/ECS.hpp"
-#include "../../ECS/inc/systems/NetworkClientSystem.hpp"
+#include "../../ECS/ECSClient.hpp"
 
 int main(int ac, char **av)
 {

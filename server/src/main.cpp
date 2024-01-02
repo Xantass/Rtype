@@ -7,8 +7,7 @@
 
 #include <memory>
 #include "main.hpp"
-#include "../../ECS/ECS.hpp"
-#include "../../ECS/inc/systems/NetworkServerSystem.hpp"
+#include "../../ECS/ECSServer.hpp"
 
 int main(int argc, char **argv)
 {
