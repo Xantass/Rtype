@@ -78,18 +78,18 @@ private:
 	 * 
 	 */
 	std::vector<Entity> _availableEntities{};
-
 	/**
 	 * @brief Number of living entities
 	 * 
 	 */
 	uint32_t _livingEntityCount{};
-
 	/**
 	 * @brief Array of signatures
 	 * 
 	 */
 	std::array<Signature, MAX_ENTITIES> _signatures{};
 };
+
+#include "../src/EntityManager.cpp"
 
 #endif /* !ENTITYMANAGER_HPP_ */
