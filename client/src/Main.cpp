@@ -5,6 +5,7 @@
 ** Main
 */
 
+#include "Menu.hpp"
 #include "Client.cpp"
 #include "Coordinator.hpp"
 #include "components/Position.hpp"
@@ -73,8 +74,9 @@ int main(int ac, char **av)
     std::string port = av[2];
     std::string name = av[3];
     int portClient = atoi(av[4]);
+    Menu menu(host, std::to_string(portClient), name);
 
-    networkClientSystem->Init(host, port, name, portClient);
+    // networkClientSystem->Init(host, port, name, portClient);
 
     Entity entity2 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(entity2, {1920, 0});
@@ -116,13 +118,22 @@ int main(int ac, char **av)
         if (elapsedTime >= interval) {
             Graphic::updateMusic(music);
             Graphic::beginDrawing();
-            Graphic::clearBackground(RBLACK); 
+            Graphic::clearBackground(RBLACK);
+            if (menu.action == "Launch Game") {
+                networkClientSystem->Init(menu._host, menu._port, menu._name, portClient);
+                menu.action = "Game";
+                std::string infos[] = {menu._port, menu._name, menu._nbPlayer};
+                coordinator.AddEvent(Event{Event::actions::PARAM, 0, std::any(std::vector<std::string>(infos, infos + sizeof(infos) / sizeof(std::string)))});
+            }
             movableSystem->Update(coordinator);
             parallaxSystem->Update(coordinator);
             graphicSystem->Update(coordinator);
-            networkClientSystem->Update(coordinator);
+            if (menu.action == "Game") {
+                networkClientSystem->Update(coordinator);
+            }
             physicSystem->Update(coordinator);
             startTime = currentTime;
+            menu.displayMenu();
             Graphic::endDrawing();
         }
     }

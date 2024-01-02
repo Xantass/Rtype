@@ -243,7 +243,9 @@ std::vector<int> NetworkClientSystem::decode(const std::vector<unsigned char>& e
 
 void NetworkClientSystem::paramEvent(Event& event)
 {
-    (void)event;
+    std::vector<std::string> list = std::any_cast<std::vector<std::string>>(event._data);
+    for (auto d : list)
+        std::cout << d << std::endl;
     return;
 }
 
@@ -272,7 +274,7 @@ void NetworkClientSystem::checkEvent(Coordinator &coordinator)
 {
     while (1) {
         auto event = coordinator.GetEvent();
-        
+
         if (event._type == Event::EMPTY) {
             break;
         }
