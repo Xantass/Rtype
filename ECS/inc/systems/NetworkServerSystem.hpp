@@ -27,13 +27,15 @@
 	#undef far
 #endif
 #include <sstream>
+#include "EnumProtocol.hpp"
+#include "../../server/inc/Client.hpp"
+
 #include "System.hpp"
-#include "Coordinator.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
 #include "components/Hitbox.hpp"
-#include "EnumProtocol.hpp"
-#include "Client.hpp"
+#include "components/Movable.hpp"
+
 
 using namespace asio;
 using asio::ip::udp;
@@ -170,5 +172,7 @@ private:
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
     int _id = 0; /**< The ID of the server. */
 };
+
+#include "../../src/systems/NetworkServerSystem.cpp"
 
 #endif /* !NETWORKSERVERSYSTEM_HPP_ */

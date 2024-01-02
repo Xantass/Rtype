@@ -6,9 +6,6 @@
 */
 
 #include "NetworkServerSystem.hpp"
-#include "components/Position.hpp"
-#include "components/Velocity.hpp"
-#include "components/Hitbox.hpp"
 
 void NetworkServerSystem::Init()
 {

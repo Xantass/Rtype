@@ -7,14 +7,7 @@
 
 #include <memory>
 #include "main.hpp"
-#include "Coordinator.hpp"
-#include "components/Position.hpp"
-#include "components/Velocity.hpp"
-#include "components/Hitbox.hpp"
-#include "systems/PhysicSystem.hpp"
-#include "systems/NetworkServerSystem.hpp"
-#include "Signature.hpp"
-#include "Event.hpp"
+#include "../../ECS/ECSServer.hpp"
 
 int main(int argc, char **argv)
 {

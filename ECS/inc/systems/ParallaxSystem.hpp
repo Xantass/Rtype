@@ -14,10 +14,12 @@
 #ifndef PARALLAXSYSTEM_HPP_
 #define PARALLAXSYSTEM_HPP_
 
-#include "../System.hpp"
-#include "../Coordinator.hpp"
-#include "../components/Position.hpp"
-#include "../components/Sprite.hpp"
+#include "System.hpp"
+#include "components/Position.hpp"
+#include "components/Velocity.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Sprite.hpp"
+#include "components/Movable.hpp"
 
 /**
  * @class ParallaxSystem
@@ -37,5 +39,7 @@ public:
 protected:
 private:
 };
+
+#include "../../src/systems/ParallaxSystem.cpp"
 
 #endif /* !PARALLAXSYSTEM_HPP_ */
