@@ -18,6 +18,7 @@ void ControlSystem::Update(Coordinator &coordinator)
             std::cout << "Player in control" << std::endl;
         } else if (con.type == IA) {
             std::cout << "IA in control" << std::endl;
+            vel = {-10, vel._y};
         } else {
             if (pos._x > 2000) {
                 std::cout << "Destroyed entity : " << entity << std::endl;
