@@ -33,7 +33,7 @@ std::vector<std::string> Parallax::getAllFiles(void)
     try {
         for (const auto& entry : std::filesystem::directory_iterator(_path)) {
             if (std::filesystem::is_regular_file(entry.path())) {
-                paths.push_back(entry.path());
+                paths.push_back(entry.path().string());
             }
         }
     } catch (const std::exception& e) {
