@@ -18,6 +18,8 @@
 
 #include "Entity.hpp"
 
+class Coordinator;
+
 /**
  * @class System
  * @brief Class of the system
@@ -25,6 +27,7 @@
  */
 class System {
 public:
+	virtual void Update(Coordinator &coordinator) = 0;
 	/**
 	 * @brief Entities list
 	 * 

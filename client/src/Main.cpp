@@ -15,6 +15,7 @@ int main(int ac, char **av)
     Client client("127.0.0.1", "4242");
     Coordinator coordinator;
 
+    std::vector<std::pair<std::shared_ptr<System>, bool>> vec;
     coordinator.Init();
     Graphic::init(1920, 1080, "R-Type");
     Music music = Graphic::loadMusic("assets/Theme.mp3");
@@ -94,6 +95,12 @@ int main(int ac, char **av)
     std::cout << "Entity 4: " << entity4 << std::endl;
     std::cout << "Entity 5: " << entity5 << std::endl;
 
+    vec.push_back(std::make_pair(physicSystem, true));
+    vec.push_back(std::make_pair(graphicSystem, true));
+    vec.push_back(std::make_pair(parallaxSystem, true));
+    vec.push_back(std::make_pair(movableSystem, true));
+    vec.push_back(std::make_pair(networkClientSystem, true));
+
     Graphic::playMusic(music);
     std::chrono::milliseconds interval(10);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
@@ -105,12 +112,11 @@ int main(int ac, char **av)
         if (elapsedTime >= interval) {
             Graphic::updateMusic(music);
             Graphic::beginDrawing();
-            Graphic::clearBackground(RBLACK); 
-            movableSystem->Update(coordinator);
-            parallaxSystem->Update(coordinator);
-            graphicSystem->Update(coordinator);
-            networkClientSystem->Update(coordinator);
-            physicSystem->Update(coordinator);
+            Graphic::clearBackground(RBLACK);
+            for (std::size_t i = 0; i < vec.size(); i++) {
+                if (vec.at(i).second == true)
+                    vec.at(i).first->Update(coordinator);
+            }
             startTime = currentTime;
             Graphic::endDrawing();
         }
