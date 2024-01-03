@@ -1,3 +1,10 @@
+/*
+** EPITECH PROJECT, 2024
+** B-CPP-500-PAR-5-2-rtype-jules.gresset
+** File description:
+** main
+*/
+
 #include "raylib.h"
 
 class Game {
@@ -116,6 +123,11 @@ private:
             for (int j = -4; j <= 4; j++) {
                 Vector3 squarePosition = { static_cast<float>(i) * 2.0f, 0.0f, static_cast<float>(j) * 2.0f };
                 Color squareColor = ((i + j) % 2 == 0) ? WHITE : BLACK;
+                
+                // Colorer deux cases en rouge
+                if (i == 1 && j == 2) squareColor = RED;
+                if (i == 3 && j == -1) squareColor = RED;
+
                 DrawCube(squarePosition, 2.0f, 0.1f, 2.0f, squareColor);
             }
         }
@@ -123,7 +135,9 @@ private:
 
     void DrawPlanets() {
         // Draw three planets in the background
-        return;
+        DrawSphere({-20.0f, 0.0f, -20.0f}, 3.0f, DARKGRAY);
+        DrawSphere({20.0f, 0.0f, -20.0f}, 4.0f, DARKGRAY);
+        DrawSphere({0.0f, 0.0f, 20.0f}, 5.0f, DARKGRAY);
     }
 };
 
