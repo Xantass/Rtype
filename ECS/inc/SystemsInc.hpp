@@ -10,7 +10,6 @@
 
 #include "systems/GraphicalSystem.hpp"
 #include "systems/MovableSystem.hpp"
-#include "systems/ParallaxSystem.hpp"
 #include "systems/PhysicSystem.hpp"
 
 #endif
