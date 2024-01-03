@@ -30,6 +30,7 @@ int main(int ac, char **av)
     auto parallaxSystem = coordinator.RegisterSystem<ParallaxSystem>();
     auto movableSystem = coordinator.RegisterSystem<MovableSystem>();
     auto networkClientSystem = coordinator.RegisterSystem<NetworkClientSystem>();
+    auto eventSystem = coordinator.RegisterSystem<EventSystem>();
 
     Signature signature;
 
@@ -64,6 +65,7 @@ int main(int ac, char **av)
     int portClient = atoi(av[4]);
 
     networkClientSystem->Init(coordinator, host, port, name, portClient);
+    eventSystem->RunEvents(coordinator);
 
     Entity entity2 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(entity2, {1920, 0});
@@ -108,6 +110,7 @@ int main(int ac, char **av)
             Graphic::clearBackground(RBLACK); 
             movableSystem->Update(coordinator);
             parallaxSystem->Update(coordinator);
+            eventSystem->RunEvents(coordinator);
             graphicSystem->Update(coordinator);
             networkClientSystem->Update(coordinator);
             physicSystem->Update(coordinator);
