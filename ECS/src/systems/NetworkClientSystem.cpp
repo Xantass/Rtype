@@ -269,7 +269,6 @@ void NetworkClientSystem::checkEvent(Coordinator &coordinator)
                     coordinator.AddComponent<Position>(bullet, coordinator.GetComponent<Position>(entity));
                     coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, OTHER});
                     coordinator.AddComponent<Velocity>(bullet, {20, 0});
-                    // coordinator.AddComponent<Controllable>(bullet, {ENGINE});
                     std::vector<int> tmp = mergeVectors({CHECK_ACTION(event._type), 2}, {static_cast<int>(bullet), static_cast<int>(entity)});
                     for (auto i : tmp)
                         std::cout << i << std::endl;
