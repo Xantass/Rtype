@@ -27,6 +27,10 @@ public:
         currentPlayer = &player1;
 
         SetTargetFPS(60);
+
+        // Ajout du menu
+        isMenuActive = true;
+        startButton = { 10, 10, 120, 40 };
     }
 
     ~Game() {
@@ -35,8 +39,13 @@ public:
 
     void Run() {
         while (!WindowShouldClose()) {
-            Update();
-            Draw();
+            if (isMenuActive) {
+                UpdateMenu();
+                DrawMenu();
+            } else {
+                Update();
+                Draw();
+            }
         }
     }
 
@@ -59,6 +68,16 @@ private:
 
     // Utilisez le comparateur personnalisé pour l'ensemble
     std::set<Vector2, Vector2Comparator> redSquarePositions;
+
+    // Variables pour le menu
+    bool isMenuActive;
+    Rectangle startButton;
+
+    void UpdateMenu() {
+        if (CheckCollisionPointRec(GetMousePosition(), startButton) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            isMenuActive = false;
+        }
+    }
 
     void Update() {
         if (IsKeyPressed(KEY_TAB)) {
@@ -83,28 +102,27 @@ private:
         return redSquarePositions.find({ static_cast<float>(gridX), static_cast<float>(gridZ) }) != redSquarePositions.end();
     }
 
-  void UpdatePlayerColorsV2() {
-    // Convertissez les coordonnées du joueur à la grille
-    int gridXPlayer1 = static_cast<int>((player1.position.x + 4.0f) / 2.0f);
-    int gridZPlayer1 = static_cast<int>((player1.position.z + 4.0f) / 2.0f);
+    void UpdatePlayerColorsV2() {
+        // Convertissez les coordonnées du joueur à la grille
+        int gridXPlayer1 = static_cast<int>((player1.position.x + 4.0f) / 2.0f);
+        int gridZPlayer1 = static_cast<int>((player1.position.z + 4.0f) / 2.0f);
 
-    int gridXPlayer2 = static_cast<int>((player2.position.x + 4.0f) / 2.0f);
-    int gridZPlayer2 = static_cast<int>((player2.position.z + 4.0f) / 2.0f);
+        int gridXPlayer2 = static_cast<int>((player2.position.x + 4.0f) / 2.0f);
+        int gridZPlayer2 = static_cast<int>((player2.position.z + 4.0f) / 2.0f);
 
-    // Vérifiez si les joueurs sont sur une case rouge
-    if (redSquarePositions.find({ static_cast<float>(gridXPlayer1), static_cast<float>(gridZPlayer1) }) != redSquarePositions.end()) {
-        player1.color = BLUE;
-    } else {
-        player1.color = GREEN;
+        // Vérifiez si les joueurs sont sur une case rouge
+        if (redSquarePositions.find({ static_cast<float>(gridXPlayer1), static_cast<float>(gridZPlayer1) }) != redSquarePositions.end()) {
+            player1.color = BLUE;
+        } else {
+            player1.color = GREEN;
+        }
+
+        if (redSquarePositions.find({ static_cast<float>(gridXPlayer2), static_cast<float>(gridZPlayer2) }) != redSquarePositions.end()) {
+            player2.color = BLUE;
+        } else {
+            player2.color = GREEN;
+        }
     }
-
-    if (redSquarePositions.find({ static_cast<float>(gridXPlayer2), static_cast<float>(gridZPlayer2) }) != redSquarePositions.end()) {
-        player2.color = BLUE;
-    } else {
-        player2.color = GREEN;
-    }
-}
-
 
     void Draw() {
         BeginDrawing();
@@ -142,6 +160,13 @@ private:
                 DrawCube(squarePosition, 2.0f, 0.1f, 2.0f, squareColor);
             }
         }
+    }
+
+    void DrawMenu() {
+        BeginDrawing();
+        DrawRectangleRec(startButton, DARKGRAY);
+        DrawText("Start", startButton.x + 10, startButton.y + 10, 20, RAYWHITE);
+        EndDrawing();
     }
 };
 
