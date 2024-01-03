@@ -8,3 +8,5 @@
 #include "inc/Coordinator.hpp"
 #include "inc/systems/NetworkServerSystem.hpp"
 #include "inc/systems/PhysicSystem.hpp"
+#include "inc/systems/CollisionSystem.hpp"
+#include "inc/systems/HealthSystem.hpp"
