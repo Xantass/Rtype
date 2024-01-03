@@ -174,24 +174,75 @@ class Graphic {
         static void drawRectangleLines(int x, int y, int width, int height, Color color) {
             DrawRectangleLines(x, y, width, height, color);
         }
+        /**
+         * @brief Check if a point and a rect intersects
+         *
+         * @param xP
+         * @param yP
+         * @param xR
+         * @param yR
+         * @param width
+         * @param height
+         * @return true
+         * @return false
+         */
         static bool checkCollisionPointRec(float xP, float yP, float xR, float yR, float width, float height) {
             return CheckCollisionPointRec({xP, yP}, {xR, yR, width, height});
         }
+        /**
+         * @brief Get the Mouse Position object
+         *
+         * @return Vector2
+         */
         static Vector2 getMousePosition(void) {
             return GetMousePosition();
         }
+        /**
+         * @brief Check if left mouse button is pressed
+         *
+         * @return true
+         * @return false
+         */
         static bool isMouseButtonPressed(void) {
             return IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
         }
+        /**
+         * @brief Measure display size of text
+         *
+         * @param text
+         * @param fontSize
+         * @return int
+         */
         static int measureText(std::string text, int fontSize) {
             return MeasureText(text.c_str(), fontSize);
         }
+        /**
+         * @brief Draw text
+         *
+         * @param text
+         * @param posX
+         * @param posY
+         * @param fontSize
+         * @param color
+         */
         static void drawText(std::string text, int posX, int posY, int fontSize, Color color) {
             return DrawText(text.c_str(), posX, posY, fontSize, color);
         }
+        /**
+         * @brief Get the Char pressed on keyboard
+         *
+         * @return int
+         */
         static int getCharPressed(void) {
             return GetCharPressed();
         }
+        /**
+         * @brief Check if a key is pressed
+         *
+         * @param key
+         * @return true
+         * @return false
+         */
         static bool isKeyPressed(int key) {
             return IsKeyPressed(key);
         }
