@@ -285,19 +285,21 @@ void NetworkServerSystem::move(std::vector<int>& decodedIntegers, udp::endpoint&
 
 void NetworkServerSystem::shoot(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
 {
-    std::cout << "PLAYER SHOOT CLIENT" << std::endl;
-    // if () {
-        Entity bullet = coordinator.CreateEntity(decodedIntegers.at(0));
-        coordinator.AddComponent<Position>(bullet, coordinator.GetComponent<Position>(decodedIntegers.at(1)));
-        coordinator.AddComponent<Velocity>(bullet, {20, 0});
-        coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, OTHER});
-        coordinator.AddComponent<Controllable>(bullet, {ENGINE});
-        std::vector<unsigned char> buffer = encode(_PASS);
-        _socket.send_to(asio::buffer(buffer), clientEndpoint);
-        return;
-    // }
-    // std::vector<unsigned char> buffer = encode(_UNKNOW);
-    // _socket.send_to(asio::buffer(buffer), clientEndpoint);
+    for (auto entity : this->_entities) {
+        if (entity == decodedIntegers.at(0)) {
+            Entity bullet = coordinator.CreateEntity(decodedIntegers.at(1));
+            coordinator.AddComponent<Position>(bullet, coordinator.GetComponent<Position>(decodedIntegers.at(0)));
+            coordinator.AddComponent<Velocity>(bullet, {20, 0});
+            coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, OTHER});
+            coordinator.AddComponent<Controllable>(bullet, {ENGINE});
+            std::vector<unsigned char> buffer = encode(_PASS);
+            _socket.send_to(asio::buffer(buffer), clientEndpoint);
+            this->sendCreate(bullet, coordinator);
+            return;
+        }
+    }
+    std::vector<unsigned char> buffer = encode(_UNKNOW);
+    _socket.send_to(asio::buffer(buffer), clientEndpoint);
 }
 
 
