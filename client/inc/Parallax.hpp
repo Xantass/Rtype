@@ -14,6 +14,7 @@
 #define PARALLAX_HPP_
 
 #include <vector>
+#include <tuple>
 #include <iostream>
 #include <string>
 #include <filesystem>
