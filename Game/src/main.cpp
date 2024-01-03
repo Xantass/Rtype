@@ -1,38 +1,30 @@
-/*
-** EPITECH PROJECT, 2024
-** B-CPP-500-PAR-5-2-rtype-jules.gresset
-** File description:
-** main
-*/
-
 #include "raylib.h"
+#include <set>
+
+struct Vector2Comparator {
+    bool operator()(const Vector2& a, const Vector2& b) const {
+        return (a.x < b.x) || ((a.x == b.x) && (a.y < b.y));
+    }
+};
 
 class Game {
 public:
     Game() {
-        InitWindow(1200, 800, "Mon Jeu 3D"); // Agrandissement de la fenêtre
+        InitWindow(1200, 800, "Mon Jeu 3D");
         camera = { { 0.0f, 10.0f, 10.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 45.0f, 0 };
 
-        // Player 1 setup
         player1.position = { -2.0f, 1.0f, 2.0f };
         player1.size = { 1.0f, 2.0f, 1.0f };
         player1.color = GREEN;
 
-        // Player 2 setup
         player2.position = { 2.0f, 1.0f, 2.0f };
         player2.size = { 1.0f, 2.0f, 1.0f };
         player2.color = GREEN;
 
-        enemyBoxPos = { -4.0f, 1.0f, 0.0f };
-        enemyBoxSize = { 2.0f, 2.0f, 2.0f };
-
-        enemySpherePos = { 4.0f, 0.0f, 0.0f };
-        enemySphereSize = 1.5f;
-
         collision1 = false;
         collision2 = false;
 
-        currentPlayer = &player1; // Initial player is player 1
+        currentPlayer = &player1;
 
         SetTargetFPS(60);
     }
@@ -60,38 +52,59 @@ private:
     Player player1;
     Player player2;
 
-    Vector3 enemyBoxPos;
-    Vector3 enemyBoxSize;
-
-    Vector3 enemySpherePos;
-    float enemySphereSize;
-
     bool collision1;
     bool collision2;
 
     Player* currentPlayer;
 
+    // Utilisez le comparateur personnalisé pour l'ensemble
+    std::set<Vector2, Vector2Comparator> redSquarePositions;
+
     void Update() {
-        // Switch player with the Tab key
         if (IsKeyPressed(KEY_TAB)) {
-            if (currentPlayer == &player1) {
-                currentPlayer = &player2;
-            } else {
-                currentPlayer = &player1;
-            }
+            currentPlayer = (currentPlayer == &player1) ? &player2 : &player1;
         }
 
-        // Move the current player
         if (IsKeyDown(KEY_A)) currentPlayer->position.x -= 0.2f;
         else if (IsKeyDown(KEY_D)) currentPlayer->position.x += 0.2f;
         else if (IsKeyDown(KEY_S)) currentPlayer->position.z += 0.2f;
         else if (IsKeyDown(KEY_W)) currentPlayer->position.z -= 0.2f;
 
-        collision1 = false;
-        collision2 = false;
+        collision1 = CheckCollisionWithRedSquare(player1);
+        collision2 = CheckCollisionWithRedSquare(player2);
 
-
+        UpdatePlayerColorsV2();
     }
+
+    bool CheckCollisionWithRedSquare(Player& player) {
+        int gridX = static_cast<int>((player.position.x + 2.0f) / 2.0f);
+        int gridZ = static_cast<int>((player.position.z + 2.0f) / 2.0f);
+
+        return redSquarePositions.find({ static_cast<float>(gridX), static_cast<float>(gridZ) }) != redSquarePositions.end();
+    }
+
+  void UpdatePlayerColorsV2() {
+    // Convertissez les coordonnées du joueur à la grille
+    int gridXPlayer1 = static_cast<int>((player1.position.x + 4.0f) / 2.0f);
+    int gridZPlayer1 = static_cast<int>((player1.position.z + 4.0f) / 2.0f);
+
+    int gridXPlayer2 = static_cast<int>((player2.position.x + 4.0f) / 2.0f);
+    int gridZPlayer2 = static_cast<int>((player2.position.z + 4.0f) / 2.0f);
+
+    // Vérifiez si les joueurs sont sur une case rouge
+    if (redSquarePositions.find({ static_cast<float>(gridXPlayer1), static_cast<float>(gridZPlayer1) }) != redSquarePositions.end()) {
+        player1.color = BLUE;
+    } else {
+        player1.color = GREEN;
+    }
+
+    if (redSquarePositions.find({ static_cast<float>(gridXPlayer2), static_cast<float>(gridZPlayer2) }) != redSquarePositions.end()) {
+        player2.color = BLUE;
+    } else {
+        player2.color = GREEN;
+    }
+}
+
 
     void Draw() {
         BeginDrawing();
@@ -99,17 +112,10 @@ private:
 
         BeginMode3D(camera);
 
-        // Draw player 1
         DrawCubeV(player1.position, player1.size, (collision1) ? RED : player1.color);
-
-        // Draw player 2
         DrawCubeV(player2.position, player2.size, (collision2) ? RED : player2.color);
 
-        // Draw chessboard in the center
         DrawChessboard();
-
-        // Draw planets in the background
-        DrawPlanets();
 
         EndMode3D();
 
@@ -122,22 +128,20 @@ private:
         for (int i = -4; i <= 4; i++) {
             for (int j = -4; j <= 4; j++) {
                 Vector3 squarePosition = { static_cast<float>(i) * 2.0f, 0.0f, static_cast<float>(j) * 2.0f };
-                Color squareColor = ((i + j) % 2 == 0) ? WHITE : BLACK;
-                
-                // Colorer deux cases en rouge
-                if (i == 1 && j == 2) squareColor = RED;
-                if (i == 3 && j == -1) squareColor = RED;
+                Color squareColor = ((i + j) % 2 == 0) ? GOLD : BLACK;
+
+                if (i == 1 && j == 2) {
+                    squareColor = RED;
+                    redSquarePositions.insert({ squarePosition.x, squarePosition.z });
+                }
+                if (i == 3 && j == -1) {
+                    squareColor = RED;
+                    redSquarePositions.insert({ squarePosition.x, squarePosition.z });
+                }
 
                 DrawCube(squarePosition, 2.0f, 0.1f, 2.0f, squareColor);
             }
         }
-    }
-
-    void DrawPlanets() {
-        // Draw three planets in the background
-        DrawSphere({-20.0f, 0.0f, -20.0f}, 3.0f, DARKGRAY);
-        DrawSphere({20.0f, 0.0f, -20.0f}, 4.0f, DARKGRAY);
-        DrawSphere({0.0f, 0.0f, 20.0f}, 5.0f, DARKGRAY);
     }
 };
 
