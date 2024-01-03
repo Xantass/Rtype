@@ -19,9 +19,7 @@ Parallax::~Parallax()
 void Parallax::loadTextures(std::vector<std::string> paths)
 {
     for (auto path : paths) {
-        std::cout << "TEST: " << path << std::endl;
         try {
-            // _textureMap.insert(std::make_pair(path, Graphic::loadTexture(path)));
             _textureList.push_back(std::make_tuple(Graphic::loadTexture(path), 1920));
         } catch (const std::exception& e) {
             std::cerr << "Error: " << e.what() << std::endl;
@@ -31,11 +29,8 @@ void Parallax::loadTextures(std::vector<std::string> paths)
 
 std::vector<std::string> Parallax::getAllFiles(void)
 {
-    std::cout << "TEEEEEEEEEEEESSSSSSSSSSSST\n";
     std::vector<std::string> paths;
-    std::cout << "TEEEEEEEEEEEESSSSSSSSSSSST\n";
     try {
-    std::cout << "TEEEEEEEEEEEESSSSSSSSSSSST\n";
         for (const auto& entry : std::filesystem::directory_iterator(_path)) {
             if (std::filesystem::is_regular_file(entry.path())) {
                 paths.push_back(entry.path());
