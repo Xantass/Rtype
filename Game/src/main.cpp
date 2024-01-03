@@ -1,16 +1,9 @@
-/*
-** EPITECH PROJECT, 2024
-** B-CPP-500-PAR-5-2-rtype-jules.gresset
-** File description:
-** main
-*/
-
 #include "raylib.h"
 
 class Game {
 public:
     Game() {
-        InitWindow(800, 450, "Mon Jeu 3D");
+        InitWindow(1200, 800, "Mon Jeu 3D"); // Agrandissement de la fenêtre
         camera = { { 0.0f, 10.0f, 10.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 45.0f, 0 };
 
         // Player 1 setup
@@ -21,7 +14,7 @@ public:
         // Player 2 setup
         player2.position = { 2.0f, 1.0f, 2.0f };
         player2.size = { 1.0f, 2.0f, 1.0f };
-        player2.color = BLUE;
+        player2.color = GREEN;
 
         enemyBoxPos = { -4.0f, 1.0f, 0.0f };
         enemyBoxSize = { 2.0f, 2.0f, 2.0f };
@@ -90,55 +83,7 @@ private:
         collision1 = false;
         collision2 = false;
 
-        // Check collisions player 1 vs enemy-box
-        if (CheckCollisionBoxes(
-            (BoundingBox){(Vector3){ player1.position.x - player1.size.x / 2,
-                                     player1.position.y - player1.size.y / 2,
-                                     player1.position.z - player1.size.z / 2 },
-                          (Vector3){ player1.position.x + player1.size.x / 2,
-                                     player1.position.y + player1.size.y / 2,
-                                     player1.position.z + player1.size.z / 2 }},
-            (BoundingBox){(Vector3){ enemyBoxPos.x - enemyBoxSize.x / 2,
-                                     enemyBoxPos.y - enemyBoxSize.y / 2,
-                                     enemyBoxPos.z - enemyBoxSize.z / 2 },
-                          (Vector3){ enemyBoxPos.x + enemyBoxSize.x / 2,
-                                     enemyBoxPos.y + enemyBoxSize.y / 2,
-                                     enemyBoxPos.z + enemyBoxSize.z / 2 }})) collision1 = true;
 
-        // Check collisions player 2 vs enemy-box
-        if (CheckCollisionBoxes(
-            (BoundingBox){(Vector3){ player2.position.x - player2.size.x / 2,
-                                     player2.position.y - player2.size.y / 2,
-                                     player2.position.z - player2.size.z / 2 },
-                          (Vector3){ player2.position.x + player2.size.x / 2,
-                                     player2.position.y + player2.size.y / 2,
-                                     player2.position.z + player2.size.z / 2 }},
-            (BoundingBox){(Vector3){ enemyBoxPos.x - enemyBoxSize.x / 2,
-                                     enemyBoxPos.y - enemyBoxSize.y / 2,
-                                     enemyBoxPos.z - enemyBoxSize.z / 2 },
-                          (Vector3){ enemyBoxPos.x + enemyBoxSize.x / 2,
-                                     enemyBoxPos.y + enemyBoxSize.y / 2,
-                                     enemyBoxPos.z + enemyBoxSize.z / 2 }})) collision2 = true;
-
-        // Check collisions player 1 vs enemy-sphere
-        if (CheckCollisionBoxSphere(
-            (BoundingBox){(Vector3){ player1.position.x - player1.size.x / 2,
-                                     player1.position.y - player1.size.y / 2,
-                                     player1.position.z - player1.size.z / 2 },
-                          (Vector3){ player1.position.x + player1.size.x / 2,
-                                     player1.position.y + player1.size.y / 2,
-                                     player1.position.z + player1.size.z / 2 }},
-            enemySpherePos, enemySphereSize)) collision1 = true;
-
-        // Check collisions player 2 vs enemy-sphere
-        if (CheckCollisionBoxSphere(
-            (BoundingBox){(Vector3){ player2.position.x - player2.size.x / 2,
-                                     player2.position.y - player2.size.y / 2,
-                                     player2.position.z - player2.size.z / 2 },
-                          (Vector3){ player2.position.x + player2.size.x / 2,
-                                     player2.position.y + player2.size.y / 2,
-                                     player2.position.z + player2.size.z / 2 }},
-            enemySpherePos, enemySphereSize)) collision2 = true;
     }
 
     void Draw() {
@@ -153,13 +98,32 @@ private:
         // Draw player 2
         DrawCubeV(player2.position, player2.size, (collision2) ? RED : player2.color);
 
-        DrawGrid(10, 1.0f);
+        // Draw chessboard in the center
+        DrawChessboard();
+
+        // Draw planets in the background
+        DrawPlanets();
 
         EndMode3D();
 
         DrawFPS(10, 10);
 
         EndDrawing();
+    }
+
+    void DrawChessboard() {
+        for (int i = -4; i <= 4; i++) {
+            for (int j = -4; j <= 4; j++) {
+                Vector3 squarePosition = { static_cast<float>(i) * 2.0f, 0.0f, static_cast<float>(j) * 2.0f };
+                Color squareColor = ((i + j) % 2 == 0) ? WHITE : BLACK;
+                DrawCube(squarePosition, 2.0f, 0.1f, 2.0f, squareColor);
+            }
+        }
+    }
+
+    void DrawPlanets() {
+        // Draw three planets in the background
+        return;
     }
 };
 
