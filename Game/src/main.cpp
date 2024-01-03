@@ -80,10 +80,18 @@ private:
     }
 
     void Update() {
+        // Camera movement
+        if (IsKeyDown(KEY_RIGHT)) camera.position.x += 0.2f;
+        else if (IsKeyDown(KEY_LEFT)) camera.position.x -= 0.2f;
+        else if (IsKeyDown(KEY_DOWN)) camera.position.z += 0.2f;
+        else if (IsKeyDown(KEY_UP)) camera.position.z -= 0.2f;
+
+        // Player switching
         if (IsKeyPressed(KEY_TAB)) {
             currentPlayer = (currentPlayer == &player1) ? &player2 : &player1;
         }
 
+        // Player movement
         if (IsKeyDown(KEY_A)) currentPlayer->position.x -= 0.2f;
         else if (IsKeyDown(KEY_D)) currentPlayer->position.x += 0.2f;
         else if (IsKeyDown(KEY_S)) currentPlayer->position.z += 0.2f;
@@ -96,32 +104,21 @@ private:
     }
 
     bool CheckCollisionWithRedSquare(Player& player) {
-        int gridX = static_cast<int>((player.position.x + 2.0f) / 2.0f);
-        int gridZ = static_cast<int>((player.position.z + 2.0f) / 2.0f);
+        int gridX = static_cast<int>((player.position.x + 4.0f) / 2.0f);  
+        int gridZ = static_cast<int>((player.position.z + 4.0f) / 2.0f);  
 
         return redSquarePositions.find({ static_cast<float>(gridX), static_cast<float>(gridZ) }) != redSquarePositions.end();
     }
 
     void UpdatePlayerColorsV2() {
-        // Convertissez les coordonnées du joueur à la grille
         int gridXPlayer1 = static_cast<int>((player1.position.x + 4.0f) / 2.0f);
         int gridZPlayer1 = static_cast<int>((player1.position.z + 4.0f) / 2.0f);
 
         int gridXPlayer2 = static_cast<int>((player2.position.x + 4.0f) / 2.0f);
         int gridZPlayer2 = static_cast<int>((player2.position.z + 4.0f) / 2.0f);
 
-        // Vérifiez si les joueurs sont sur une case rouge
-        if (redSquarePositions.find({ static_cast<float>(gridXPlayer1), static_cast<float>(gridZPlayer1) }) != redSquarePositions.end()) {
-            player1.color = BLUE;
-        } else {
-            player1.color = GREEN;
-        }
-
-        if (redSquarePositions.find({ static_cast<float>(gridXPlayer2), static_cast<float>(gridZPlayer2) }) != redSquarePositions.end()) {
-            player2.color = BLUE;
-        } else {
-            player2.color = GREEN;
-        }
+        player1.color = (redSquarePositions.find({ static_cast<float>(gridXPlayer1), static_cast<float>(gridZPlayer1) }) != redSquarePositions.end()) ? BLUE : GREEN;
+        player2.color = (redSquarePositions.find({ static_cast<float>(gridXPlayer2), static_cast<float>(gridZPlayer2) }) != redSquarePositions.end()) ? BLUE : GREEN;
     }
 
     void Draw() {
@@ -130,8 +127,8 @@ private:
 
         BeginMode3D(camera);
 
-        DrawCubeV(player1.position, player1.size, (collision1) ? RED : player1.color);
-        DrawCubeV(player2.position, player2.size, (collision2) ? RED : player2.color);
+        DrawCubeV(player1.position, player1.size, GREEN );
+        DrawCubeV(player2.position, player2.size, BLACK);
 
         DrawChessboard();
 
