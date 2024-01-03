@@ -65,34 +65,34 @@ int main(int ac, char **av)
 
     networkClientSystem->Init(coordinator, host, port, name, portClient);
 
-    Entity entity2 = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity2, {1920, 0});
-    coordinator.AddComponent<Velocity>(entity2, {-2, 0});
-    coordinator.AddComponent<Hitbox>(entity2, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity2, {Graphic::loadTexture("assets/parallax-space-big-planet.png")});
+    // Entity entity2 = coordinator.CreateEntity();
+    // coordinator.AddComponent<Position>(entity2, {1920, 0});
+    // coordinator.AddComponent<Velocity>(entity2, {-2, 0});
+    // coordinator.AddComponent<Hitbox>(entity2, {0, 0, 0, 0, OTHER});
+    // coordinator.AddComponent<Sprite>(entity2, {Graphic::loadTexture("assets/parallax-space-big-planet.png")});
 
-    Entity entity3 = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity3, {1920, 0});
-    coordinator.AddComponent<Velocity>(entity3, {-2.3, 0});
-    coordinator.AddComponent<Hitbox>(entity3, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity3, {Graphic::loadTexture("assets/parallax-space-far-planets.png")});
+    // Entity entity3 = coordinator.CreateEntity();
+    // coordinator.AddComponent<Position>(entity3, {1920, 0});
+    // coordinator.AddComponent<Velocity>(entity3, {-2.3, 0});
+    // coordinator.AddComponent<Hitbox>(entity3, {0, 0, 0, 0, OTHER});
+    // coordinator.AddComponent<Sprite>(entity3, {Graphic::loadTexture("assets/parallax-space-far-planets.png")});
 
-    Entity entity4 = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity4, {1920, 0});
-    coordinator.AddComponent<Velocity>(entity4, {-2.6, 0});
-    coordinator.AddComponent<Hitbox>(entity4, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity4, {Graphic::loadTexture("assets/parallax-space-ring-planet.png")});
+    // Entity entity4 = coordinator.CreateEntity();
+    // coordinator.AddComponent<Position>(entity4, {1920, 0});
+    // coordinator.AddComponent<Velocity>(entity4, {-2.6, 0});
+    // coordinator.AddComponent<Hitbox>(entity4, {0, 0, 0, 0, OTHER});
+    // coordinator.AddComponent<Sprite>(entity4, {Graphic::loadTexture("assets/parallax-space-ring-planet.png")});
 
-    Entity entity5 = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity5, {1920, 0});
-    coordinator.AddComponent<Velocity>(entity5, {-2.9, 0});
-    coordinator.AddComponent<Hitbox>(entity5, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity5, {Graphic::loadTexture("assets/parallax-space-stars.png")});
+    // Entity entity5 = coordinator.CreateEntity();
+    // coordinator.AddComponent<Position>(entity5, {1920, 0});
+    // coordinator.AddComponent<Velocity>(entity5, {-2.9, 0});
+    // coordinator.AddComponent<Hitbox>(entity5, {0, 0, 0, 0, OTHER});
+    // coordinator.AddComponent<Sprite>(entity5, {Graphic::loadTexture("assets/parallax-space-stars.png")});
 
-    std::cout << "Entity 2: " << entity2 << std::endl;
-    std::cout << "Entity 3: " << entity3 << std::endl;
-    std::cout << "Entity 4: " << entity4 << std::endl;
-    std::cout << "Entity 5: " << entity5 << std::endl;
+    // std::cout << "Entity 2: " << entity2 << std::endl;
+    // std::cout << "Entity 3: " << entity3 << std::endl;
+    // std::cout << "Entity 4: " << entity4 << std::endl;
+    // std::cout << "Entity 5: " << entity5 << std::endl;
 
     Graphic::playMusic(music);
     std::chrono::milliseconds interval(10);
@@ -107,7 +107,7 @@ int main(int ac, char **av)
             Graphic::beginDrawing();
             Graphic::clearBackground(RBLACK); 
             movableSystem->Update(coordinator);
-            parallaxSystem->Update(coordinator);
+            // parallaxSystem->Update(coordinator);
             graphicSystem->Update(coordinator);
             networkClientSystem->Update(coordinator);
             physicSystem->Update(coordinator);

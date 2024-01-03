@@ -161,19 +161,25 @@ void NetworkClientSystem::pos(std::vector<int>& decodedIntegers, Coordinator &co
 void NetworkClientSystem::createEntity(std::vector<int> decodedIntegers, Coordinator &coordinator)
 {
     std::cout << "CREATE" << std::endl;
-    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
+    int size = 0;
+    
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
+    size = decodedIntegers.at(0);
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
     while (decodedIntegers.empty() == false) {
-        Entity entity = coordinator.CreateEntity(decodedIntegers.at(0));
-        if (entity == _id) {
-            coordinator.AddComponent<Movable>(entity, {NONE});
-        }
+        Entity entity = coordinator.CreateEntity();
         if (CHECK_TYPE(decodedIntegers.at(9)) == PLAYER) {
             coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
         }
         coordinator.AddComponent<Position>(entity, {CHECK_ZERO(decodedIntegers.at(1)), CHECK_ZERO(decodedIntegers.at(2))});
         coordinator.AddComponent<Velocity>(entity, {CHECK_ZERO(decodedIntegers.at(3)), CHECK_ZERO(decodedIntegers.at(4))});
         coordinator.AddComponent<Hitbox>(entity, {CHECK_ZERO(decodedIntegers.at(5)), CHECK_ZERO(decodedIntegers.at(6)), CHECK_ZERO(decodedIntegers.at(7)), CHECK_ZERO(decodedIntegers.at(8)), CHECK_TYPE(decodedIntegers.at(9))});
-        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 10);
+        if (size == 11) {
+            coordinator.AddComponent<Sprite>(entity, {LoadTexture("assets/bullet.png")});
+            decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 11);
+        } else {
+            decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 10);
+        }
     }
 }
 
@@ -264,17 +270,11 @@ void NetworkClientSystem::checkEvent(Coordinator &coordinator)
         if (event._type == Event::SHOOT) {
             for (auto entity : _entities) {
                 if (this->_id == entity) {
-                    Entity bullet = coordinator.CreateEntity();
-                    std::cout << "SHOOT and created bullet : " << bullet << std::endl;
-                    coordinator.AddComponent<Position>(bullet, coordinator.GetComponent<Position>(entity));
-                    coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, OTHER});
-                    coordinator.AddComponent<Velocity>(bullet, {20, 0});
-                    std::vector<int> tmp = mergeVectors({CHECK_ACTION(event._type), 1}, {static_cast<int>(entity), static_cast<int>(bullet)});
+                    std::vector<int> tmp = mergeVectors({CHECK_ACTION(event._type), 0}, {static_cast<int>(entity)});
                     for (auto i : tmp)
                         std::cout << i << std::endl;
                     std::vector<unsigned char> buffer = encode(tmp);
                     _socket.send_to(asio::buffer(buffer), _serverEndpoint);
-                    coordinator.AddComponent<Sprite>(bullet, {LoadTexture("assets/bullet.png")});
                     break;
                 }
             }
