@@ -65,7 +65,6 @@ int main(int ac, char **av)
     int portClient = atoi(av[4]);
 
     networkClientSystem->Init(coordinator, host, port, name, portClient);
-    eventSystem->RunEvents(coordinator);
 
     Entity entity2 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(entity2, {1920, 0});

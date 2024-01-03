@@ -16,12 +16,11 @@ void EventSystem::RunEvents(Coordinator &coordinator)
 
 	// std::cout << "EventSystem, last event: " << event._type << std::endl;
 
-	for (int i = 0; i < eventQueue.size(); i++) {
+	while (!eventQueue.empty()) {
 		Event event = eventQueue.front();
 		eventQueue.pop();
 		switch (event._type) {
 			case Event::actions::CREATE: {
-				std::cout << "Create entity with id " << std::any_cast<int>(event._data[0]) << std::endl;
 				Entity entity = coordinator.CreateEntity(std::any_cast<int>(event._data[0]));
 				coordinator.AddComponent<Position>(entity, {std::any_cast<float>(event._data[1]), std::any_cast<float>(event._data[2])});
 				coordinator.AddComponent<Velocity>(entity, {std::any_cast<float>(event._data[3]), std::any_cast<float>(event._data[4])});
@@ -29,7 +28,7 @@ void EventSystem::RunEvents(Coordinator &coordinator)
 				if (std::any_cast<float>(event._data[9]) == PLAYER)
 					coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
 				if (std::any_cast<int>(event._data[10]) == entity)
-					coordinator.AddComponent<Movable>(entity, {NONE});
+					coordinator.AddComponent<Movable>(entity, {NONE});		
 				break;
 			} case Event::actions::MOVE: {
 				coordinator.GetComponent<Position>(event._entity)._x += coordinator.GetComponent<Velocity>(event._entity)._x;
