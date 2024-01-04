@@ -12,6 +12,7 @@ void Coordinator::Init()
 	this->_componentManager = std::make_unique<ComponentManager>();
 	this->_entityManager = std::make_unique<EntityManager>();
 	this->_systemManager = std::make_unique<SystemManager>();
+	this->_eventManager = std::make_unique<EventManager>();
 }
 
 Entity Coordinator::CreateEntity()
@@ -80,15 +81,15 @@ void Coordinator::SetSystemSignature(Signature signature)
 
 void Coordinator::AddEvent(Event event)
 {
-	this->_eventQueue.push(event);
+	this->_eventManager->AddEvent(event);
 }
 
 Event Coordinator::GetEvent()
 {
-	if (this->_eventQueue.empty() != true) {
-		Event event = this->_eventQueue.front();
-		this->_eventQueue.pop();
-		return event;
-	}
-	return Event{Event::actions::EMPTY, 0, std::any(int(-1))};
+	return this->_eventManager->GetEvent();
+}
+
+std::queue<Event> Coordinator::GetEventQueue() const
+{
+	return this->_eventManager->GetEventQueue();
 }

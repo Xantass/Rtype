@@ -18,7 +18,7 @@
 #include "ComponentManager.hpp"
 #include "EntityManager.hpp"
 #include "SystemManager.hpp"
-#include "Event.hpp"
+#include "EventManager.hpp"
 
 /**
  * @class Coordinator
@@ -136,6 +136,8 @@ public:
 	template<typename T>
 	void SetSystemSignature(Signature signature);
 
+	/* ----------------------------- Events methods ----------------------------- */
+
 	/**
 	 * @brief Add an event to the queue
 	 * 
@@ -145,9 +147,16 @@ public:
 	/**
 	 * @brief Get the first event of the queue
 	 * 
-	 * @return Event First event of the queue
+	 * @return Event Event
 	 */
 	Event GetEvent();
+
+	/**
+	 * @brief Get the Event Queue object
+	 * 
+	 * @return std::queue<Event> Queue of events
+	 */
+	std::queue<Event> GetEventQueue() const;
 
 private:
 	/**
@@ -167,10 +176,11 @@ private:
 	std::unique_ptr<SystemManager> _systemManager;
 
 	/**
-	 * @brief Queue of events
+	 * @brief Pointer to the event manager
 	 * 
 	 */
-	std::queue<Event> _eventQueue;
+	std::unique_ptr<EventManager> _eventManager;
+
 };
 
 #include "../src/Coordinator.cpp"

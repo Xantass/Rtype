@@ -32,8 +32,7 @@ Entity EntityManager::CreateEntity(int id) {
         //ERROR : Entity out of range.
     }
 
-    Entity entity = this->_availableEntities.at(id);
-    this->_availableEntities.erase(this->_availableEntities.begin() + id - 1);
+    Entity entity = id;
     this->_livingEntityCount++;
 
     return id;
