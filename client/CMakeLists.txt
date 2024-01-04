@@ -34,6 +34,7 @@ include_directories("./inc/" "./../ECS/" "../ECS/inc/" "./../ECS/inc/systems/" "
 add_executable(r-type_client
     src/Main.cpp
     src/Client.cpp
+    src/Parallax.cpp
     )
 
 if(WIN32)
