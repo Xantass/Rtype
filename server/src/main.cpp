@@ -19,11 +19,13 @@ int main(int argc, char **argv)
     coordinator.RegisterComponent<Velocity>();
     coordinator.RegisterComponent<Hitbox>();
     coordinator.RegisterComponent<Controllable>();
+    coordinator.RegisterComponent<SpawnClock>();
 
     auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
     auto controlSystem = coordinator.RegisterSystem<ControlSystem>();
     auto networkServerSystem = coordinator.RegisterSystem<NetworkServerSystem>();
-
+    auto spawnSystem = coordinator.RegisterSystem<SpawnSystem>();
+    
     Signature signature;
 
     signature.set(coordinator.GetComponentType<Position>());
@@ -39,6 +41,14 @@ int main(int argc, char **argv)
     signature2.set(coordinator.GetComponentType<Controllable>());
     coordinator.SetSystemSignature<ControlSystem>(signature2);
 
+    Signature signature3;
+    
+    signature3.set(coordinator.GetComponentType<SpawnClock>());
+    coordinator.SetSystemSignature<SpawnClock>(signature3);
+
+    Entity ent = coordinator.CreateEntity();
+    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now()});
+
     networkServerSystem->Init();
     std::chrono::milliseconds interval(10);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
@@ -51,6 +61,7 @@ int main(int argc, char **argv)
             networkServerSystem->Update(coordinator);
             physicSystem->Update(coordinator);
             controlSystem->Update(coordinator);
+            spawnSystem->Update(coordinator);
             startTime = currentTime;
         }
     }

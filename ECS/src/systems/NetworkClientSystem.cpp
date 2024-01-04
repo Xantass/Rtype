@@ -15,8 +15,19 @@
 using asio::ip::udp;
 
 #define CHECK_ZERO(x) x == 0 ? static_cast<float>(x) : static_cast<float>(x) / 10
-#define CHECK_TYPE(x) x == 1 ? PLAYER : OTHER
+// #define CHECK_TYPE(x) x == 1 ? PLAYER : OTHER
 #define CHECK_ACTION(x) x == Event::actions::MOVE ? 11 : 10
+
+static HitboxType CHECK_TYPE(int x)
+{
+    if (x == 0)
+        return ENNEMY;
+    if (x == 1)
+        return PLAYER;
+    if (x == 2)
+        return BULLET;
+    return OTHER;
+}
 
 void NetworkClientSystem::Init(Coordinator &coordinator, std::string host, std::string port, std::string name, int portClient)
 {
@@ -161,47 +172,11 @@ void NetworkClientSystem::pos(std::vector<int>& decodedIntegers, Coordinator &co
 void NetworkClientSystem::createEntity(std::vector<int> decodedIntegers, Coordinator &coordinator)
 {
     std::cout << "CREATE" << std::endl;
-    int size = 0;
-    
-    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
-    size = decodedIntegers.at(0);
-    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
-    // while (decodedIntegers.empty() == false) {
-    //     Entity entity = coordinator.CreateEntity();
-    //     if (CHECK_TYPE(decodedIntegers.at(9)) == PLAYER) {
-    //         coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
-    //     }
-    //     coordinator.AddComponent<Position>(entity, {CHECK_ZERO(decodedIntegers.at(1)), CHECK_ZERO(decodedIntegers.at(2))});
-    //     coordinator.AddComponent<Velocity>(entity, {CHECK_ZERO(decodedIntegers.at(3)), CHECK_ZERO(decodedIntegers.at(4))});
-    //     coordinator.AddComponent<Hitbox>(entity, {CHECK_ZERO(decodedIntegers.at(5)), CHECK_ZERO(decodedIntegers.at(6)), CHECK_ZERO(decodedIntegers.at(7)), CHECK_ZERO(decodedIntegers.at(8)), CHECK_TYPE(decodedIntegers.at(9))});
-    //     if (size == 11) {
-    //         coordinator.AddComponent<Sprite>(entity, {LoadTexture("assets/bullet.png")});
-    //         decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 11);
-    //     } else {
-    //         decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 10);
-    //     }
-    // decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
+
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
     while (decodedIntegers.empty() == false) {
-        if (size == 11) {
-            std::cout << "Shoot event, creating bullet" << std::endl;
-            coordinator.AddEvent(Event{Event::CREATE, static_cast<Entity>(decodedIntegers.at(0)), {std::make_any<int>(decodedIntegers.at(0)), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(1))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(2))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(3))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(4))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(5))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(6))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(7))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(8))), std::make_any<float>(CHECK_TYPE(decodedIntegers.at(9))), std::make_any<int>(decodedIntegers.at(10)), std::make_any<int>(_id)}});
-            decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 11);
-        } else {
-            coordinator.AddEvent(Event{Event::CREATE, static_cast<Entity>(decodedIntegers.at(0)), {std::make_any<int>(decodedIntegers.at(0)), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(1))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(2))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(3))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(4))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(5))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(6))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(7))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(8))), std::make_any<float>(CHECK_TYPE(decodedIntegers.at(9))), std::make_any<int>(_id)}});
-            decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 10);
-        }
-        // coordinator.AddEvent(Event{Event::CREATE, static_cast<Entity>(decodedIntegers.at(0)), {std::make_any<int>(decodedIntegers.at(0)), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(1))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(2))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(3))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(4))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(5))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(6))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(7))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(8))), std::make_any<float>(CHECK_TYPE(decodedIntegers.at(9))), std::make_any<int>(_id)}});
-        // Entity entity = coordinator.CreateEntity(decodedIntegers.at(0));
-        // if (entity == _id) {
-        //     coordinator.AddComponent<Movable>(entity, {NONE});
-        // }
-        // if (CHECK_TYPE(decodedIntegers.at(9)) == PLAYER) {
-        //     coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
-        // }
-        // coordinator.AddComponent<Position>(entity, {CHECK_ZERO(decodedIntegers.at(1)), CHECK_ZERO(decodedIntegers.at(2))});
-        // coordinator.AddComponent<Velocity>(entity, {CHECK_ZERO(decodedIntegers.at(3)), CHECK_ZERO(decodedIntegers.at(4))});
-        // coordinator.AddComponent<Hitbox>(entity, {CHECK_ZERO(decodedIntegers.at(5)), CHECK_ZERO(decodedIntegers.at(6)), CHECK_ZERO(decodedIntegers.at(7)), CHECK_ZERO(decodedIntegers.at(8)), CHECK_TYPE(decodedIntegers.at(9))});
-        // decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 10);
+        coordinator.AddEvent(Event{Event::CREATE, static_cast<Entity>(decodedIntegers.at(0)), {std::make_any<int>(decodedIntegers.at(0)), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(1))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(2))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(3))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(4))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(5))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(6))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(7))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(8))), std::make_any<float>(CHECK_TYPE(decodedIntegers.at(9))), std::make_any<int>(_id)}});
+        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 10);
     }
 }
 
@@ -282,17 +257,13 @@ void NetworkClientSystem::checkEvent(Coordinator &coordinator)
             break;
         }
         if (event._type == Event::actions::MOVE) {
-            std::cout << "MOVE" << std::endl;
             std::vector<int> tmp = mergeVectors({CHECK_ACTION(event._type), 3}, {static_cast<int>(event._entity), static_cast<int>(std::any_cast<Velocity>(event._data.at(0))._x * 10), static_cast<int>(std::any_cast<Velocity>(event._data.at(0))._y * 10)});
             // for (auto i : tmp)
             //     std::cout << i << std::endl;
-            std::cout << "AFTER MOVE TMP" << std::endl;
             std::vector<unsigned char> buffer = encode(tmp);
             _socket.send_to(asio::buffer(buffer), _serverEndpoint);
-            std::cout << "AFTER MOVE" << std::endl;
         }
         if (event._type == Event::actions::SHOOT) {
-            std::cout << "SHOOT" << std::endl;
             for (auto entity : _entities) {
                 if (this->_id == entity) {
                     std::vector<int> tmp = mergeVectors({CHECK_ACTION(event._type), 0}, {static_cast<int>(entity)});
@@ -304,15 +275,6 @@ void NetworkClientSystem::checkEvent(Coordinator &coordinator)
                 }
             }
         }
-        std::cout << "AFTER EVENT" << std::endl;
-        // std::cout << "EVENT" << std::endl;
-        // // std::cout << this->_id << std::endl;
-        // std::vector<int> tmp = mergeVectors({CHECK_ACTION(event._type), 3}, {static_cast<int>(event._entity), static_cast<int>(std::any_cast<Velocity>(event._data.at(0))._x * 10), static_cast<int>(std::any_cast<Velocity>(event._data.at(0))._y * 10)});
-        // // for (auto i : tmp)
-        // //     std::cout << i << std::endl;
-        // std::vector<unsigned char> buffer = encode(tmp);
-        // _socket.send_to(asio::buffer(buffer), _serverEndpoint);
-        // }
     }
 }
 

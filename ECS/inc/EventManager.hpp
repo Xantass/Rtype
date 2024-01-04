@@ -26,7 +26,8 @@ struct Event {
         SHOOT = 10,
         EMPTY = 0,
         CREATE = 2,
-        DESTROY = 3
+        DESTROY = 3,
+        SPAWN = 4
     };
 
     /**

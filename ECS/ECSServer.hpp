@@ -9,3 +9,4 @@
 #include "inc/systems/NetworkServerSystem.hpp"
 #include "inc/systems/PhysicSystem.hpp"
 #include "systems/ControlSystem.hpp"
+#include "systems/SpawnSystem.hpp"
