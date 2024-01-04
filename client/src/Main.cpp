@@ -31,6 +31,7 @@ int main(int ac, char **av)
     auto graphicSystem = coordinator.RegisterSystem<GraphicalSystem>();
     auto movableSystem = coordinator.RegisterSystem<MovableSystem>();
     auto networkClientSystem = coordinator.RegisterSystem<NetworkClientSystem>();
+    auto eventSystem = coordinator.RegisterSystem<EventSystem>();
 
     Signature signature2;
 
@@ -74,6 +75,7 @@ int main(int ac, char **av)
             Graphic::clearBackground(RBLACK);
             parallax.draw();
             movableSystem->Update(coordinator);
+            eventSystem->RunEvents(coordinator);
             graphicSystem->Update(coordinator);
             networkClientSystem->Update(coordinator);
             physicSystem->Update(coordinator);

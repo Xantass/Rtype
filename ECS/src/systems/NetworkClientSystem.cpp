@@ -14,7 +14,7 @@ using asio::ip::udp;
 
 #define CHECK_ZERO(x) x == 0 ? static_cast<float>(x) : static_cast<float>(x) / 10
 #define CHECK_TYPE(x) x == 1 ? PLAYER : ENNEMY
-#define CHECK_ACTION(x) x == Event::MOVE ? 11 : 10
+#define CHECK_ACTION(x) x == Event::actions::MOVE ? 11 : 10
 
 void NetworkClientSystem::Init(Coordinator &coordinator, std::string host, std::string port, std::string name, int portClient)
 {
@@ -56,21 +56,21 @@ void NetworkClientSystem::Init(Coordinator &coordinator, std::string host, std::
 
 void NetworkClientSystem::createEntities(std::vector<int> decodedInteger, Coordinator &coordinator)
 {
-    // std::cout << "CREATE" << std::endl;
     decodedInteger.erase(decodedInteger.begin(), decodedInteger.begin() + 1);
     // std::cout << "SIZE: " << decodedInteger.size() << std::endl;
     while (decodedInteger.empty() == false) {
+        coordinator.AddEvent(Event{Event::CREATE, static_cast<Entity>(decodedInteger.at(0)), {std::make_any<int>(decodedInteger.at(0)), std::make_any<float>(CHECK_ZERO(decodedInteger.at(1))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(2))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(3))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(4))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(5))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(6))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(7))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(8))), std::make_any<float>(CHECK_TYPE(decodedInteger.at(9))), std::make_any<int>(_id)}});
         //ADD INT FOR ID ENTITY
-        Entity entity = coordinator.CreateEntity(decodedInteger.at(0));
-        if (entity == _id) {
-            coordinator.AddComponent<Movable>(entity, {NONE});
-        }
-        if (CHECK_TYPE(decodedInteger.at(9)) == PLAYER) {
-            coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
-        }
-        coordinator.AddComponent<Position>(entity, {CHECK_ZERO(decodedInteger.at(1)), CHECK_ZERO(decodedInteger.at(2))});
-        coordinator.AddComponent<Velocity>(entity, {CHECK_ZERO(decodedInteger.at(3)), CHECK_ZERO(decodedInteger.at(4))});
-        coordinator.AddComponent<Hitbox>(entity, {CHECK_ZERO(decodedInteger.at(5)), CHECK_ZERO(decodedInteger.at(6)), CHECK_ZERO(decodedInteger.at(7)), CHECK_ZERO(decodedInteger.at(8)), CHECK_TYPE(decodedInteger.at(9))});
+        // Entity entity = coordinator.CreateEntity(decodedInteger.at(0));
+        // if (entity == _id) {
+        //     coordinator.AddComponent<Movable>(entity, {NONE});
+        // }
+        // if (CHECK_TYPE(decodedInteger.at(9)) == PLAYER) {
+        //     coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
+        // }
+        // coordinator.AddComponent<Position>(entity, {CHECK_ZERO(decodedInteger.at(1)), CHECK_ZERO(decodedInteger.at(2))});
+        // coordinator.AddComponent<Velocity>(entity, {CHECK_ZERO(decodedInteger.at(3)), CHECK_ZERO(decodedInteger.at(4))});
+        // coordinator.AddComponent<Hitbox>(entity, {CHECK_ZERO(decodedInteger.at(5)), CHECK_ZERO(decodedInteger.at(6)), CHECK_ZERO(decodedInteger.at(7)), CHECK_ZERO(decodedInteger.at(8)), CHECK_TYPE(decodedInteger.at(9))});
         decodedInteger.erase(decodedInteger.begin(), decodedInteger.begin() + 10);
     }
 }
@@ -153,19 +153,19 @@ void NetworkClientSystem::pos(std::vector<int>& decodedIntegers, Coordinator &co
 
 void NetworkClientSystem::createEntity(std::vector<int> decodedIntegers, Coordinator &coordinator)
 {
-    std::cout << "CREATE" << std::endl;
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
     while (decodedIntegers.empty() == false) {
-        Entity entity = coordinator.CreateEntity(decodedIntegers.at(0));
-        if (entity == _id) {
-            coordinator.AddComponent<Movable>(entity, {NONE});
-        }
-        if (CHECK_TYPE(decodedIntegers.at(9)) == PLAYER) {
-            coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
-        }
-        coordinator.AddComponent<Position>(entity, {CHECK_ZERO(decodedIntegers.at(1)), CHECK_ZERO(decodedIntegers.at(2))});
-        coordinator.AddComponent<Velocity>(entity, {CHECK_ZERO(decodedIntegers.at(3)), CHECK_ZERO(decodedIntegers.at(4))});
-        coordinator.AddComponent<Hitbox>(entity, {CHECK_ZERO(decodedIntegers.at(5)), CHECK_ZERO(decodedIntegers.at(6)), CHECK_ZERO(decodedIntegers.at(7)), CHECK_ZERO(decodedIntegers.at(8)), CHECK_TYPE(decodedIntegers.at(9))});
+        coordinator.AddEvent(Event{Event::CREATE, static_cast<Entity>(decodedIntegers.at(0)), {std::make_any<int>(decodedIntegers.at(0)), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(1))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(2))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(3))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(4))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(5))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(6))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(7))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(8))), std::make_any<float>(CHECK_TYPE(decodedIntegers.at(9))), std::make_any<int>(_id)}});
+        // Entity entity = coordinator.CreateEntity(decodedIntegers.at(0));
+        // if (entity == _id) {
+        //     coordinator.AddComponent<Movable>(entity, {NONE});
+        // }
+        // if (CHECK_TYPE(decodedIntegers.at(9)) == PLAYER) {
+        //     coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
+        // }
+        // coordinator.AddComponent<Position>(entity, {CHECK_ZERO(decodedIntegers.at(1)), CHECK_ZERO(decodedIntegers.at(2))});
+        // coordinator.AddComponent<Velocity>(entity, {CHECK_ZERO(decodedIntegers.at(3)), CHECK_ZERO(decodedIntegers.at(4))});
+        // coordinator.AddComponent<Hitbox>(entity, {CHECK_ZERO(decodedIntegers.at(5)), CHECK_ZERO(decodedIntegers.at(6)), CHECK_ZERO(decodedIntegers.at(7)), CHECK_ZERO(decodedIntegers.at(8)), CHECK_TYPE(decodedIntegers.at(9))});
         decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 10);
     }
 }
@@ -173,7 +173,7 @@ void NetworkClientSystem::createEntity(std::vector<int> decodedIntegers, Coordin
 void NetworkClientSystem::destroyEntity(std::vector<int> decodedIntegers, Coordinator &coordinator)
 {
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
-    coordinator.DestroyEntity(decodedIntegers.at(0));
+    coordinator.AddEvent(Event{Event::DESTROY, static_cast<Entity>(decodedIntegers.at(0)), {std::make_any<int>(decodedIntegers.at(0))}});
 }
 
 void NetworkClientSystem::handleCmd(std::vector<int>& decodedIntegers, Coordinator &coordinator)
@@ -246,13 +246,15 @@ void NetworkClientSystem::checkEvent(Coordinator &coordinator)
         if (event._type == Event::EMPTY) {
             break;
         }
-        // std::cout << "EVENT" << std::endl;
-        // std::cout << this->_id << std::endl;
-        std::vector<int> tmp = mergeVectors({CHECK_ACTION(event._type), 3}, {static_cast<int>(event._entity), static_cast<int>(std::any_cast<Velocity>(event._data)._x * 10), static_cast<int>(std::any_cast<Velocity>(event._data)._y * 10)});
-        // for (auto i : tmp)
-        //     std::cout << i << std::endl;
-        std::vector<unsigned char> buffer = encode(tmp);
-        _socket.send_to(asio::buffer(buffer), _serverEndpoint);
+        if (event._type == Event::MOVE) {
+
+            // std::cout << this->_id << std::endl;
+            std::vector<int> tmp = mergeVectors({CHECK_ACTION(event._type), 3}, {static_cast<int>(event._entity), static_cast<int>(std::any_cast<Velocity>(event._data.at(0))._x * 10), static_cast<int>(std::any_cast<Velocity>(event._data.at(0))._y * 10)});
+            // for (auto i : tmp)
+            //     std::cout << i << std::endl;
+            std::vector<unsigned char> buffer = encode(tmp);
+            _socket.send_to(asio::buffer(buffer), _serverEndpoint);
+        }
     }
 }
 
@@ -262,7 +264,6 @@ void NetworkClientSystem::Update(Coordinator &coordinator)
     udp::endpoint receiveEndpoint;
 
     checkEvent(coordinator);
-    std::cout << "UPDATE" << std::endl;
     while (1) {
         try {
             size_t length = _socket.receive_from(asio::buffer(data), receiveEndpoint, 0);

@@ -28,7 +28,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(raylib)
 
-include_directories("./inc/" "../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
+include_directories("./inc/" "./../ECS/" "../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
 
 # Your project source files
 add_executable(r-type_client
