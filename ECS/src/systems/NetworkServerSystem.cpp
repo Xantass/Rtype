@@ -20,7 +20,7 @@ void NetworkServerSystem::Init()
     _functions[7] = nullptr;
     _functions[8] = nullptr;
     _functions[9] = nullptr;
-    _functions[10] = nullptr;
+    _functions[10] = std::bind(&NetworkServerSystem::shoot, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[11] = std::bind(&NetworkServerSystem::move, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[12] = nullptr;
     _functions[13] = nullptr;
@@ -218,12 +218,16 @@ void NetworkServerSystem::sendDestroy(int entity)
 
 void NetworkServerSystem::sendCreate(int entity, Coordinator &coordinator)
 {
+    std::vector<int> res;
     auto& pos = coordinator.GetComponent<Position>(entity);
     auto& vel = coordinator.GetComponent<Velocity>(entity);
-    auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
-
-    std::vector<int> res = {Cmd::CREATE, 10, static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type};
-
+    auto& hitbox = coordinator.GetComponent<Hitbox>(entity); 
+    if (hitbox.type != OTHER && hitbox.type != PLAYER) {
+        auto& con = coordinator.GetComponent<Controllable>(entity);
+        res = {Cmd::CREATE, 11, static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, con.type};
+    } else {
+        res = {Cmd::CREATE, 10, static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type};
+    }
     std::vector<unsigned char> data = encode(res);
     for (auto client : _clients) {
         // std::cout << "SEND TO: " << client.getClientEndpoint() << std::endl;
@@ -281,6 +285,26 @@ void NetworkServerSystem::move(std::vector<int>& decodedIntegers, udp::endpoint&
     std::vector<unsigned char> buffer = encode(_UNKNOW);
     _socket.send_to(asio::buffer(buffer), clientEndpoint);
 }
+
+void NetworkServerSystem::shoot(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
+{
+    for (auto entity : this->_entities) {
+        if (entity == decodedIntegers.at(0)) {
+            Entity bullet = coordinator.CreateEntity();
+            coordinator.AddComponent<Position>(bullet, coordinator.GetComponent<Position>(decodedIntegers.at(0)));
+            coordinator.AddComponent<Velocity>(bullet, {20, 0});
+            coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, BULLET});
+            coordinator.AddComponent<Controllable>(bullet, {ENGINE});
+            std::vector<unsigned char> buffer = encode(_PASS);
+            _socket.send_to(asio::buffer(buffer), clientEndpoint);
+            this->sendCreate(bullet, coordinator);
+            return;
+        }
+    }
+    std::vector<unsigned char> buffer = encode(_UNKNOW);
+    _socket.send_to(asio::buffer(buffer), clientEndpoint);
+}
+
 
 void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint, Coordinator &coordinator)
 {

@@ -11,6 +11,7 @@
 #include "systems/GraphicalSystem.hpp"
 #include "systems/MovableSystem.hpp"
 #include "systems/PhysicSystem.hpp"
+#include "systems/ControlSystem.hpp"
 #include "systems/EventSystem.hpp"
 
 #endif
