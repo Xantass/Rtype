@@ -14,7 +14,7 @@ void ControlSystem::Update(Coordinator &coordinator)
         auto& con = coordinator.GetComponent<Controllable>(entity);
         auto& pos = coordinator.GetComponent<Position>(entity);
         auto& vel = coordinator.GetComponent<Velocity>(entity);
-        if (con.type == INPUT) {
+        if (con.type == PLAYER_INPUT) {
             std::cout << "Player in control" << std::endl;
         } else if (con.type == IA) {
             std::cout << "IA in control" << std::endl;

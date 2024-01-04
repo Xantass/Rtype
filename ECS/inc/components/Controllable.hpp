@@ -20,7 +20,7 @@
  *
  */
 enum ControllableType {
-    INPUT,
+    PLAYER_INPUT,
     IA,
     ENGINE
 };
