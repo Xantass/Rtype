@@ -13,7 +13,6 @@
 #include "../components/Controllable.hpp"
 #include "../components/Velocity.hpp"
 #include "../components/Position.hpp"
-#include "../Event.hpp"
 
 /**
  * @class ControlSystem
