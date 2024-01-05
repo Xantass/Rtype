@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     coordinator.SetSystemSignature<SpawnClock>(signature3);
 
     Entity ent = coordinator.CreateEntity();
-    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now()});
+    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 3});
 
     networkServerSystem->Init();
     std::chrono::milliseconds interval(10);
