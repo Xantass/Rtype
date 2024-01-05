@@ -6,10 +6,15 @@
 */
 
 #include "systems/SpawnSystem.hpp"
+#include <random>
 
 void SpawnSystem::Update(Coordinator &coordinator)
 {
     // std::cout << "SpawnSystem update :" << std::endl;
+    std::random_device rdm;
+    std::uniform_int_distribution<> y(100, 1000);
+
+    rdm();
     for (auto entity : this->_entities) {
         auto& cl = coordinator.GetComponent<SpawnClock>(entity);
         cl._spawn_end = std::chrono::high_resolution_clock::now();
@@ -17,7 +22,7 @@ void SpawnSystem::Update(Coordinator &coordinator)
 
         if ((elapsed_time != cl._check) && ((elapsed_time % cl._seconds) == 0)) {
             cl._check = elapsed_time;
-            coordinator.AddEvent(Event{Event::actions::SPAWN, 0, {std::any(Velocity{1, 0})}});
+            coordinator.AddEvent(Event{Event::actions::SPAWN, 0, {y(rdm)}});
         }
     }
 }

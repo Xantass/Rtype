@@ -12,8 +12,9 @@ void HealthSystem::Update(Coordinator &coordinator)
     for (auto entity : this->_entities) {
         auto& hp = coordinator.GetComponent<HealthPoint>(entity);
         if (hp._curr_hp <= 0) {
-            //send Event : Destroy entity [ID: entity]
-            std::cout << entity << " has 0 hp remaining" << std::endl;
+            coordinator.AddEvent(Event{Event::actions::DESTROY, entity, {std::any(Velocity{1, 0})}});
+            coordinator.DestroyEntity(entity);
+            return;
         }
         if (hp._curr_hp >= hp._max_hp)
             hp._curr_hp = hp._max_hp;

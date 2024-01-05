@@ -151,7 +151,9 @@ void NetworkServerSystem::connect(std::vector<int>& decodedIntegers, udp::endpoi
     Entity entity = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(entity, {1, 0});
     coordinator.AddComponent<Velocity>(entity, {0, 0});
-    coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
+    coordinator.AddComponent<Hitbox>(entity, {0, 0, 100, 100, PLAYER});
+    coordinator.AddComponent<HealthPoint>(entity, {300, 300});
+    coordinator.AddComponent<Damage>(entity, {100, 100});
     sendCreate(entity, coordinator);
     _clients.push_back(Client(username, clientEndpoint, entity));
     // std::cout << _clients.at(_clients.size() - 1).getClientEndpoint() << std::endl;
@@ -222,7 +224,7 @@ void NetworkServerSystem::sendCreate(int entity, Coordinator &coordinator)
     auto& pos = coordinator.GetComponent<Position>(entity);
     auto& vel = coordinator.GetComponent<Velocity>(entity);
     auto& hitbox = coordinator.GetComponent<Hitbox>(entity); 
-    res = {Cmd::CREATE, 10, static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type};
+    res = {Cmd::CREATE, 10, static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x), static_cast<int>(hitbox._y), static_cast<int>(hitbox.width), static_cast<int>(hitbox.height), hitbox.type};
     std::vector<unsigned char> data = encode(res);
     for (auto client : _clients) {
         // std::cout << "SEND TO: " << client.getClientEndpoint() << std::endl;
@@ -286,10 +288,13 @@ void NetworkServerSystem::shoot(std::vector<int>& decodedIntegers, udp::endpoint
     for (auto entity : this->_entities) {
         if (entity == decodedIntegers.at(0)) {
             Entity bullet = coordinator.CreateEntity();
-            coordinator.AddComponent<Position>(bullet, coordinator.GetComponent<Position>(decodedIntegers.at(0)));
+            auto pos = coordinator.GetComponent<Position>(decodedIntegers.at(0));
+            coordinator.AddComponent<Position>(bullet, {pos._x + 100, pos._y + 20});
             coordinator.AddComponent<Velocity>(bullet, {20, 0});
-            coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, BULLET});
+            coordinator.AddComponent<Hitbox>(bullet, {0, 0, 60, 60, BULLET});
             coordinator.AddComponent<Controllable>(bullet, {ENGINE});
+            coordinator.AddComponent<HealthPoint>(bullet, {1, 1});
+            coordinator.AddComponent<Damage>(bullet, {50, 50});
             std::vector<unsigned char> buffer = encode(_PASS);
             _socket.send_to(asio::buffer(buffer), clientEndpoint);
             this->sendCreate(bullet, coordinator);
@@ -338,7 +343,7 @@ void NetworkServerSystem::sendEcs(Coordinator &coordinator)
             auto& vel = coordinator.GetComponent<Velocity>(entity);
             auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
 
-            std::vector<int> encode_ = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type};
+            std::vector<int> encode_ = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x), static_cast<int>(hitbox._y), static_cast<int>(hitbox.width), static_cast<int>(hitbox.height), hitbox.type};
             for (auto i : encode_)
                 res.push_back(i);
         }
@@ -360,10 +365,12 @@ void NetworkServerSystem::checkEvent(Coordinator &coordinator)
         }
         if (event._type == Event::actions::SPAWN) {
             Entity ennemy = coordinator.CreateEntity();
-            coordinator.AddComponent<Position>(ennemy, {1990, 0});
+            coordinator.AddComponent<Position>(ennemy, {1990, (std::any_cast<int>(event._data[0]))});
             coordinator.AddComponent<Velocity>(ennemy, {-20, 0});
-            coordinator.AddComponent<Hitbox>(ennemy, {0, 0, 1, 1, ENNEMY});
+            coordinator.AddComponent<Hitbox>(ennemy, {0, 0, 150, 150, ENNEMY});
             coordinator.AddComponent<Controllable>(ennemy, {IA});
+            coordinator.AddComponent<HealthPoint>(ennemy, {150, 150});
+            coordinator.AddComponent<Damage>(ennemy, {50, 50});
             this->sendCreate(ennemy, coordinator);
             break;
         }
