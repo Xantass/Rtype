@@ -159,6 +159,12 @@ public:
      * @param coordinator The Coordinator reference.
      */
     void sendEcs(Coordinator &coordinator);
+    
+    /**
+     * @brief checks and run intern server events.
+     * @param coordinator The Coordinator reference.
+     */
+    void checkEvent(Coordinator &coordinator);
 
     /**
      * @brief Updates the NetworkServerSystem.

@@ -30,16 +30,17 @@ void EventSystem::RunEvents(Coordinator &coordinator)
 					coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
 				if (std::any_cast<int>(event._data[10]) == entity)
 					coordinator.AddComponent<Movable>(entity, {NONE});	
-				if (event._data.size() > 11) {
-					std::cout << "Shoot event, creating bullet in client event" << std::endl;
+				if (std::any_cast<float>(event._data[9]) == BULLET)
 					coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/bullets.png")});
-				}
+				if (std::any_cast<float>(event._data[9]) == ENNEMY)
+					coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/carli.png")});
 				break;
 			} case Event::actions::MOVE: {
 				coordinator.GetComponent<Position>(event._entity)._x += coordinator.GetComponent<Velocity>(event._entity)._x;
 				coordinator.GetComponent<Position>(event._entity)._y += coordinator.GetComponent<Velocity>(event._entity)._y;
 				break;
 			} case Event::actions::DESTROY: {
+				std::cout << "DESTROY" << std::endl;
 				coordinator.DestroyEntity(event._entity);
 			} default:
 				break;
