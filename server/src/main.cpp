@@ -62,7 +62,9 @@ int main(int argc, char **argv)
     coordinator.SetSystemSignature<HealthSystem>(signature5);
 
     Entity ent = coordinator.CreateEntity();
-    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 2});
+    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 2, 100, 1000});
+    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 1, 500, 700});
+    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 3, 200, 900});
 
     networkServerSystem->Init();
     std::chrono::milliseconds interval(10);

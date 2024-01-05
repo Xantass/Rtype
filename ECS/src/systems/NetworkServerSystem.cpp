@@ -367,7 +367,7 @@ void NetworkServerSystem::checkEvent(Coordinator &coordinator)
             Entity ennemy = coordinator.CreateEntity();
             coordinator.AddComponent<Position>(ennemy, {1990, (std::any_cast<int>(event._data[0]))});
             coordinator.AddComponent<Velocity>(ennemy, {-20, 0});
-            coordinator.AddComponent<Hitbox>(ennemy, {0, 0, 150, 150, ENNEMY});
+            coordinator.AddComponent<Hitbox>(ennemy, {0, 0, 100, 100, ENNEMY});
             coordinator.AddComponent<Controllable>(ennemy, {IA});
             coordinator.AddComponent<HealthPoint>(ennemy, {150, 150});
             coordinator.AddComponent<Damage>(ennemy, {50, 50});
