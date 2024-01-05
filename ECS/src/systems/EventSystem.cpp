@@ -27,12 +27,12 @@ void EventSystem::RunEvents(Coordinator &coordinator)
 				coordinator.AddComponent<Velocity>(entity, {std::any_cast<float>(event._data[3]), std::any_cast<float>(event._data[4])});
 				coordinator.AddComponent<Hitbox>(entity, {std::any_cast<float>(event._data[5]), std::any_cast<float>(event._data[6])});
 				if (std::any_cast<float>(event._data[9]) == PLAYER)
-					coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
+					coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("player")});
 				if (std::any_cast<int>(event._data[10]) == entity)
-					coordinator.AddComponent<Movable>(entity, {NONE});	
+					coordinator.AddComponent<Movable>(entity, {NONE});
 				if (event._data.size() > 11) {
 					std::cout << "Shoot event, creating bullet in client event" << std::endl;
-					coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/bullets.png")});
+					coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("bullet")});
 				}
 				break;
 			} case Event::actions::MOVE: {

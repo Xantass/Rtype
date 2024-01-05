@@ -20,6 +20,11 @@ int main(int ac, char **av)
     Graphic::init(1920, 1080, "R-Type");
     Music music = Graphic::loadMusic("assets/Theme.mp3");
     Parallax parallax("assets/parallax/");
+    
+    _textures = {
+        {"bullet", LoadTexture("assets/bullets.png")},
+        {"player", LoadTexture("assets/spaceship.png")}
+    };
 
     coordinator.RegisterComponent<Position>();
     coordinator.RegisterComponent<Velocity>();

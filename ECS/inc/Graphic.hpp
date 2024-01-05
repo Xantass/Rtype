@@ -18,7 +18,10 @@
 #define RWHITE Color{255 ,255, 255, 255}
 
 #include <iostream>
+#include <unordered_map>
 #include "raylib.h"
+
+inline std::unordered_map<std::string, Texture2D> _textures;
 
 /**
  * @class Graphic
@@ -115,7 +118,8 @@ class Graphic {
          * @return Texture
          */
         static Texture loadTexture(std::string path) {
-            return LoadTexture(path.c_str());
+            // return LoadTexture(path.c_str());
+            return _textures[path];
         }
         /**
          * @brief Load a music

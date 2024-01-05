@@ -20,7 +20,7 @@ void Parallax::loadTextures(std::vector<std::string> paths)
 {
     for (auto path : paths) {
         try {
-            _textureList.push_back(std::make_tuple(Graphic::loadTexture(path), 1920));
+            _textureList.push_back(std::make_tuple(LoadTexture(path.c_str()), 1920));
         } catch (const std::exception& e) {
             std::cerr << "Error: " << e.what() << std::endl;
         }
