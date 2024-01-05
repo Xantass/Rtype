@@ -10,3 +10,5 @@
 #include "inc/systems/PhysicSystem.hpp"
 #include "inc/systems/CollisionSystem.hpp"
 #include "inc/systems/HealthSystem.hpp"
+#include "systems/ControlSystem.hpp"
+#include "systems/SpawnSystem.hpp"

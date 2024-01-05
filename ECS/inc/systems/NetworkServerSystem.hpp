@@ -35,6 +35,7 @@
 #include "components/Velocity.hpp"
 #include "components/Hitbox.hpp"
 #include "components/Movable.hpp"
+#include "components/Controllable.hpp"
 
 
 using namespace asio;
@@ -139,6 +140,8 @@ public:
     void pong(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     void move(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
+    
+    void shoot(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     int checkMove(Position& pos, Velocity& vel, Hitbox& hitbox, Entity entity, Coordinator& coordinator);
 
@@ -156,6 +159,12 @@ public:
      * @param coordinator The Coordinator reference.
      */
     void sendEcs(Coordinator &coordinator);
+    
+    /**
+     * @brief checks and run intern server events.
+     * @param coordinator The Coordinator reference.
+     */
+    void checkEvent(Coordinator &coordinator);
 
     /**
      * @brief Updates the NetworkServerSystem.

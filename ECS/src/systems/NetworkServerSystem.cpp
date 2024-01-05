@@ -20,7 +20,7 @@ void NetworkServerSystem::Init()
     _functions[7] = nullptr;
     _functions[8] = nullptr;
     _functions[9] = nullptr;
-    _functions[10] = nullptr;
+    _functions[10] = std::bind(&NetworkServerSystem::shoot, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[11] = std::bind(&NetworkServerSystem::move, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[12] = nullptr;
     _functions[13] = nullptr;
@@ -166,7 +166,7 @@ void NetworkServerSystem::ping(Coordinator &coordinator)
 
     for (auto client : _clients) {
         if (client.getAlive() == false) {
-            std::cout << "DESTROY" << std::endl;
+            // std::cout << "DESTROY" << std::endl;
             coordinator.DestroyEntity(client.getID());
             sendDestroy(client.getID());
         }
@@ -188,7 +188,7 @@ void NetworkServerSystem::ping(Coordinator &coordinator)
     );
     for (auto client : _clients) {
         std::vector<unsigned char> buffer = encode(_PING);
-        std::cout << "SEND TO: " << client.getClientEndpoint() << std::endl;
+        // std::cout << "SEND TO: " << client.getClientEndpoint() << std::endl;
         _socket.send_to(asio::buffer(buffer), client.getClientEndpoint());
     }
 }
@@ -197,8 +197,8 @@ void NetworkServerSystem::pong(std::vector<int>& decodedIntegers, udp::endpoint&
 {
     int index = getClient(decodedIntegers.at(0));
 
-    std::cout << "PONG DECODED INTEGERS: " << decodedIntegers.at(0) << std::endl;
-    std::cout << "PONG INDEX: " << index << std::endl;
+    // std::cout << "PONG DECODED INTEGERS: " << decodedIntegers.at(0) << std::endl;
+    // std::cout << "PONG INDEX: " << index << std::endl;
     if (index == -1) {
         return;
     }
@@ -218,15 +218,14 @@ void NetworkServerSystem::sendDestroy(int entity)
 
 void NetworkServerSystem::sendCreate(int entity, Coordinator &coordinator)
 {
+    std::vector<int> res;
     auto& pos = coordinator.GetComponent<Position>(entity);
     auto& vel = coordinator.GetComponent<Velocity>(entity);
-    auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
-
-    std::vector<int> res = {Cmd::CREATE, 10, static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type};
-
+    auto& hitbox = coordinator.GetComponent<Hitbox>(entity); 
+    res = {Cmd::CREATE, 10, static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type};
     std::vector<unsigned char> data = encode(res);
     for (auto client : _clients) {
-        std::cout << "SEND TO: " << client.getClientEndpoint() << std::endl;
+        // std::cout << "SEND TO: " << client.getClientEndpoint() << std::endl;
         _socket.send_to(asio::buffer(data), client.getClientEndpoint());
     }
 }
@@ -259,7 +258,6 @@ int NetworkServerSystem::checkMove(Position& pos, Velocity& vel, Hitbox& hitbox,
 
 void NetworkServerSystem::move(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
 {
-    // std::cout << "MOVE CLIENT" << std::endl;
     for (auto entity : this->_entities) {
         if (entity == decodedIntegers.at(0)) {
             auto& vel = coordinator.GetComponent<Velocity>(entity);
@@ -283,6 +281,26 @@ void NetworkServerSystem::move(std::vector<int>& decodedIntegers, udp::endpoint&
     _socket.send_to(asio::buffer(buffer), clientEndpoint);
 }
 
+void NetworkServerSystem::shoot(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
+{
+    for (auto entity : this->_entities) {
+        if (entity == decodedIntegers.at(0)) {
+            Entity bullet = coordinator.CreateEntity();
+            coordinator.AddComponent<Position>(bullet, coordinator.GetComponent<Position>(decodedIntegers.at(0)));
+            coordinator.AddComponent<Velocity>(bullet, {20, 0});
+            coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, BULLET});
+            coordinator.AddComponent<Controllable>(bullet, {ENGINE});
+            std::vector<unsigned char> buffer = encode(_PASS);
+            _socket.send_to(asio::buffer(buffer), clientEndpoint);
+            this->sendCreate(bullet, coordinator);
+            return;
+        }
+    }
+    std::vector<unsigned char> buffer = encode(_UNKNOW);
+    _socket.send_to(asio::buffer(buffer), clientEndpoint);
+}
+
+
 void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint, Coordinator &coordinator)
 {
     int index = decodedIntegers.at(0);
@@ -302,7 +320,7 @@ void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, udp::endp
 
 void NetworkServerSystem::processReceiveData(const std::vector<unsigned char>& data, udp::endpoint clientEndpoint, std::size_t bytesReceived, Coordinator &coordinator)
 {
-    std::cout << clientEndpoint << std::endl;
+    // std::cout << clientEndpoint << std::endl;
     if (clientEndpoint != asio::ip::udp::endpoint(asio::ip::make_address("0.0.0.0"), 0)) {
         std::vector<int> res = decode(data, bytesReceived);
         handleCmd(res, clientEndpoint, coordinator);
@@ -332,6 +350,29 @@ void NetworkServerSystem::sendEcs(Coordinator &coordinator)
     }
 }
 
+void NetworkServerSystem::checkEvent(Coordinator &coordinator)
+{
+    while (1) {
+        auto event = coordinator.GetEvent();
+        
+        if (event._type == Event::actions::EMPTY) {
+            break;
+        }
+        if (event._type == Event::actions::SPAWN) {
+            Entity ennemy = coordinator.CreateEntity();
+            coordinator.AddComponent<Position>(ennemy, {1990, 0});
+            coordinator.AddComponent<Velocity>(ennemy, {-20, 0});
+            coordinator.AddComponent<Hitbox>(ennemy, {0, 0, 1, 1, ENNEMY});
+            coordinator.AddComponent<Controllable>(ennemy, {IA});
+            this->sendCreate(ennemy, coordinator);
+            break;
+        }
+        if (event._type == Event::actions::DESTROY) {
+            this->sendDestroy(event._entity);
+        }
+    }
+}
+
 void NetworkServerSystem::Update(Coordinator &coordinator)
 {
     std::vector<unsigned char> data(1024);
@@ -340,6 +381,7 @@ void NetworkServerSystem::Update(Coordinator &coordinator)
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::duration elapsedTime = currentTime - _startTime;
 
+    checkEvent(coordinator);
     while (1) {
         try {
             size_t length = _socket.receive_from(asio::buffer(data), clientEndpoint, 0);
