@@ -29,13 +29,15 @@
 #include <sstream>
 #include <fstream>
 #include <thread>
+#include "EnumProtocol.hpp"
+#include "../../server/inc/Client.hpp"
+
 #include "System.hpp"
-#include "Coordinator.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
 #include "components/Hitbox.hpp"
-#include "EnumProtocol.hpp"
-#include "Client.hpp"
+#include "components/Movable.hpp"
+
 
 using namespace asio;
 using asio::ip::udp;
@@ -59,6 +61,8 @@ public:
      * @return The ID of the client if found, otherwise returns -1.
      */
     int getClient(int id);
+
+    int hourIntNow();
 
     /**
      * @brief Finds a valid port to use.
@@ -88,7 +92,7 @@ public:
      * @param clientEndpoint The endpoint of the client.
      * @param bytesReceived The number of bytes received.
      */
-    void processReceiveData(const std::vector<unsigned char>& data, udp::endpoint clientEndpoint, std::size_t bytesReceived, Coordinator &coordinator);
+    void processReceiveData(udp::endpoint clientEndpoint, Coordinator &coordinator, std::vector<int> res);
 
     /**
      * @brief Merges two vectors of integers into a single vector.
@@ -153,6 +157,14 @@ public:
      */
     void param(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
+    void send(std::vector<int> header, std::vector<int> data, bool stock, udp::endpoint clientEndpoint, int index);
+
+    int checkAlreadyReceive(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint);
+
+    void packetLoss();
+
+    std::tuple<std::vector<int>, udp::endpoint> receive();
+
     /**
      * @brief Updates the NetworkServerSystem.
      * @param coordinator The Coordinator reference.
@@ -169,5 +181,7 @@ private:
     int _id = 0; /**< The ID of the server. */
     int _port = 4243;
 };
+
+#include "../../src/systems/NetworkServerSystem.cpp"
 
 #endif /* !NETWORKSERVERSYSTEM_HPP_ */

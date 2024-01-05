@@ -54,7 +54,10 @@ enum Error {
     ALREADY_START = 3, /**< Already started error. */
     ALREADY_STOP = 4, /**< Already stopped error. */
     FAIL_CONNECT = 5, /**< Failed to connect error. */
-    FAIL_START = 6 /**< Failed to start error. */
+    FAIL_START = 6, /**< Failed to start error. */
+    CREATE_ROOM = 7,
+    STOP_SEND = 8,
+    UNVAILABLE_MOVE = 9
 };
 
 enum class DataType {
@@ -86,6 +89,12 @@ static const std::vector<int> _UNKNOW = {Cmd::RESPONSE, 1, Error::UNKNOW};
  * @brief Vector representing a FAIL_CONNECT error response.
  */
 static const std::vector<int> _FAIL_CONNECT = {Cmd::RESPONSE, 1, Error::FAIL_CONNECT};
+
+static const std::vector<int> _CREATE_ROOM = {Cmd::RESPONSE, 1, Error::CREATE_ROOM};
+
+static const std::vector<int> _STOP_SEND = {Cmd::RESPONSE, 1, Error::STOP_SEND};
+
+static const std::vector<int> _UNVAILABLE_MOVE = {Cmd::RESPONSE, 1, Error::UNVAILABLE_MOVE};
 
 /** 
  * @brief Vector representing an OK response.

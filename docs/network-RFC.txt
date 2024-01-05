@@ -55,6 +55,8 @@ Table of Contents
 
     * timeStamp : It's the signature of the packet.
 
+    * id : Only for client packet when send to server.
+
 3.  Protocol packets definition
 
 3.1.  Response packet

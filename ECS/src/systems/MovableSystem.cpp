@@ -8,7 +8,7 @@
 #include "systems/MovableSystem.hpp"
 #include "Graphic.hpp"
 
-void MovableSystem::Update(Coordinator &coordinator)
+inline void MovableSystem::Update(Coordinator &coordinator)
 {
     // std::cout << "MovableSystem update :" << std::endl;
     for (auto &entity : this->_entities) {

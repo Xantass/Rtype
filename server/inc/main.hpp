@@ -9,13 +9,6 @@
 #define MAIN_HPP_
 
 #include <memory>
-#include "Coordinator.hpp"
-#include "components/Position.hpp"
-#include "components/Velocity.hpp"
-#include "components/Hitbox.hpp"
-#include "systems/PhysicSystem.hpp"
-#include "systems/NetworkServerSystem.hpp"
-#include "Signature.hpp"
-#include "Event.hpp"
+#include "../../ECS/ECSServer.hpp"
 
 #endif /* !MAIN_HPP_ */

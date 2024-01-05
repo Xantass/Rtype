@@ -7,7 +7,7 @@
 
 #include "systems/ParallaxSystem.hpp"
 
-void ParallaxSystem::Update(Coordinator &coordinator)
+inline void ParallaxSystem::Update(Coordinator &coordinator)
 {
     // std::cout << "ParallaxSystem update :" << std::endl;
     for (auto &entity : this->_entities) {

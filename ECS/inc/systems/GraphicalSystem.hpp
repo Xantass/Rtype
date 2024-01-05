@@ -8,10 +8,13 @@
 #ifndef GRAPHICALSYSTEM_HPP_
 #define GRAPHICALSYSTEM_HPP_
 
-#include "../Coordinator.hpp"
-#include "../System.hpp"
-#include "../components/Position.hpp"
-#include "../components/Sprite.hpp"
+#include "System.hpp"
+#include "components/Position.hpp"
+#include "components/Velocity.hpp"
+#include "components/Hitbox.hpp"
+#include "components/Sprite.hpp"
+#include "components/Movable.hpp"
+
 /**
  * @class GraphicalSystem
  * @brief Class of the graphical system
@@ -27,5 +30,7 @@ class GraphicalSystem : public System {
     protected:
     private:
 };
+
+#include "../../src/systems/GraphicalSystem.cpp"
 
 #endif /* !GRAPHICALSYSTEM_HPP_ */

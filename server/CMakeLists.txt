@@ -14,21 +14,12 @@ FetchContent_MakeAvailable(asiocmake)
 
 project(r-type_server)
 
-include_directories("./inc/" "./../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
+include_directories("./inc/" "./../ECS/" "./../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
 
 set(SOURCES
     src/main.cpp
     src/room.cpp
     src/Client.cpp
-
-    ../ECS/src/systems/PhysicSystem.cpp
-    ../ECS/src/systems/NetworkServerSystem.cpp
-    ../ECS/src/systems/NetworkRoomSystem.cpp
-    ../ECS/src/EntityManager.cpp
-    ../ECS/src/ComponentArray.cpp
-    ../ECS/src/ComponentManager.cpp
-    ../ECS/src/SystemManager.cpp
-    ../ECS/src/Coordinator.cpp
 )
 
 add_executable(r-type_server ${SOURCES})

@@ -51,6 +51,10 @@ public:
      */
     int getClient(int id);
 
+    int hourIntNow();
+
+    std::vector<int> mergeVectors(const std::vector<int>& vec1, const std::vector<int>& vec2);
+
     /**
      * @brief Encodes a vector of integers into a vector of bytes.
      * @param values The vector of integers to encode.
@@ -73,7 +77,7 @@ public:
      * @param bytesReceived The number of bytes received.
      * @param coordinator The Coordinator reference.
      */
-    void processReceiveData(const std::vector<unsigned char>& data, udp::endpoint clientEndpoint, std::size_t bytesReceived, Coordinator &coordinator);
+    void processReceiveData(udp::endpoint clientEndpoint, Coordinator &coordinator, std::vector<int> res);
 
     /**
      * @brief Converts a vector of integers into a string.
@@ -104,6 +108,8 @@ public:
      * @param coordinator The Coordinator reference.
      */
     void response(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
+
+    void connect(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     /**
      * @brief Sends a ping request to all connected clients.
@@ -163,6 +169,14 @@ public:
      */
     void Init(int port);
 
+    void send(std::vector<int> header, std::vector<int> data, bool stock, udp::endpoint clientEndpoint, int index);
+
+    int checkAlreadyReceive(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint);
+
+    void packetLoss();
+
+    std::tuple<std::vector<int>, udp::endpoint> receive();
+
     /**
      * @brief Updates the NetworkRoomSystem.
      * @param coordinator The Coordinator reference.
@@ -176,6 +190,9 @@ private:
     std::vector<Client> _clients; /**< Vector storing information about connected clients. */
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
     std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[14]; /**< Array of function pointers. */
+    std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
 };
+
+#include "../../src/systems/NetworkRoomSystem.cpp"
 
 #endif /* !NETWORKROOMSYSTEM_HPP_ */

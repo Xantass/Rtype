@@ -13,7 +13,18 @@
 #ifndef CLIENT_HPP_
 #define CLIENT_HPP_
 
-#include <asio.hpp>
+#if defined(_WIN32)           
+	#define NOGDI             // All GDI defines and routines
+	#define NOUSER            // All USER defines and routines
+#endif
+
+#include <asio.hpp> // or any library that uses Windows.h
+
+#if defined(_WIN32)           // raylib uses these names as function parameters
+	#undef near
+	#undef far
+#endif
+
 #include <string>
 #include <map>
 #include <vector>
@@ -72,6 +83,10 @@ public:
      */
     bool getAlive() const;
 
+    std::map<int, std::vector<unsigned char>> getPacketsSend() const;
+
+    std::map<int, std::vector<int>> getPacketsReceive() const;
+
     // Setters
 
     /**
@@ -98,13 +113,22 @@ public:
      */
     void setAlive(const bool& alive);
 
+    void addPacketSend(int timeStamp, std::vector<unsigned char> packet);
+
+    void delPacketSend(int timeStamp);
+
+    void addPacketReceive(int timeStamp, std::vector<int> packet);
+
+    void delPacketReceive(int timeStamp);
+
 protected:
 private:
     std::string _username; /**< The username of the client. */
     int _ID; /**< The ID of the client. */
     udp::endpoint _clientEndpoint; /**< The UDP endpoint of the client. */
     bool _alive; /**< The status of the client (alive or not). */
-    std::map<int, std::vector<unsigned char>> _packets;
+    std::map<int, std::vector<unsigned char>> _packetsSend;
+    std::map<int, std::vector<int>> _packetsReceive;
 };
 
 #endif /* !CLIENT_HPP_ */

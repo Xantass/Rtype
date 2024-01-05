@@ -17,6 +17,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <memory>
+#include <typeindex>
 
 #include "ComponentArray.hpp"
 #include "Entity.hpp"
@@ -30,29 +31,13 @@
  */
 class ComponentManager {
 public:
-
 	/**
 	 * @brief Register a new component type
 	 * 
 	 * @tparam T Type of the component
 	 */
 	template<typename T>
-	void RegisterComponent() {
-		const char* typeName = typeid(T).name();
-
-		if (this->_componentTypes.find(typeName) == this->_componentTypes.end()) {
-			// ERROR : "Registering component type more than once."
-		}
-
-		// Add this component type to the component type map
-		this->_componentTypes.insert({typeName, this->_nextComponentType});
-
-		// Create a ComponentArray pointer and add it to the component arrays map
-		this->_componentArrays.insert({typeName, std::make_shared<ComponentArray<T>>()});
-
-		// Increment the value so that the next component registered will be different
-		this->_nextComponentType++;
-	}
+	void RegisterComponent();
 
 	/**
 	 * @brief Get the Component Type object
@@ -61,16 +46,7 @@ public:
 	 * @return ComponentType Type of the component
 	 */
 	template<typename T>
-	ComponentType GetComponentType() {
-		const char* typeName = typeid(T).name();
-
-		if (this->_componentTypes.find(typeName) == this->_componentTypes.end()) {
-			// ERROR : "Component not registered before use."
-		}
-
-		// Return this component's type - used for creating signatures
-		return this->_componentTypes[typeName];
-	}
+	ComponentType GetComponentType();
 
 	/**
 	 * @brief Add a component to an entity
@@ -80,9 +56,7 @@ public:
 	 * @param component Component to add to the entity
 	 */
 	template<typename T>
-	void AddComponent(Entity entity, T component) {
-		GetComponentArray<T>()->InsertData(entity, component);
-	}
+	void AddComponent(Entity entity, T component);
 
 	/**
 	 * @brief Remove a component from an entity
@@ -91,9 +65,7 @@ public:
 	 * @param entity Entity to remove the component from
 	 */
 	template<typename T>
-	void RemoveComponent(Entity entity) {
-		GetComponentArray<T>()->RemoveData(entity);
-	}
+	void RemoveComponent(Entity entity);
 
 	/**
 	 * @brief Get a reference of a component from an entity
@@ -103,35 +75,27 @@ public:
 	 * @return T& Component of the entity
 	 */
 	template<typename T>
-	T& GetComponent(Entity entity) {
-		return GetComponentArray<T>()->GetData(entity);
-	}
+	T& GetComponent(Entity entity);
 
 	/**
 	 * @brief Notify the component manager that an entity has been destroyed
 	 * 
 	 * @param entity Entity that has been destroyed
 	 */
-	void EntityDestroyed(Entity entity) {
-		for (auto const& pair : this->_componentArrays) {
-			auto const& component = pair.second;
-
-			component->EntityDestroyed(entity);
-		}
-	}
+	void EntityDestroyed(Entity entity);
 
 private:
 	/**
 	 * @brief Map to store the type of the components registered
 	 * 
 	 */
-	std::unordered_map<std::string, ComponentType> _componentTypes;
+	std::unordered_map<std::type_index, ComponentType> _componentTypes;
 
 	/**
 	 * @brief Map to store a reference the component arrays
 	 * 
 	 */
-	std::unordered_map<const char*, std::shared_ptr<IComponentArray>> _componentArrays{};
+	std::unordered_map<std::type_index, std::shared_ptr<IComponentArray>> _componentArrays{};
 
 	/**
 	 * @brief Component type to be assigned to the next registered component
@@ -149,14 +113,14 @@ private:
 	 */
 	template<typename T>
 	std::shared_ptr<ComponentArray<T>> GetComponentArray() {
-		const char* typeName = typeid(T).name();
-
-		if (_componentTypes.find(typeName) == _componentTypes.end()) {
-			// ERROR : "Component not registered before use."
-		}
-
-		return std::static_pointer_cast<ComponentArray<T>>(_componentArrays[typeName]);
+		std::type_index typeName = std::type_index(typeid(T));
+	// if (_componentTypes.find(typeName) == _componentTypes.end()) {
+		// ERROR : "Component not registered before use."
+	// }
+	return std::static_pointer_cast<ComponentArray<T>>(_componentArrays[typeName]);
 	}
 };
+
+#include "../src/ComponentManager.cpp"
 
 #endif /* !COMPONENTMANAGER_HPP_ */
