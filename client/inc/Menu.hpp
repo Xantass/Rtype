@@ -26,7 +26,7 @@ class Menu {
         Menu(std::string host, std::string port, std::string name) : _host(host), _port(port), _name(name), _nbPlayer("4") {}
         ~Menu() {}
         void displayMenu(void) {
-            if (Graphic::isKeyPressed(KEY_BACKSPACE)) {
+            if (Graphic::isKeyPressed(KEY_TAB)) {
                 action = "";
             }
             if (action == "<") {
@@ -71,7 +71,7 @@ class Menu {
             displayTextInput({760, 500}, {400, 80}, _port);
             displayTextInput({760, 620}, {400, 80}, _name);
             displayTextInput({760, 740}, {180, 80}, _nbPlayer);
-            displayButton({980, 740}, {180, 80}, "Create Room", true);
+            displayButton({980, 740}, {180, 80}, "Create room", true);
         }
     protected:
     private:
