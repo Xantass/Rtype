@@ -11,6 +11,7 @@
 #include "inc/Coordinator.hpp"
 #include "inc/SystemsInc.hpp"
 #include "inc/systems/NetworkClientSystem.hpp"
+#include "inc/systems/EventSystem.hpp"
 #include "components/Sprite.hpp"
 
 #endif

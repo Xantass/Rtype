@@ -28,12 +28,13 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(raylib)
 
-include_directories("./inc/" "../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
+include_directories("./inc/" "./../ECS/" "../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
 
 # Your project source files
 add_executable(r-type_client
     src/Main.cpp
     src/Client.cpp
+    src/Parallax.cpp
     )
 
 if(WIN32)
@@ -50,7 +51,7 @@ if (APPLE AND UNIX)
 endif()
 
 if(UNIX AND NOT APPLE)
-    target_compile_options(r-type_client PRIVATE -std=c++2a -Wall -Wextra -O3)
+    target_compile_options(r-type_client PRIVATE -std=c++2a -Wall -Wextra -O3 -g3)
     target_link_libraries(r-type_client PRIVATE raylib asio)
 endif()
 

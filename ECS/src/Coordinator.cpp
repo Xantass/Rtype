@@ -80,15 +80,15 @@ inline void Coordinator::SetSystemSignature(Signature signature)
 
 inline void Coordinator::AddEvent(Event event)
 {
-	this->_eventQueue.push(event);
+	this->_eventManager->AddEvent(event);
 }
 
 inline Event Coordinator::GetEvent()
 {
-	if (this->_eventQueue.empty() != true) {
-		Event event = this->_eventQueue.front();
-		this->_eventQueue.pop();
-		return event;
-	}
-	return Event{Event::actions::EMPTY, 0, std::any(int(-1))};
+	return this->_eventManager->GetEvent();
+}
+
+inline std::queue<Event> Coordinator::GetEventQueue() const
+{
+	return this->_eventManager->GetEventQueue();
 }

@@ -255,7 +255,6 @@ inline void NetworkServerSystem::ping(Coordinator &coordinator)
 
 inline void NetworkServerSystem::pong(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
 {
-    (void)clientEndpoint;
     (void)coordinator;
 
     int timeStamp = decodedIntegers.at(0);
@@ -288,7 +287,6 @@ inline int NetworkServerSystem::checkAlreadyReceive(std::vector<int>& decodedInt
         send(_STOP_SEND, {timeStamp}, false, clientEndpoint, index);
         return -1;
     }
-    return 0;
 }
 
 inline void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint, Coordinator &coordinator)

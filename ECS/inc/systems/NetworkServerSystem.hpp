@@ -31,12 +31,12 @@
 #include <thread>
 #include "EnumProtocol.hpp"
 #include "../../server/inc/Client.hpp"
-
 #include "System.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
 #include "components/Hitbox.hpp"
 #include "components/Movable.hpp"
+#include "components/Controllable.hpp"
 
 
 using namespace asio;
@@ -62,6 +62,10 @@ public:
      */
     int getClient(int id);
 
+    /**
+     * @brief Obtains the current hour as an integer.
+     * @return An integer representing the current hour.
+     */
     int hourIntNow();
 
     /**
@@ -155,15 +159,44 @@ public:
      * @param clientEndpoint The endpoint of the client sending the parameter data.
      * @param coordinator The Coordinator reference.
      */
+
     void param(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
+    /**
+     * @brief Sends a packet with header and data to a specific client endpoint, optionally storing it.
+     * @param header The header data for the packet.
+     * @param data The actual data payload for the packet.
+     * @param stock Boolean indicating whether to store the packet.
+     * @param clientEndpoint The endpoint of the client to send the packet to.
+     * @param index The index for packet identification.
+     */
     void send(std::vector<int> header, std::vector<int> data, bool stock, udp::endpoint clientEndpoint, int index);
 
+    /**
+     * @brief Checks if a packet with the given header has already been received from a specific client endpoint.
+     * @param decodedIntegers The decoded integers representing the packet header.
+     * @param clientEndpoint The endpoint of the client to check for packet reception.
+     * @return An integer indicating the packet's reception status.
+     */
     int checkAlreadyReceive(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint);
 
+    /**
+     * @brief Handles packet loss and manages related actions.
+     */
     void packetLoss();
 
+    /**
+     * @brief Receives a packet along with its endpoint information.
+     * @return A tuple containing the vector of integers representing the received packet
+     *         and the endpoint from which the packet was received.
+     */
     std::tuple<std::vector<int>, udp::endpoint> receive();
+
+    /**
+     * @brief Sends an ECS (Entity-Component-System) update to the Coordinator.
+     * @param coordinator The Coordinator reference for ECS update.
+     */
+    void sendEcs(Coordinator &coordinator);
 
     /**
      * @brief Updates the NetworkServerSystem.

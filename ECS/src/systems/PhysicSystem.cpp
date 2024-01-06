@@ -34,7 +34,7 @@ inline void PhysicSystem::Update(Coordinator &coordinator) {
                 pos._y + hitbox._y + hitbox.height >= pos2._y + hitbox2._y &&
                 pos._y + hitbox._y <= pos2._y + hitbox2._y + hitbox2.height &&
                 hitbox.type == PLAYER && hitbox2.type == ENNEMY) {
-                std::cout << "Collision with " << entity2 << " detected, destroying entity " << entity << std::endl; // TEST - TO BE REMOVED
+                std::cout << "Collision with " << entity2 << " with type : " << hitbox2.type << " detected, destroying entity " << entity << " with type : " << hitbox.type << std::endl; // TEST - TO BE REMOVED
                 coordinator.DestroyEntity(entity);
                 return;
             }
