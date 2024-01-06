@@ -7,7 +7,7 @@
 
 #include "systems/SpawnSystem.hpp"
 
-void SpawnSystem::Update(Coordinator &coordinator)
+inline void SpawnSystem::Update(Coordinator &coordinator)
 {
     // std::cout << "SpawnSystem update :" << std::endl;
     for (auto entity : this->_entities) {

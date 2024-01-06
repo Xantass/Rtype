@@ -7,12 +7,12 @@
 
 #include "EventManager.hpp"
 
-void EventManager::AddEvent(Event event) {
+inline void EventManager::AddEvent(Event event) {
     
     this->_eventQueue.push(event);
 }
 
-Event EventManager::GetEvent() {
+inline Event EventManager::GetEvent() {
     if (this->_eventQueue.empty() != true) {
         Event event = this->_eventQueue.front();
         this->_eventQueue.pop();
@@ -21,6 +21,6 @@ Event EventManager::GetEvent() {
     return Event{Event::actions::EMPTY, 0, {std::any(int(-1))}};
 }
 
-std::queue<Event> EventManager::GetEventQueue() const {
+inline std::queue<Event> EventManager::GetEventQueue() const {
     return std::queue<Event>(this->_eventQueue);
 }

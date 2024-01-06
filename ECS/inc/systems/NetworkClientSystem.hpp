@@ -58,6 +58,10 @@ public:
      */
     unsigned short findValidPort(asio::io_context& service);
 
+    /**
+     * @brief Retrieves the current hour as an integer.
+     * @return An integer representing the current hour.
+     */
     int hourIntNow();
 
     /**
@@ -115,6 +119,11 @@ public:
      */
     void pos(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
+    /**
+     * @brief Handles a response based on the provided decoded integers.
+     * @param decodedIntegers The vector of integers containing response data.
+     * @param coordinator The Coordinator reference.
+     */
     void response(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
     /**
@@ -151,6 +160,10 @@ public:
      */
     void joinEvent(Event& event, Coordinator& coordinator);
 
+    /**
+     * @brief Handles a move event using the provided Event object.
+     * @param event The Event object representing the move event.
+     */
     void moveEvent(Event& event);
 
     /**
@@ -159,20 +172,56 @@ public:
      */
     void checkEvent(Coordinator &coordinator);
 
+    /**
+     * @brief Adds a packet to the send queue with the given timestamp.
+     * @param timeStamp The timestamp for the packet.
+     * @param packet The vector of bytes representing the packet.
+     */
     void addPacketSend(int timeStamp, std::vector<unsigned char> packet);
 
+    /**
+     * @brief Deletes a packet from the send queue based on the timestamp.
+     * @param timeStamp The timestamp of the packet to delete.
+     */
     void delPacketSend(int timeStamp);
 
+    /**
+     * @brief Adds a packet to the receive queue with the given timestamp.
+     * @param timeStamp The timestamp for the packet.
+     * @param packet The vector of integers representing the packet.
+     */
     void addPacketReceive(int timeStamp, std::vector<int> packet);
 
+    /**
+     * @brief Deletes a packet from the receive queue based on the timestamp.
+     * @param timeStamp The timestamp of the packet to delete.
+     */
     void delPacketReceive(int timeStamp);
 
+    /**
+     * @brief Sends a packet with header and data, optionally storing it.
+     * @param header The header data for the packet.
+     * @param data The actual data payload for the packet.
+     * @param stock Boolean indicating whether to store the packet.
+     */
     void send(std::vector<int> header, std::vector<int> data, bool stock);
 
+    /**
+     * @brief Checks if a packet with the given header has already been received.
+     * @param decodedIntegers The decoded integers representing the packet header.
+     * @return An integer indicating the packet's reception status.
+     */
     int checkAlreadyReceive(std::vector<int> decodedIntegers);
 
+    /**
+     * @brief Retrieves the next packet from the receive queue.
+     * @return The vector of integers representing the received packet.
+     */
     std::vector<int> receive();
 
+    /**
+     * @brief Handles packet loss and manages related actions.
+     */
     void packetLoss();
 
     /**
@@ -188,8 +237,8 @@ private:
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
     std::function<void(std::vector<int>&, Coordinator &coordinator)> _functions[14]; /**< Array of function pointers. */
     int _id; /**< The ID of the client. */
-    std::map<int, std::vector<unsigned char>> _packetsSend;
-    std::map<int, std::vector<int>> _packetsReceive;
+    std::map<int, std::vector<unsigned char>> _packetsSend; /**< Packets sent with associated timestamps. */
+    std::map<int, std::vector<int>> _packetsReceive; /**< Packets received with associated timestamps. */
 };
 
 #include "../../src/systems/NetworkClientSystem.cpp"

@@ -24,7 +24,7 @@ inline void NetworkRoomSystem::Init(int port)
     _functions[7] = nullptr;
     _functions[8] = nullptr;
     _functions[9] = nullptr;
-    _functions[10] = nullptr;
+    _functions[10] = std::bind(&NetworkRoomSystem::shoot, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[11] = std::bind(&NetworkRoomSystem::move, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[12] = nullptr;
     _functions[13] = nullptr;
@@ -313,6 +313,25 @@ inline void NetworkRoomSystem::move(std::vector<int>& decodedIntegers, udp::endp
     _socket.send_to(asio::buffer(buffer), clientEndpoint);
 }
 
+inline void NetworkRoomSystem::shoot(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
+{
+    for (auto entity : this->_entities) {
+        if (static_cast<int>(entity) == decodedIntegers.at(0)) {
+            Entity bullet = coordinator.CreateEntity();
+            coordinator.AddComponent<Position>(bullet, coordinator.GetComponent<Position>(decodedIntegers.at(0)));
+            coordinator.AddComponent<Velocity>(bullet, {20, 0});
+            coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, BULLET});
+            coordinator.AddComponent<Controllable>(bullet, {ENGINE});
+            std::vector<unsigned char> buffer = encode(_PASS);
+            _socket.send_to(asio::buffer(buffer), clientEndpoint);
+            this->sendCreate(bullet, coordinator);
+            return;
+        }
+    }
+    std::vector<unsigned char> buffer = encode(_UNKNOW);
+    _socket.send_to(asio::buffer(buffer), clientEndpoint);
+}
+
 inline int NetworkRoomSystem::checkAlreadyReceive(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint)
 {
     int timeStamp = decodedIntegers.at(2);
@@ -357,6 +376,29 @@ inline void NetworkRoomSystem::handleCmd(std::vector<int>& decodedIntegers, udp:
     else {
         // std::vector<unsigned char> buffer = encode(_UNKNOW);
         // _socket.send_to(asio::buffer(buffer), clientEndpoint);
+    }
+}
+
+inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
+{
+    while (1) {
+        auto event = coordinator.GetEvent();
+        
+        if (event._type == Event::actions::EMPTY) {
+            break;
+        }
+        if (event._type == Event::actions::SPAWN) {
+            Entity ennemy = coordinator.CreateEntity();
+            coordinator.AddComponent<Position>(ennemy, {1990, 0});
+            coordinator.AddComponent<Velocity>(ennemy, {-20, 0});
+            coordinator.AddComponent<Hitbox>(ennemy, {0, 0, 1, 1, ENNEMY});
+            coordinator.AddComponent<Controllable>(ennemy, {IA});
+            this->sendCreate(ennemy, coordinator);
+            break;
+        }
+        if (event._type == Event::actions::DESTROY) {
+            this->sendDestroy(event._entity);
+        }
     }
 }
 
@@ -441,6 +483,7 @@ inline void NetworkRoomSystem::Update(Coordinator& coordinator)
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::duration elapsedTime = currentTime - _startTime;
 
+    checkEvent(coordinator);
     packetLoss();
     while (1) {
         try {
