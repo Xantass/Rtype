@@ -79,7 +79,7 @@ int main(int ac, char **av)
                 networkClientSystem->Init(menu._host, menu._port, menu._name, portClient);
                 menu.action = "Game";
                 std::string infos[] = {menu._port, menu._name, menu._nbPlayer};
-                coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::any(std::vector<std::string>(infos, infos + sizeof(infos) / sizeof(std::string)))}});
+                coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::make_any<std::string>(infos[0]), std::make_any<std::string>(infos[1]), std::make_any<std::string>(infos[2])}});
             }
             parallax.draw();
             movableSystem->Update(coordinator);

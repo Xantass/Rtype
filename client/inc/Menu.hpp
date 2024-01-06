@@ -71,7 +71,7 @@ class Menu {
             displayTextInput({760, 500}, {400, 80}, _port);
             displayTextInput({760, 620}, {400, 80}, _name);
             displayTextInput({760, 740}, {180, 80}, _nbPlayer);
-            displayButton({980, 740}, {180, 80}, "Create room", true);
+            displayButton({980, 740}, {180, 80}, "Launch Game", true);
         }
     protected:
     private:

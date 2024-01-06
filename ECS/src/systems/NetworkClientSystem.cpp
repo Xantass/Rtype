@@ -287,7 +287,9 @@ inline std::vector<int> NetworkClientSystem::decode(const std::vector<unsigned c
 
 inline void NetworkClientSystem::paramEvent(Event& event)
 {
-    std::vector<std::string> list = std::any_cast<std::vector<std::string>>(event._data);
+    std::vector<std::string> list;
+    for (int i = 0; i < event._data.size(); i++)
+        list.push_back(std::any_cast<std::string>(event._data[i]));
     // int port = atoi(list.at(0).c_str());
     int nbPlayer = atoi(list.at(2).c_str());
 
