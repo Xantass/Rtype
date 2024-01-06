@@ -12,6 +12,7 @@ inline void Coordinator::Init()
 	this->_componentManager = std::make_unique<ComponentManager>();
 	this->_entityManager = std::make_unique<EntityManager>();
 	this->_systemManager = std::make_unique<SystemManager>();
+	this->_eventManager = std::make_unique<EventManager>();
 }
 
 inline Entity Coordinator::CreateEntity()
