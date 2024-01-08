@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include "Graphic.hpp"
+#include "Coordinator.hpp"
 
 class Menu {
     public:
@@ -22,8 +23,9 @@ class Menu {
         std::string _name;
         std::string _nbPlayer;
         std::vector<std::vector<std::string>> _roomList;
+        Coordinator &_coordinator;
         int page = 0;
-        Menu(std::string host, std::string port, std::string name) : _host(host), _port(port), _name(name), _nbPlayer("4") {}
+        Menu(std::string host, std::string port, std::string name, Coordinator &coordinator) : _host(host), _port(port), _name(name), _nbPlayer("4"), _coordinator(coordinator)  {}
         ~Menu() {}
         void displayMenu(void) {
             if (Graphic::isKeyPressed(KEY_TAB)) {
@@ -43,6 +45,17 @@ class Menu {
                 createRoom();
             } else if (action == "Join Room") {
                 displayJoinable();
+            } else {
+                for (auto room : _roomList) {
+                    if (room[1] == action) {
+                        std::vector<std::string> list(3, "");
+                        list[0] = _host;
+                        list[1] = room[0];
+                        list[2] = room[1];
+                        _coordinator.AddEvent(Event{Event::actions::JOIN, 0, {std::make_any<std::string>(list[0]), std::make_any<std::string>(list[1]), std::make_any<std::string>(list[2])}});
+                        break;
+                    }
+                }
             }
         }
         void displayJoinable(void) {

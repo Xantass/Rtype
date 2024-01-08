@@ -9,6 +9,7 @@
 
 int room(int nbPlayer, int port)
 {
+    std::cout << "CREATE ROOM OK" << std::endl;
     (void)nbPlayer;
     Coordinator coordinator;
 
@@ -43,6 +44,5 @@ int room(int nbPlayer, int port)
             startTime = currentTime;
         }
     }
-    return 0;
     return 0;
 }

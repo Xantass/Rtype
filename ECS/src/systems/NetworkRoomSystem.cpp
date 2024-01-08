@@ -10,6 +10,7 @@
 inline void NetworkRoomSystem::Init(int port)
 {
     udp::endpoint endpoint(udp::v4(), port);
+    std::cout << endpoint << std::endl;
     _socket.close();
     _socket.open(endpoint.protocol());
     _socket.bind(endpoint);
@@ -184,10 +185,12 @@ inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::e
 
     // std::cout << "username: " << username << std::endl;
 
+    std::cout << "CONNECT ROOM" << std::endl;
+
     for (auto client : _clients) {
         if (client.getUsername() == username) {
-            std::vector<unsigned char> buffer = encode(_FAIL_CONNECT);
-            _socket.send_to(asio::buffer(buffer), clientEndpoint);
+            // std::vector<unsigned char> buffer = encode(_FAIL_CONNECT);
+            // _socket.send_to(asio::buffer(buffer), clientEndpoint);
             return;
         }
     }
@@ -357,18 +360,18 @@ inline void NetworkRoomSystem::handleCmd(std::vector<int>& decodedIntegers, udp:
     int index = decodedIntegers.at(0);
 
     // std::cout << "INDEX: " << index << std::endl;
-    if (index < 0 || index > 12)
+    if (index < 0 || index > 14)
         return;
+    if (index == 1) {
+        _functions[index](decodedIntegers, clientEndpoint, coordinator);
+        return;
+    }
     if (decodedIntegers.size() < 4 && decodedIntegers.at(0) != 1)
         return;
     if (checkAlreadyReceive(decodedIntegers, clientEndpoint) == -1)
         return;
-    if (decodedIntegers.at(0) != 1) {
-    
-        int indexClient = getClient(decodedIntegers.at(3));
-    
-        _clients.at(indexClient).addPacketReceive(decodedIntegers.at(2), decodedIntegers);
-    }
+    int indexClient = getClient(decodedIntegers.at(3));
+    _clients.at(indexClient).addPacketReceive(decodedIntegers.at(2), decodedIntegers);
     if (_functions[index] != nullptr) {
         decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
         _functions[index](decodedIntegers, clientEndpoint, coordinator);
@@ -383,7 +386,7 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
 {
     while (1) {
         auto event = coordinator.GetEvent();
-        
+
         if (event._type == Event::actions::EMPTY) {
             break;
         }
@@ -418,11 +421,11 @@ inline void NetworkRoomSystem::sendEcs(Coordinator &coordinator)
     std::vector<int> header = {Cmd::POS, 1};
 
     for (auto client : _clients) {
-    
+
         std::vector<int> encode_ = {};
 
         for (auto entity : this->_entities) {
-    
+
             auto& pos = coordinator.GetComponent<Position>(entity);
             auto& vel = coordinator.GetComponent<Velocity>(entity);
             auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
@@ -492,6 +495,7 @@ inline void NetworkRoomSystem::Update(Coordinator& coordinator)
             udp::endpoint clientEndpoint;
 
             std::tie(decodedIntegers, clientEndpoint) = receive();
+            std::cout << "NETWORK ROOM" << std::endl;
             processReceiveData(clientEndpoint, coordinator, decodedIntegers);
         } catch (...) {
             break;

@@ -59,7 +59,7 @@ int main(int ac, char **av)
     std::string port = av[2];
     std::string name = av[3];
     int portClient = atoi(av[4]);
-    Menu menu(host, std::to_string(portClient), name);
+    Menu menu(host, std::to_string(portClient), name, coordinator);
 
     networkClientSystem->Init(host, port, name, portClient);
 
@@ -76,7 +76,7 @@ int main(int ac, char **av)
             Graphic::beginDrawing();
             Graphic::clearBackground(RBLACK);
             if (menu.action == "Launch Game") {
-                menu.action = "Game";
+                menu.action = "";
                 std::string infos[] = {menu._port, menu._name, menu._nbPlayer};
                 coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::make_any<std::string>(infos[0]), std::make_any<std::string>(infos[1]), std::make_any<std::string>(infos[2])}});
             }
