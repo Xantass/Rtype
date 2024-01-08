@@ -159,7 +159,11 @@ inline std::vector<int> NetworkClientSystem::stringToVector(const std::string& s
 inline void NetworkClientSystem::response(std::vector<int>& decodedIntegers, Coordinator &coordinator)
 {
     (void)coordinator;
-    (void)decodedIntegers;
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
+
+    int timeStamp = decodedIntegers.at(0);
+
+    _packetsSend.erase(timeStamp);
 }
 
 inline void NetworkClientSystem::ping(std::vector<int>& decodedIntegers, Coordinator &coordinator)
