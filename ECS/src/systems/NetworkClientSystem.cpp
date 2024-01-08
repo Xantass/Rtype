@@ -39,8 +39,10 @@ inline void NetworkClientSystem::Init(std::string host, std::string port, std::s
     _id = -1;
     _serverEndpoint = udp::endpoint(asio::ip::make_address(host), atoi(port.c_str()));
     send(_CONNECT, stringToVector(name), false);
-    std::vector<int> decodedIntegers = receive();
-    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
+    std::vector<unsigned char> data(1024);
+    udp::endpoint receiveEndpoint;
+    size_t length = _socket.receive_from(asio::buffer(data), receiveEndpoint, 0);
+    std::vector<int> decodedIntegers = decode(data, length);
     _id = decodedIntegers.at(0);
     _functions[0] = std::bind(&NetworkClientSystem::response, this, std::placeholders::_1, std::placeholders::_2);
     _functions[1] = nullptr;
@@ -57,6 +59,7 @@ inline void NetworkClientSystem::Init(std::string host, std::string port, std::s
     _functions[12] = std::bind(&NetworkClientSystem::destroyEntity, this, std::placeholders::_1, std::placeholders::_2);
     _functions[13] = std::bind(&NetworkClientSystem::createEntity, this, std::placeholders::_1, std::placeholders::_2);
     _socket.non_blocking(true);
+    std::cout << "finish init client" << std::endl;
 }
 
 inline void NetworkClientSystem::addPacketSend(int timeStamp, std::vector<unsigned char> packet)
@@ -380,6 +383,9 @@ inline std::vector<int> NetworkClientSystem::receive()
     udp::endpoint receiveEndpoint;
     size_t length = _socket.receive_from(asio::buffer(data), receiveEndpoint, 0);
     std::vector<int> decodedIntegers = decode(data, length);
+    // for (auto i : decodedIntegers)
+    //     std::cout << i << std::endl;
+    // std::cout << std::endl;
     _packetsReceive[decodedIntegers.at(2)] = decodedIntegers;
 
     return decodedIntegers;

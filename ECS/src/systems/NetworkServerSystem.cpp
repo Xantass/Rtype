@@ -9,6 +9,10 @@
 
 inline void NetworkServerSystem::Init()
 {
+    udp::endpoint endpoint(udp::v4(), 4242);
+    _socket.close();
+    _socket.open(endpoint.protocol());
+    _socket.bind(endpoint);
     _socket.non_blocking(true);
     _functions[0] = std::bind(&NetworkServerSystem::response, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[1] = std::bind(&NetworkServerSystem::connect, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
@@ -92,9 +96,11 @@ inline unsigned short NetworkServerSystem::findValidPort(asio::io_context& servi
             asio::ip::udp::endpoint endpoint(asio::ip::udp::v4(), port);
 
             socket.open(endpoint.protocol());
-            socket.bind(endpoint);
+            socket.bind(endpoint);  
+            socket.close();
             return port;
         } catch (std::exception&) {
+            socket.close();
         }
     }
 
@@ -179,15 +185,17 @@ inline void NetworkServerSystem::param(std::vector<int>& decodedIntegers, udp::e
 
     int nbPlayer = decodedIntegers.at(2);
 
-    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 3);
 
     std::string name = vectorToString(decodedIntegers);
 
+    int port = findValidPort(_service);
+
     if (fichier.is_open()) {
-        fichier << std::to_string(_port) << "\t" << name << "\t" << std::to_string(nbPlayer) << std::endl;
+        fichier << std::to_string(port) << "\t" << name << "\t" << std::to_string(nbPlayer) << std::endl;
         fichier.close();
 
-        std::thread Thread(room, nbPlayer, _port);
+        std::thread Thread(room, nbPlayer, port);
 
         Thread.detach();
         _port++;
@@ -233,6 +241,7 @@ inline void NetworkServerSystem::ping(Coordinator &coordinator)
             _clients.end(),
             [](Client& client) {
                 if (!client.getAlive()) {
+                    std::cout << "CLIENT DECONNECT" << std::endl;
                     return true;
                 } else {
                     client.setAlive(false);
@@ -260,8 +269,6 @@ inline void NetworkServerSystem::pong(std::vector<int>& decodedIntegers, udp::en
     int timeStamp = decodedIntegers.at(0);
     int index = getClient(decodedIntegers.at(1));
 
-    // std::cout << "PONG DECODED INTEGERS: " << decodedIntegers.at(0) << std::endl;
-    // std::cout << "PONG INDEX: " << index << std::endl;
     if (index == -1) {
         return;
     }
@@ -275,17 +282,21 @@ inline int NetworkServerSystem::checkAlreadyReceive(std::vector<int>& decodedInt
     int timeStamp = decodedIntegers.at(2);
     int index = getClient(decodedIntegers.at(3));
 
+
+    // std::cout << "INDEX CLIENT: " << decodedIntegers.at(3) << std::endl;
+    // std::cout << "TIMESTAMP PACKET: " << decodedIntegers.at(2) << std::endl;
     if(index == -1)
         return -1;
 
     auto packets = _clients.at(index).getPacketsReceive();
-    auto it = packets.find(timeStamp);
-
-    if (it != packets.end()) {
-        return 0;
-    } else {
+    try {
+        auto it = packets.at(timeStamp);
+        // std::cout << "FOUND" << std::endl;
         send(_STOP_SEND, {timeStamp}, false, clientEndpoint, index);
         return -1;
+    } catch (...) {
+        // std::cout << "NOT FOUND" << std::endl;
+        return 0;
     }
 }
 
@@ -294,18 +305,19 @@ inline void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, ud
     int index = decodedIntegers.at(0);
 
     // std::cout << "INDEX: " << index << std::endl;
-    if (index < 0 || index > 12)
+    // std::cout << "SIZE: " << decodedIntegers.size() << std::endl;
+    if (index < 0 || index > 14)
         return;
-    if (decodedIntegers.size() < 4 && decodedIntegers.at(0) != 1)
+    if (decodedIntegers.at(0) == 1) {
+        _functions[index](decodedIntegers, clientEndpoint, coordinator);
+        return;
+    }
+    if (decodedIntegers.size() < 4)
         return;
     if (checkAlreadyReceive(decodedIntegers, clientEndpoint) == -1)
         return;
-    if (decodedIntegers.at(0) != 1) {
-    
-        int indexClient = getClient(decodedIntegers.at(3));
-    
-        _clients.at(indexClient).addPacketReceive(decodedIntegers.at(2), decodedIntegers);
-    }
+    int indexClient = getClient(decodedIntegers.at(3));
+    _clients.at(indexClient).addPacketReceive(decodedIntegers.at(2), decodedIntegers);
     if (_functions[index] != nullptr) {
         decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
         _functions[index](decodedIntegers, clientEndpoint, coordinator);
@@ -367,19 +379,19 @@ inline void NetworkServerSystem::packetLoss()
 
 inline void NetworkServerSystem::Update(Coordinator &coordinator)
 {
-    std::vector<unsigned char> data(1024);
     std::chrono::seconds interval(5);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::duration elapsedTime = currentTime - _startTime;
 
-    packetLoss();
     while (1) {
         try {
-
             std::vector<int> decodedIntegers;
             udp::endpoint clientEndpoint;
 
             std::tie(decodedIntegers, clientEndpoint) = receive();
+            // for (auto i : decodedIntegers)
+            //     std::cout << i << std::endl;
+            // std::cout << std::endl;
             processReceiveData(clientEndpoint, coordinator, decodedIntegers);
         } catch (...) {
             break;
@@ -387,6 +399,7 @@ inline void NetworkServerSystem::Update(Coordinator &coordinator)
     }
     if (elapsedTime >= interval) {
         ping(coordinator);
+        packetLoss();
         _startTime = currentTime;
     }
 }

@@ -61,7 +61,7 @@ int main(int ac, char **av)
     int portClient = atoi(av[4]);
     Menu menu(host, std::to_string(portClient), name);
 
-    // networkClientSystem->Init(host, port, name, portClient);
+    networkClientSystem->Init(host, port, name, portClient);
 
     Graphic::playMusic(music);
     std::chrono::milliseconds interval(10);
@@ -76,7 +76,6 @@ int main(int ac, char **av)
             Graphic::beginDrawing();
             Graphic::clearBackground(RBLACK);
             if (menu.action == "Launch Game") {
-                networkClientSystem->Init(menu._host, menu._port, menu._name, portClient);
                 menu.action = "Game";
                 std::string infos[] = {menu._port, menu._name, menu._nbPlayer};
                 coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::make_any<std::string>(infos[0]), std::make_any<std::string>(infos[1]), std::make_any<std::string>(infos[2])}});
@@ -85,9 +84,7 @@ int main(int ac, char **av)
             movableSystem->Update(coordinator);
             eventSystem->RunEvents(coordinator);
             graphicSystem->Update(coordinator);
-            if (menu.action == "Game") {
-                networkClientSystem->Update(coordinator);
-            }
+            networkClientSystem->Update(coordinator);
             physicSystem->Update(coordinator);
             startTime = currentTime;
             menu.displayMenu();
