@@ -53,6 +53,7 @@ class Menu {
                         list[1] = room[0];
                         list[2] = room[1];
                         _coordinator.AddEvent(Event{Event::actions::JOIN, 0, {std::make_any<std::string>(list[0]), std::make_any<std::string>(list[1]), std::make_any<std::string>(list[2])}});
+                        action = "Game";
                         break;
                     }
                 }
@@ -74,7 +75,7 @@ class Menu {
             }
 
             displayButton({900, 800}, {50, 50}, "<", true);
-            if (subVector.size() == 4 && _roomList.size() % 4 != 0)
+            if ((endIdx + 1) != _roomList.size())
                 displayButton({970, 800}, {50, 50}, ">", true);
             else
                 displayButton({970, 800}, {50, 50}, ">", false);
