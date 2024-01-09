@@ -85,6 +85,7 @@ int main(int ac, char **av)
             eventSystem->RunEvents(coordinator);
             graphicSystem->Update(coordinator);
             networkClientSystem->Update(coordinator);
+            eventSystem->RunEvents(coordinator);
             physicSystem->Update(coordinator);
             startTime = currentTime;
             menu.displayMenu();
