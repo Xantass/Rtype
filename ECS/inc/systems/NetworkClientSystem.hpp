@@ -177,7 +177,7 @@ public:
      * @param timeStamp The timestamp for the packet.
      * @param packet The vector of bytes representing the packet.
      */
-    void addPacketSend(int timeStamp, std::vector<unsigned char> packet);
+    void addPacketSend(int timeStamp, std::vector<int> packet);
 
     /**
      * @brief Deletes a packet from the send queue based on the timestamp.
@@ -237,7 +237,7 @@ private:
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
     std::function<void(std::vector<int>&, Coordinator &coordinator)> _functions[14]; /**< Array of function pointers. */
     int _id; /**< The ID of the client. */
-    std::map<int, std::vector<unsigned char>> _packetsSend; /**< Packets sent with associated timestamps. */
+    std::map<int, std::vector<int>> _packetsSend; /**< Packets sent with associated timestamps. */
     std::map<int, std::vector<int>> _packetsReceive; /**< Packets received with associated timestamps. */
 };
 
