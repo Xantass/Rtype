@@ -59,10 +59,9 @@ inline void NetworkClientSystem::Init(std::string host, std::string port, std::s
     _functions[12] = std::bind(&NetworkClientSystem::destroyEntity, this, std::placeholders::_1, std::placeholders::_2);
     _functions[13] = std::bind(&NetworkClientSystem::createEntity, this, std::placeholders::_1, std::placeholders::_2);
     _socket.non_blocking(true);
-    std::cout << "finish init client" << std::endl;
 }
 
-inline void NetworkClientSystem::addPacketSend(int timeStamp, std::vector<unsigned char> packet)
+inline void NetworkClientSystem::addPacketSend(int timeStamp, std::vector<int> packet)
 {
     _packetsSend[timeStamp] = packet;
 }
@@ -103,7 +102,6 @@ inline int NetworkClientSystem::hourIntNow()
 
 inline void NetworkClientSystem::createEntities(std::vector<int> decodedInteger, Coordinator &coordinator)
 {
-    std::cout << "SIZE: " << decodedInteger.size() << std::endl;
     decodedInteger.erase(decodedInteger.begin(), decodedInteger.begin() + 3);
     // std::cout << "SIZE: " << decodedInteger.size() << std::endl;
     while (decodedInteger.empty() == false) {
@@ -162,15 +160,10 @@ inline std::vector<int> NetworkClientSystem::stringToVector(const std::string& s
 
 inline void NetworkClientSystem::response(std::vector<int>& decodedIntegers, Coordinator &coordinator)
 {
-    std::cout << "RESPONSE" << std::endl;
-    for (auto i : decodedIntegers)
-        std::cout << i << std::endl;
     (void)coordinator;
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 3);
 
     int timeStamp = decodedIntegers.at(0);
-
-    std::cout << "timeStamp: " << timeStamp << std::endl;
 
     _packetsSend.erase(timeStamp);
 }
@@ -185,7 +178,7 @@ inline void NetworkClientSystem::ping(std::vector<int>& decodedIntegers, Coordin
 
 inline void NetworkClientSystem::pos(std::vector<int>& decodedIntegers, Coordinator &coordinator)
 {
-    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
     int timeStamp = decodedIntegers.at(0);
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
     while (decodedIntegers.empty() == false) {
@@ -317,25 +310,35 @@ inline void NetworkClientSystem::paramEvent(Event& event)
 inline void NetworkClientSystem::joinEvent(Event& event, Coordinator& coordinator)
 {
     std::vector<std::string> list;
-    std::cout << "SIZE: " << event._data.size() << std::endl;
     for (std::size_t i = 0; i < event._data.size(); i++)
         list.push_back(std::any_cast<std::string>(event._data[i]));
     _serverEndpoint = udp::endpoint(asio::ip::make_address(list.at(0)), atoi(list.at(1).c_str()));
-    _socket.non_blocking(false);
-    std::cout << _serverEndpoint << std::endl;
     std::vector<int> header = {CONNECT, 1};
-    send(header, stringToVector(list.at(2)), true);
-    std::cout << "BEFORE RECEIVE" << std::endl;
+    send(header, stringToVector(list.at(2)), false);
     std::vector<unsigned char> data(1024);
     udp::endpoint receiveEndpoint;
-    size_t length = _socket.receive_from(asio::buffer(data), receiveEndpoint, 0);
+    size_t length;
+    while (1) {
+        try {
+            length = _socket.receive_from(asio::buffer(data), receiveEndpoint, 0);
+            if (receiveEndpoint == _serverEndpoint)
+                break;
+        } catch (...) {
+            send(header, stringToVector(list.at(2)), false);
+        }   
+    }
     std::vector<int> decodedIntegers = decode(data, length);
-    std::cout << "AFTER RECEIVE" << std::endl;
-    for (auto i : decodedIntegers)
-        std::cout << i << std::endl;
     _id = decodedIntegers.at(0);
     send(_OK, {decodedIntegers.at(0)}, false);
-    length = _socket.receive_from(asio::buffer(data), receiveEndpoint, 0);
+    while (1) {
+        try {
+            length = _socket.receive_from(asio::buffer(data), receiveEndpoint, 0);
+            if (receiveEndpoint == _serverEndpoint)
+                break;
+        } catch (...) {
+        }
+           
+    }
     decodedIntegers = decode(data, length);
     for (auto i : decodedIntegers)
         std::cout << i << std::endl;
@@ -345,7 +348,7 @@ inline void NetworkClientSystem::joinEvent(Event& event, Coordinator& coordinato
 
 inline void NetworkClientSystem::moveEvent(Event& event)
 {
-    send({CHECK_ACTION(event._type), 3}, {static_cast<int>(event._entity), static_cast<int>(std::any_cast<Velocity>(event._data)._x * 10), static_cast<int>(std::any_cast<Velocity>(event._data)._y * 10)}, true);
+    send({CHECK_ACTION(event._type), 3}, {static_cast<int>(event._entity), static_cast<int>(std::any_cast<Velocity>(event._data.at(0))._x * 10), static_cast<int>(std::any_cast<Velocity>(event._data.at(0))._y * 10)}, true);
 }
 
 inline void NetworkClientSystem::checkEvent(Coordinator &coordinator)
@@ -358,12 +361,17 @@ inline void NetworkClientSystem::checkEvent(Coordinator &coordinator)
         }
         if (event._type == Event::MOVE) {
             moveEvent(event);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
         if (event._type == Event::PARAM) {
             paramEvent(event);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            return;
         }
         if (event._type == Event::JOIN) {
             joinEvent(event, coordinator);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            return;
         }
         if (event._type == Event::actions::SHOOT) {
             for (auto entity : _entities) {
@@ -373,6 +381,7 @@ inline void NetworkClientSystem::checkEvent(Coordinator &coordinator)
                     //     std::cout << i << std::endl;
                     std::vector<unsigned char> buffer = encode(tmp);
                     _socket.send_to(asio::buffer(buffer), _serverEndpoint);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
                     break;
                 }
             }
@@ -391,10 +400,9 @@ inline void NetworkClientSystem::send(std::vector<int> header, std::vector<int> 
     header.push_back(_id);
     std::vector<int> res = mergeVectors(header, data);
     std::vector<unsigned char> buffer = encode(res);
-    std::cout << "SERVER ENDPOINT: " << _serverEndpoint << std::endl;
     _socket.send_to(asio::buffer(buffer), _serverEndpoint);
     if (stock == true)
-        _packetsSend[timeStamp] = buffer;
+        _packetsSend[timeStamp] = res;
 }
 
 inline std::vector<int> NetworkClientSystem::receive()
@@ -405,9 +413,6 @@ inline std::vector<int> NetworkClientSystem::receive()
     if (receiveEndpoint != _serverEndpoint)
         throw std::runtime_error("Bad Ip");
     std::vector<int> decodedIntegers = decode(data, length);
-    // for (auto i : decodedIntegers)
-    //     std::cout << i << std::endl;
-    // std::cout << std::endl;
     _packetsReceive[decodedIntegers.at(2)] = decodedIntegers;
 
     return decodedIntegers;
@@ -415,12 +420,7 @@ inline std::vector<int> NetworkClientSystem::receive()
 
 inline void NetworkClientSystem::packetLoss()
 {
-    std::cout << "PACKET LOSS" << std::endl;
     for (auto pair : _packetsSend) {
-        std::cout << "TIME STAMP: " << pair.first << " DATA: ";
-        for (auto i : pair.second)
-            std::cout << i << " ";
-        std::cout << std::endl;
         _socket.send_to(asio::buffer(pair.second), _serverEndpoint);
     }
 }
@@ -447,6 +447,7 @@ inline void NetworkClientSystem::Update(Coordinator &coordinator)
         try {
             std::vector<int> decodedIntegers = receive();
             handleCmd(decodedIntegers, coordinator);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } catch (...) {
             break;
         }

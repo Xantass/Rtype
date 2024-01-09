@@ -9,7 +9,6 @@
 
 int room(int nbPlayer, int port)
 {
-    std::cout << "CREATE ROOM OK" << std::endl;
     (void)nbPlayer;
     Coordinator coordinator;
 

@@ -241,7 +241,6 @@ inline void NetworkServerSystem::ping(Coordinator &coordinator)
             _clients.end(),
             [](Client& client) {
                 if (!client.getAlive()) {
-                    std::cout << "CLIENT DECONNECT" << std::endl;
                     return true;
                 } else {
                     client.setAlive(false);
@@ -257,7 +256,6 @@ inline void NetworkServerSystem::ping(Coordinator &coordinator)
 
     for (auto client : _clients) {
         send(_PING, {timeStamp}, true, client.getClientEndpoint(), index);
-        // std::cout << "SEND TO: " << client.getClientEndpoint() << std::endl;
         index++;
     }
 }
@@ -389,10 +387,8 @@ inline void NetworkServerSystem::Update(Coordinator &coordinator)
             udp::endpoint clientEndpoint;
 
             std::tie(decodedIntegers, clientEndpoint) = receive();
-            // for (auto i : decodedIntegers)
-            //     std::cout << i << std::endl;
-            // std::cout << std::endl;
             processReceiveData(clientEndpoint, coordinator, decodedIntegers);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } catch (...) {
             break;
         }
