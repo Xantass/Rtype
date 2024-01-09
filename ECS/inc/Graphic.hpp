@@ -246,6 +246,16 @@ class Graphic {
         static bool isKeyPressed(int key) {
             return IsKeyPressed(key);
         }
+        /**
+         * @brief Check if a key is released
+         *
+         * @param key
+         * @return true
+         * @return false
+         */
+        static bool isKeyReleased(int key) {
+            return IsKeyReleased(key);
+        }
 };
 
 #endif /* !GRAPHIC_HPP_ */
