@@ -37,6 +37,8 @@
 #include "components/Hitbox.hpp"
 #include "components/Movable.hpp"
 #include "components/Controllable.hpp"
+#include "components/HealthPoint.hpp"
+#include "components/Damage.hpp"
 
 
 using namespace asio;

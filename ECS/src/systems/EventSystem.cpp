@@ -41,6 +41,7 @@ void EventSystem::RunEvents(Coordinator &coordinator)
 				break;
 			} case Event::actions::DESTROY: {
 				coordinator.DestroyEntity(event._entity);
+				break;
 			} default:
 				break;
 		}
