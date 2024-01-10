@@ -256,6 +256,13 @@ class Graphic {
         static bool isKeyReleased(int key) {
             return IsKeyReleased(key);
         }
+        /**
+         * @brief Toggle fullscreen
+         *
+         */
+        static void toggleFullScreen(void) {
+            ToggleFullscreen();
+        }
 };
 
 #endif /* !GRAPHIC_HPP_ */
