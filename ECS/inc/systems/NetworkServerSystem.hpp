@@ -27,7 +27,6 @@
 	#undef far
 #endif
 #include <sstream>
-#include <fstream>
 #include <thread>
 #include "EnumProtocol.hpp"
 #include "../../server/inc/Client.hpp"
@@ -37,6 +36,8 @@
 #include "components/Hitbox.hpp"
 #include "components/Movable.hpp"
 #include "components/Controllable.hpp"
+#include "components/HealthPoint.hpp"
+#include "components/Damage.hpp"
 
 
 using namespace asio;
@@ -119,6 +120,8 @@ public:
      * @return A string generated from the vector of integers.
      */
     std::string vectorToString(const std::vector<int>& data);
+
+    void sendCreateRoom(int port, int nbPlayer, std::string name);
 
     /**
      * @brief Handles the received command data.
@@ -209,10 +212,11 @@ private:
     io_context _service; /**< The Boost ASIO io_service. */
     udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v4(), 4242)); /**< The UDP socket for communication. */
     std::vector<Client> _clients; /**< Vector storing information about connected clients. */
-    std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[14]; /**< Array of function pointers. */
+    std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[16]; /**< Array of function pointers. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
     int _id = 0; /**< The ID of the server. */
     int _port = 4243;
+    std::vector<std::tuple<int, int, std::string>> _room;
 };
 
 #include "../../src/systems/NetworkServerSystem.cpp"

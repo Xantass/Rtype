@@ -26,7 +26,7 @@ class Chat {
         };
 
         void displayChatWindow(Coordinator &coordinator) {
-            drawWindow(_isOpen);
+            drawWindow(_isOpen, coordinator);
         }
 
         bool isOpen(void) {
@@ -34,7 +34,7 @@ class Chat {
         }
 
     protected:
-        void drawWindow(bool isOpen) {
+        void drawWindow(bool isOpen, Coordinator &coordinator) {
             int size;
             if (isOpen) {
                 Graphic::drawRectangle(50, 630, 600, 400, {0, 0, 0, 50});
@@ -63,6 +63,7 @@ class Chat {
             if (Graphic::isKeyPressed(KEY_ENTER)) {
                 if (_chat != "" && _isOpen) {
                     chatList.push_back(std::make_pair(_user, _chat));
+                    coordinator.AddEvent(Event{Event::actions::MESSAGE, 0, {std::make_any<std::string>(_chat)}});
                     _chat.clear();
                 } else {
                     _isOpen = !_isOpen;

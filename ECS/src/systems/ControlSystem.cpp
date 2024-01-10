@@ -25,7 +25,6 @@ inline void ControlSystem::Update(Coordinator &coordinator)
             }
         } else {
             if (pos._x > 2000) {
-                std::cout << "Destroyed entity : " << entity << std::endl;
                 coordinator.AddEvent(Event{Event::actions::DESTROY, entity, {std::any(Velocity{1, 0})}});
                 coordinator.DestroyEntity(entity);
                 return;

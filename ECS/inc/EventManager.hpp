@@ -29,7 +29,8 @@ struct Event {
         JOIN = 1,
         CREATE = 3,
         DESTROY = 4,
-        SPAWN = 5
+        SPAWN = 5,
+        MESSAGE = 15,
     };
 
     /**

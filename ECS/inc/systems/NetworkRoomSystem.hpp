@@ -98,6 +98,8 @@ public:
      */
     std::string vectorToString(const std::vector<int>& data);
 
+    std::vector<int> stringToVector(const std::string& str);
+
     /**
      * @brief Finds a valid port to use.
      * @param service The io_service to use for port validation.
@@ -177,6 +179,7 @@ public:
      */
     void shoot(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
+    void message(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     /**
      * @brief Sends a destroy signal for an entity.
@@ -190,6 +193,7 @@ public:
      * @param coordinator The Coordinator reference.
      */
     void sendCreate(int entity, Coordinator &coordinator);
+
 
     /**
      * @brief Initializes the NetworkRoomSystem with a specific port.
@@ -246,7 +250,7 @@ private:
     udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v6(), 0)); /**< The UDP socket for communication. */
     std::vector<Client> _clients; /**< Vector storing information about connected clients. */
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
-    std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[14]; /**< Array of function pointers. */
+    std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[16]; /**< Array of function pointers. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
 };
 
