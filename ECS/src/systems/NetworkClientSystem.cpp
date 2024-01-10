@@ -128,19 +128,18 @@ inline void NetworkClientSystem::createEntities(std::vector<int> decodedInteger,
 inline unsigned short NetworkClientSystem::findValidPort(asio::io_context& service)
 {
     udp::socket socket(service);
-
-    // Commencer à partir d'un certain port (par exemple 5000)
     unsigned short startingPort = 5000;
-    unsigned short maxPort = 65535; // Port maximum possible
+    unsigned short maxPort = 65535;
 
     for (unsigned short port = startingPort; port <= maxPort; ++port) {
         try {
+
             udp::endpoint endpoint(udp::v4(), port);
+
             socket.open(endpoint.protocol());
             socket.bind(endpoint);
             return port;
         } catch (std::exception&) {
-            // Le port est déjà utilisé, essayez le suivant
         }
     }
 
@@ -150,16 +149,31 @@ inline unsigned short NetworkClientSystem::findValidPort(asio::io_context& servi
 inline std::vector<int> NetworkClientSystem::mergeVectors(const std::vector<int>& vec1, const std::vector<int>& vec2)
 {
     std::vector<int> mergedVector = vec1;
+
     mergedVector.insert(mergedVector.end(), vec2.begin(), vec2.end());
     return mergedVector;
 }
 
 inline std::vector<int> NetworkClientSystem::stringToVector(const std::string& str) {
     std::vector<int> result;
+
     for (char c : str) {
         result.push_back(static_cast<int>(c));
     }
     return result;
+}
+
+inline std::string NetworkClientSystem::vectorToString(const std::vector<int>& data)
+{
+    std::stringstream ss;
+
+    for (int num : data) {
+        ss << static_cast<char>(num); // Conversion des entiers en caractères
+    }
+
+    std::string myString = ss.str();
+
+    return myString;
 }
 
 inline void NetworkClientSystem::response(std::vector<int>& decodedIntegers, Coordinator &coordinator)
@@ -183,7 +197,9 @@ inline void NetworkClientSystem::ping(std::vector<int>& decodedIntegers, Coordin
 inline void NetworkClientSystem::pos(std::vector<int>& decodedIntegers, Coordinator &coordinator)
 {
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
+
     int timeStamp = decodedIntegers.at(0);
+
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
     while (decodedIntegers.empty() == false) {
         for (auto entity : this->_entities) {
@@ -211,11 +227,30 @@ inline void NetworkClientSystem::pos(std::vector<int>& decodedIntegers, Coordina
 
 inline void NetworkClientSystem::createRoom(std::vector<int>& decodedIntegers, Coordinator &coordinator)
 {
+    std::cout << "CREATE ROOM" << std::endl;
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
 
     int timeStamp = decodedIntegers.at(0);
 
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
+
+    int port = decodedIntegers.at(0);
+    int nbPlayer = decodedIntegers.at(1);
+
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
+
+    std::string name = vectorToString(decodedIntegers);
+    std::ofstream fichier;
+
+    fichier.open("room.txt", std::ios::app);
+    if (fichier.is_open()) {
+        fichier << std::to_string(port) << "\t" << name << "\t" << std::to_string(nbPlayer) << std::endl;
+        fichier.close();
+        send({_OK}, {timeStamp}, false);
+    } else {
+        std::cerr << "Impossible d'ouvrir le fichier." << std::endl;
+        send({_CREATE_ROOM}, {timeStamp}, false);
+    }
 }
 
 inline void NetworkClientSystem::createEntity(std::vector<int> decodedIntegers, Coordinator &coordinator)
@@ -462,6 +497,7 @@ inline int NetworkClientSystem::checkAlreadyReceive(std::vector<int> decodedInte
     auto it = _packetsReceive.find(timeStamp);
 
     if (it != _packetsReceive.end()) {
+        std::cout << "Error: Key not found" << std::endl;
         return 0;
     } else {
         send(_STOP_SEND, {timeStamp}, false);
@@ -472,16 +508,23 @@ inline int NetworkClientSystem::checkAlreadyReceive(std::vector<int> decodedInte
 
 inline void NetworkClientSystem::Update(Coordinator &coordinator)
 {
+    std::chrono::seconds interval(5);
+    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::duration elapsedTime = currentTime - _startTime;
+
     checkEvent(coordinator);
-    packetLoss();
+    if (elapsedTime >= interval) {
+        packetLoss();
+        _startTime = currentTime;
+    }
     while (1) {
         try {
-
             std::vector<int> decodedIntegers = receive();
     
             handleCmd(decodedIntegers, coordinator);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } catch (...) {
+            //e.what();
             break;
         }
     }

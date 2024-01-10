@@ -15,6 +15,9 @@
 
 #include <map>
 #include <cstddef>
+#include <sstream>
+#include <fstream>
+#include <chrono>
 #if defined(_WIN32)           
 	#define NOGDI             // All GDI defines and routines
 	#define NOUSER            // All USER defines and routines
@@ -100,6 +103,8 @@ public:
      * @return A vector of integers generated from the string.
      */
     std::vector<int> stringToVector(const std::string& str);
+
+    std::string vectorToString(const std::vector<int>& data);
 
     /**
      * @brief Handles the received command data.
@@ -241,6 +246,7 @@ private:
     int _id; /**< The ID of the client. */
     std::map<int, std::vector<int>> _packetsSend; /**< Packets sent with associated timestamps. */
     std::map<int, std::vector<int>> _packetsReceive; /**< Packets received with associated timestamps. */
+    std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
 };
 
 #include "../../src/systems/NetworkClientSystem.cpp"

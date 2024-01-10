@@ -157,6 +157,18 @@ inline std::vector<int> NetworkServerSystem::decode(const std::vector<unsigned c
     return decodedValues;
 }
 
+inline void NetworkServerSystem::sendCreateRoom(int port, int nbPlayer, std::string name)
+{
+    std::vector<int> data = {port, nbPlayer};
+    int index = 0;
+
+    data = mergeVectors(data, stringToVector(name));
+    for (auto client : _clients) {
+        send({CREATE_ROOM_CMD, 3}, data, true, client.getClientEndpoint(), index);
+        index++;
+    }
+}
+
 inline void NetworkServerSystem::response(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
 {
     (void)clientEndpoint;
@@ -176,10 +188,6 @@ inline void NetworkServerSystem::param(std::vector<int>& decodedIntegers, udp::e
     (void)clientEndpoint;
     (void)coordinator;
 
-    std::ofstream fichier;
-
-    fichier.open("room.txt", std::ios::app);
-
     int timeStamp = decodedIntegers.at(0);
     int index = getClient(decodedIntegers.at(1));
 
@@ -193,17 +201,15 @@ inline void NetworkServerSystem::param(std::vector<int>& decodedIntegers, udp::e
     std::string name = vectorToString(decodedIntegers);
     int port = findValidPort(_service);
 
-    if (fichier.is_open()) {
-        fichier << std::to_string(port) << "\t" << name << "\t" << std::to_string(nbPlayer) << std::endl;
-        fichier.close();
-
+    try {
         std::thread Thread(room, nbPlayer, port);
 
         Thread.detach();
-        _port++;
         send({_OK}, {timeStamp}, false, clientEndpoint, index);
-    } else {
-        std::cerr << "Impossible d'ouvrir le fichier." << std::endl;
+        sendCreateRoom(port, nbPlayer, name);
+        _room.push_back(std::make_tuple(port, nbPlayer, name));
+    } catch (std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
         send({_CREATE_ROOM}, {timeStamp}, false, clientEndpoint, index);
     }
     return;
@@ -229,6 +235,12 @@ inline void NetworkServerSystem::connect(std::vector<int>& decodedIntegers, udp:
     std::vector<unsigned char> buffer = encode(tmp);
 
     _socket.send_to(asio::buffer(buffer), clientEndpoint);
+    tmp = {};
+    for (auto room : _room) {
+        sendCreateRoom(std::get<0>(room), std::get<1>(room), std::get<2>(room));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    
 }
 
 inline void NetworkServerSystem::ping(Coordinator &coordinator)
@@ -290,7 +302,8 @@ inline int NetworkServerSystem::checkAlreadyReceive(std::vector<int>& decodedInt
 
         send(_STOP_SEND, {timeStamp}, false, clientEndpoint, index);
         return -1;
-    } catch (...) {
+    } catch (std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
         return 0;
     }
 }
@@ -379,6 +392,9 @@ inline void NetworkServerSystem::Update(Coordinator &coordinator)
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::duration elapsedTime = currentTime - _startTime;
 
+    if (elapsedTime >= interval) {
+        packetLoss();
+    }
     while (1) {
         try {
             std::vector<int> decodedIntegers;
@@ -386,14 +402,14 @@ inline void NetworkServerSystem::Update(Coordinator &coordinator)
             std::tie(decodedIntegers, clientEndpoint) = receive();
 
             processReceiveData(clientEndpoint, coordinator, decodedIntegers);
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        } catch (...) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        } catch (std::exception& e) {
+            //std::cerr << "Error: " << e.what() << std::endl;
             break;
         }
     }
     if (elapsedTime >= interval) {
         ping(coordinator);
-        packetLoss();
         _startTime = currentTime;
     }
 }

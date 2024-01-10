@@ -27,7 +27,6 @@
 	#undef far
 #endif
 #include <sstream>
-#include <fstream>
 #include <thread>
 #include "EnumProtocol.hpp"
 #include "../../server/inc/Client.hpp"
@@ -119,6 +118,8 @@ public:
      * @return A string generated from the vector of integers.
      */
     std::string vectorToString(const std::vector<int>& data);
+
+    void sendCreateRoom(int port, int nbPlayer, std::string name);
 
     /**
      * @brief Handles the received command data.
@@ -213,6 +214,7 @@ private:
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
     int _id = 0; /**< The ID of the server. */
     int _port = 4243;
+    std::vector<std::tuple<int, int, std::string>> _room;
 };
 
 #include "../../src/systems/NetworkServerSystem.cpp"

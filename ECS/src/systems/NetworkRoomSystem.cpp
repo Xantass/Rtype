@@ -496,7 +496,9 @@ inline void NetworkRoomSystem::Update(Coordinator& coordinator)
     std::chrono::steady_clock::duration elapsedTime = currentTime - _startTime;
 
     checkEvent(coordinator);
-    packetLoss();
+    if (elapsedTime >= interval) {
+        packetLoss();
+    }
     while (1) {
         try {
             std::vector<int> decodedIntegers;

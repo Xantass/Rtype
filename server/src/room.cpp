@@ -30,7 +30,7 @@ int room(int nbPlayer, int port)
     coordinator.SetSystemSignature<NetworkRoomSystem>(signature);
 
     networkRoomSystem->Init(port);
-    std::chrono::milliseconds interval(10);
+    std::chrono::milliseconds interval(16);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::duration elapsedTime;

@@ -5,6 +5,7 @@
 ** Main
 */
 
+#include <fstream>
 #include "../inc/Client.hpp"
 #include "../../ECS/ECSClient.hpp"
 #include "Parallax.hpp"
@@ -14,7 +15,17 @@ int main(int ac, char **av)
 {
     if (ac != 5)
         return -84;
-    // Client client("127.0.0.1", "4242");
+    std::ofstream fichier;
+    fichier.open("room.txt", std::ofstream::out | std::ofstream::trunc);
+    
+    if (fichier.is_open()) {
+        fichier << "PORT\tNAME\tNB_PLAYER" << std::endl;
+        fichier.close();
+        std::cout << "Le contenu du fichier a été supprimé." << std::endl;
+    } else {
+        std::cerr << "Impossible d'ouvrir le fichier." << std::endl;
+    }
+
     Coordinator coordinator;
 
     coordinator.Init();
@@ -64,7 +75,7 @@ int main(int ac, char **av)
     networkClientSystem->Init(host, port, name, portClient);
 
     Graphic::playMusic(music);
-    std::chrono::milliseconds interval(10);
+    std::chrono::milliseconds interval(16);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::duration elapsedTime;
