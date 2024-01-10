@@ -9,6 +9,7 @@
 
 #include "components/Sprite.hpp"
 #include "components/Controllable.hpp"
+#include "components/HealthPoint.hpp"
 #include "Graphic.hpp"
 
 void EventSystem::RunEvents(Coordinator &coordinator)
@@ -26,6 +27,7 @@ void EventSystem::RunEvents(Coordinator &coordinator)
 				coordinator.AddComponent<Position>(entity, {std::any_cast<float>(event._data[1]), std::any_cast<float>(event._data[2])});
 				coordinator.AddComponent<Velocity>(entity, {std::any_cast<float>(event._data[3]), std::any_cast<float>(event._data[4])});
 				coordinator.AddComponent<Hitbox>(entity, {std::any_cast<float>(event._data[5]), std::any_cast<float>(event._data[6]), std::any_cast<float>(event._data[7]), std::any_cast<float>(event._data[8]), std::any_cast<HitboxType>(event._data[9])});
+				coordinator.AddComponent<HealthPoint>(entity, {std::any_cast<int>(event._data[10]), std::any_cast<int>(event._data[11])});
 				if (std::any_cast<HitboxType>(event._data[9]) == (PLAYER))
 					coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
 				if (std::any_cast<int>(event._data[10]) == static_cast<int>(entity))
