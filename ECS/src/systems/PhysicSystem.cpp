@@ -7,7 +7,7 @@
 
 #include "systems/PhysicSystem.hpp"
 
-void PhysicSystem::Update(Coordinator &coordinator)
+inline void PhysicSystem::Update(Coordinator &coordinator)
 {
     for (auto entity : this->_entities) {
         auto& pos = coordinator.GetComponent<Position>(entity);

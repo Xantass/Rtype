@@ -8,7 +8,7 @@
 #include "SystemManager.hpp"
 
 template<typename T>
-std::shared_ptr<T> SystemManager::RegisterSystem()
+inline std::shared_ptr<T> SystemManager::RegisterSystem()
 {
 	std::type_index typeName = std::type_index(typeid(T));
 
@@ -22,7 +22,7 @@ std::shared_ptr<T> SystemManager::RegisterSystem()
 }
 
 template<typename T>
-void SystemManager::SetSignature(Signature signature)
+inline void SystemManager::SetSignature(Signature signature)
 {
     std::type_index typeName = typeid(T);
 
@@ -32,7 +32,7 @@ void SystemManager::SetSignature(Signature signature)
 	_signatures.insert({typeName, signature});
 }
 
-void SystemManager::EntityDestroyed(Entity entity)
+inline void SystemManager::EntityDestroyed(Entity entity)
 {
 	for (auto const& pair : this->_systems) {
 		auto const& system = pair.second;
@@ -40,7 +40,7 @@ void SystemManager::EntityDestroyed(Entity entity)
 	}
 }
 
-void SystemManager::EntitySignatureChanged(Entity entity, Signature entitySignature)
+inline void SystemManager::EntitySignatureChanged(Entity entity, Signature entitySignature)
 {
 	// Notify each system that an entity's signature changed
 	for (auto const& pair : this->_systems) {

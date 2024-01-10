@@ -8,7 +8,7 @@
 #include "systems/GraphicalSystem.hpp"
 #include "Graphic.hpp"
 
-void GraphicalSystem::Update(Coordinator &coordinator)
+inline void GraphicalSystem::Update(Coordinator &coordinator)
 {
     // std::cout << "GraphicalSystem update :" << std::endl;
     for (auto &entity : this->_entities) {

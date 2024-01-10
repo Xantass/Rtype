@@ -17,9 +17,8 @@ project(r-type_server)
 include_directories("./inc/" "./../ECS/" "./../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
 
 set(SOURCES
-    src/Server.cpp
     src/main.cpp
-    src/RoomManager.cpp
+    src/room.cpp
     src/Client.cpp
 )
 

@@ -8,7 +8,7 @@
 #include "systems/SpawnSystem.hpp"
 #include <random>
 
-void SpawnSystem::Update(Coordinator &coordinator)
+inline void SpawnSystem::Update(Coordinator &coordinator)
 {
     // std::cout << "SpawnSystem update :" << std::endl;
     std::random_device rdm;

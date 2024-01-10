@@ -39,18 +39,23 @@ Table of Contents
 
     The maximum size of the data MUST be "2^16-1"
 
-    +--------+----------+--------------+
-    | Name   | type     | Description  |
-    +--------+----------+--------------+
-    | opcode | uint8_t  | Opcode       |
-    | size   | uint16_t | Size of data |
-    +--------+----------+--------------+
+    +-----------+----------+--------------+
+    | Name      | type     | Description  |
+    +-----------+----------+--------------+
+    | opcode    | uint8_t  | Opcode       |
+    | size      | uint16_t | Size of data |
+    | timeStamp | uint16_t | Size of data |
+    +--------+----------+-----------------+
 
       Table 3: Packet header structure
 
     * opcode : It's identify what is the packet type
 
     * size : It's the number of argument after header.
+
+    * timeStamp : It's the signature of the packet.
+
+    * id : Only for client packet when send to server.
 
 3.  Protocol packets definition
 
@@ -146,14 +151,18 @@ Table of Contents
 
       Table 10: Action packet header structure
 
-    +--------+------------+------------------------+
-    |  Name  | Data type  | Description            |
-    +--------+------------+------------------------+
-    | action |  uint8_t   | the action of the game |
-    | nbGame |  uint8_t   | the number of the game |
-    +--------+------------+------------------------+
+    +-------------+---------------------------------------+
+    | Action code | Description                           |
+    +-------------+---------------------------------------+
+    | 8           | Ready                                 |
+    | 9           | Start Game                            |
+    | 10          | Player Shoot                          |
+    | 11          | Move Player                           |
+    | 12          | Destroy entitie                       |
+    | 13          | Create entitie                        |
+    +-------------+---------------------------------------+
 
-      Table 11: the action packet data structure
+      Table 11: Action code definition
 
 3.5.  Position packet
 

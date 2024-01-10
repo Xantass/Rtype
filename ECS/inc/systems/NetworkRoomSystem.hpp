@@ -1,17 +1,17 @@
 /*
 ** EPITECH PROJECT, 2023
-** R-Type
+** RType [WSL: Fedora]
 ** File description:
-** NetworkServerSystem
+** NetworkRoomSystem
 */
 
 /**
- * @file NetworkServerSystem.hpp
- * @brief Header file defining the NetworkServerSystem class.
+ * @file NetworkRoomSystem.hpp
+ * @brief Header file defining the NetworkRoomSystem class.
  */
 
-#ifndef NETWORKSERVERSYSTEM_HPP_
-#define NETWORKSERVERSYSTEM_HPP_
+#ifndef NETWORKROOMSYSTEM_HPP_
+#define NETWORKROOMSYSTEM_HPP_
 
 #include <functional>
 #include <chrono>
@@ -27,35 +27,24 @@
 	#undef far
 #endif
 #include <sstream>
-#include <fstream>
-#include <thread>
-#include "EnumProtocol.hpp"
-#include "../../server/inc/Client.hpp"
 #include "System.hpp"
+#include "Coordinator.hpp"
 #include "components/Position.hpp"
 #include "components/Velocity.hpp"
 #include "components/Hitbox.hpp"
 #include "components/Movable.hpp"
 #include "components/Controllable.hpp"
-#include "components/HealthPoint.hpp"
-#include "components/Damage.hpp"
-
-
-using namespace asio;
-using asio::ip::udp;
-
-int room(int nbPlayer, int port);
+#include "EnumProtocol.hpp"
+#include "Client.hpp"
 
 /**
- * @class NetworkServerSystem
- * @brief Handles server-side network communication.
+ * @class NetworkRoomSystem
+ * @brief Handles networking for room-related activities.
  */
-class NetworkServerSystem : public System {
+
+class NetworkRoomSystem : public System {
 public:
-    /**
-     * @brief Initializes the NetworkServerSystem.
-     */
-    void Init();
+    // Methods
 
     /**
      * @brief Retrieves the client with the given ID.
@@ -71,11 +60,12 @@ public:
     int hourIntNow();
 
     /**
-     * @brief Finds a valid port to use.
-     * @param service The io_service to use for port validation.
-     * @return An unsigned short representing the valid port.
+     * @brief Merges two vectors of integers into a single vector.
+     * @param vec1 The first vector of integers.
+     * @param vec2 The second vector of integers.
+     * @return A merged vector of integers.
      */
-    unsigned short findValidPort(asio::io_context& service);
+    std::vector<int> mergeVectors(const std::vector<int>& vec1, const std::vector<int>& vec2);
 
     /**
      * @brief Encodes a vector of integers into a vector of bytes.
@@ -97,23 +87,9 @@ public:
      * @param data The received data in vector format.
      * @param clientEndpoint The endpoint of the client.
      * @param bytesReceived The number of bytes received.
+     * @param coordinator The Coordinator reference.
      */
     void processReceiveData(udp::endpoint clientEndpoint, Coordinator &coordinator, std::vector<int> res);
-
-    /**
-     * @brief Merges two vectors of integers into a single vector.
-     * @param vec1 The first vector of integers.
-     * @param vec2 The second vector of integers.
-     * @return A merged vector of integers.
-     */
-    std::vector<int> mergeVectors(const std::vector<int>& vec1, const std::vector<int>& vec2);
-
-    /**
-     * @brief Converts a string into a vector of integers.
-     * @param str The string to convert.
-     * @return A vector of integers generated from the string.
-     */
-    std::vector<int> stringToVector(const std::string& str);
 
     /**
      * @brief Converts a vector of integers into a string.
@@ -123,46 +99,103 @@ public:
     std::string vectorToString(const std::vector<int>& data);
 
     /**
-     * @brief Handles the received command data.
-     * @param data The vector of integers representing the command data.
-     * @param clientEndpoint The endpoint of the client sending the command.
+     * @brief Finds a valid port to use.
+     * @param service The io_service to use for port validation.
+     * @return An unsigned short representing the valid port.
      */
-    void handleCmd(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint, Coordinator &coordinator);
+    unsigned short findValidPort(asio::io_context& service);
+
+    /**
+     * @brief Sends a pong response to a ping request.
+     * @param decodedIntegers The vector of integers representing the pong response data.
+     * @param clientEndpoint The endpoint of the client requesting pong.
+     * @param coordinator The Coordinator reference.
+     */
+    void pong(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     /**
      * @brief Sends a response to a client.
-     * @param data The vector of integers for the response data.
+     * @param decodedIntegers The vector of integers for the response data.
      * @param clientEndpoint The endpoint of the client to respond to.
+     * @param coordinator The Coordinator reference.
      */
     void response(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     /**
      * @brief Establishes a connection with a client.
-     * @param data The vector of integers representing connection data.
+     * @param decodedIntegers The vector of integers representing connection data.
      * @param clientEndpoint The endpoint of the client attempting to connect.
+     * @param coordinator The Coordinator reference.
      */
     void connect(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
-    /**
-     * @brief Sends a pong response to a ping request.
-     * @param data The vector of integers representing the pong response data.
-     * @param clientEndpoint The endpoint of the client requesting pong.
-     */
-    void pong(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     /**
      * @brief Sends a ping request to all connected clients.
+     * @param coordinator The Coordinator reference.
      */
     void ping(Coordinator& coordinator);
 
     /**
-     * @brief Handles parameter data received from a client.
-     * @param decodedIntegers The vector of integers representing the parameter data.
-     * @param clientEndpoint The endpoint of the client sending the parameter data.
+     * @brief Send Ecs to all clients.
      * @param coordinator The Coordinator reference.
      */
+    void sendEcs(Coordinator &coordinator);
 
-    void param(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
+    /**
+     * @brief Handles the received command data.
+     * @param decodedIntegers The vector of integers representing the command data.
+     * @param clientEndpoint The endpoint of the client sending the command.
+     * @param coordinator The Coordinator reference.
+     */
+    void handleCmd(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint, Coordinator &coordinator);
+
+    /**
+     * @brief Checks movement for an entity.
+     * @param pos The Position component.
+     * @param vel The Velocity component.
+     * @param hitbox The Hitbox component.
+     * @param entity The entity to check movement for.
+     * @param coordinator The Coordinator reference.
+     * @return An integer indicating the movement state.
+     */
+    int checkMove(Position& pos, Velocity& vel, Hitbox& hitbox, Entity entity, Coordinator& coordinator);
+
+    /**
+     * @brief Moves an entity.
+     * @param decodedIntegers The vector of integers representing movement data.
+     * @param clientEndpoint The endpoint of the client requesting movement.
+     * @param coordinator The Coordinator reference.
+     */
+    void move(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
+
+    /**
+     * @brief Handles a shooting action initiated by a client.
+     * @param decodedIntegers The vector of integers representing the shooting data.
+     * @param clientEndpoint The endpoint of the client performing the shooting action.
+     * @param coordinator The Coordinator reference.
+     */
+    void shoot(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
+
+
+    /**
+     * @brief Sends a destroy signal for an entity.
+     * @param entity The entity to destroy.
+     */
+    void sendDestroy(int entity);
+
+    /**
+     * @brief Sends a create signal for an entity.
+     * @param entity The entity to create.
+     * @param coordinator The Coordinator reference.
+     */
+    void sendCreate(int entity, Coordinator &coordinator);
+
+    /**
+     * @brief Initializes the NetworkRoomSystem with a specific port.
+     * @param port The port to use for communication.
+     */
+    void Init(int port);
 
     /**
      * @brief Sends a packet with header and data to a specific client endpoint, optionally storing it.
@@ -194,29 +227,29 @@ public:
      */
     std::tuple<std::vector<int>, udp::endpoint> receive();
 
-    /**
-     * @brief Sends an ECS (Entity-Component-System) update to the Coordinator.
-     * @param coordinator The Coordinator reference for ECS update.
-     */
-    void sendEcs(Coordinator &coordinator);
 
     /**
-     * @brief Updates the NetworkServerSystem.
+     * @brief checks and run intern server events.
      * @param coordinator The Coordinator reference.
      */
-    void Update(Coordinator &coordinator);
+    void checkEvent(Coordinator &coordinator);
+
+    /**
+     * @brief Updates the NetworkRoomSystem.
+     * @param coordinator The Coordinator reference.
+     */
+    void Update(Coordinator& coordinator);
 
 protected:
 private:
     io_context _service; /**< The Boost ASIO io_service. */
-    udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v4(), 4242)); /**< The UDP socket for communication. */
+    udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v6(), 0)); /**< The UDP socket for communication. */
     std::vector<Client> _clients; /**< Vector storing information about connected clients. */
+    udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
     std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[14]; /**< Array of function pointers. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
-    int _id = 0; /**< The ID of the server. */
-    int _port = 4243;
 };
 
-#include "../../src/systems/NetworkServerSystem.cpp"
+#include "../../src/systems/NetworkRoomSystem.cpp"
 
-#endif /* !NETWORKSERVERSYSTEM_HPP_ */
+#endif /* !NETWORKROOMSYSTEM_HPP_ */

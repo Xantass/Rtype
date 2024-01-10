@@ -7,12 +7,16 @@
 
 #include "NetworkServerSystem.hpp"
 
-void NetworkServerSystem::Init()
+inline void NetworkServerSystem::Init()
 {
+    udp::endpoint endpoint(udp::v4(), 4242);
+    _socket.close();
+    _socket.open(endpoint.protocol());
+    _socket.bind(endpoint);
     _socket.non_blocking(true);
     _functions[0] = std::bind(&NetworkServerSystem::response, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[1] = std::bind(&NetworkServerSystem::connect, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    _functions[2] = nullptr;
+    _functions[2] = std::bind(&NetworkServerSystem::param, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[3] = nullptr;
     _functions[4] = nullptr;
     _functions[5] = nullptr;
@@ -20,14 +24,14 @@ void NetworkServerSystem::Init()
     _functions[7] = nullptr;
     _functions[8] = nullptr;
     _functions[9] = nullptr;
-    _functions[10] = std::bind(&NetworkServerSystem::shoot, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    _functions[11] = std::bind(&NetworkServerSystem::move, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    _functions[10] = nullptr;
+    _functions[11] = nullptr;
     _functions[12] = nullptr;
     _functions[13] = nullptr;
     _startTime = std::chrono::steady_clock::now();
 }
 
-int NetworkServerSystem::getClient(int id)
+inline int NetworkServerSystem::getClient(int id)
 {
     int index = 0;
 
@@ -42,51 +46,71 @@ int NetworkServerSystem::getClient(int id)
     return -1;
 }
 
-std::vector<int> NetworkServerSystem::mergeVectors(const std::vector<int>& vec1, const std::vector<int>& vec2)
+inline int NetworkServerSystem::hourIntNow()
+{
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    auto timeSinceEpoch = currentTime.time_since_epoch();
+    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch);
+    int currentTime_ms = static_cast<int>(milliseconds.count());
+
+    return currentTime_ms;
+}
+
+inline std::vector<int> NetworkServerSystem::mergeVectors(const std::vector<int>& vec1, const std::vector<int>& vec2)
 {
     std::vector<int> mergedVector = vec1;
+
     mergedVector.insert(mergedVector.end(), vec2.begin(), vec2.end());
     return mergedVector;
 }
 
-std::vector<int> NetworkServerSystem::stringToVector(const std::string& str) {
+inline std::vector<int> NetworkServerSystem::stringToVector(const std::string& str) {
     std::vector<int> result;
+
     for (char c : str) {
         result.push_back(static_cast<int>(c));
     }
     return result;
 }
 
-std::string NetworkServerSystem::vectorToString(const std::vector<int>& data)
+inline std::string NetworkServerSystem::vectorToString(const std::vector<int>& data)
 {
     std::stringstream ss;
+
     for (int num : data) {
         ss << static_cast<char>(num); // Conversion des entiers en caractères
     }
+
     std::string myString = ss.str();
+
     return myString;
 }
 
-unsigned short NetworkServerSystem::findValidPort(asio::io_context& service)
+inline unsigned short NetworkServerSystem::findValidPort(asio::io_context& service)
 {
     asio::ip::udp::socket socket(service);
 
     for (unsigned short port = 1024; port < 65535; ++port) {
         try {
+
             asio::ip::udp::endpoint endpoint(asio::ip::udp::v4(), port);
+
             socket.open(endpoint.protocol());
-            socket.bind(endpoint);
+            socket.bind(endpoint);  
+            socket.close();
             return port;
         } catch (std::exception&) {
+            socket.close();
         }
     }
 
     throw std::runtime_error("Could not find an available port.");
 }
 
-std::vector<unsigned char> NetworkServerSystem::encode(const std::vector<int>& values)
+inline std::vector<unsigned char> NetworkServerSystem::encode(const std::vector<int>& values)
 {
     std::vector<unsigned char> encodedData;
+
     for (int value : values) {
         unsigned int intValue = (value >= 0) ? (static_cast<unsigned int>(value) << 1) : ((-value) << 1 | 1);
 
@@ -99,7 +123,7 @@ std::vector<unsigned char> NetworkServerSystem::encode(const std::vector<int>& v
     return encodedData;
 }
 
-std::vector<int> NetworkServerSystem::decode(const std::vector<unsigned char>& encodedData, size_t numBytesToRead)
+inline std::vector<int> NetworkServerSystem::decode(const std::vector<unsigned char>& encodedData, size_t numBytesToRead)
 {
     std::vector<int> decodedValues;
     int value = 0;
@@ -130,49 +154,87 @@ std::vector<int> NetworkServerSystem::decode(const std::vector<unsigned char>& e
     return decodedValues;
 }
 
-void NetworkServerSystem::response(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
+inline void NetworkServerSystem::response(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
 {
+    (void)clientEndpoint;
+    (void)coordinator;
+
+    int timeStamp = decodedIntegers.at(0);
+    int index = getClient(decodedIntegers.at(1));
+
+    if (index == -1)
+        return;
+    _clients.at(index).delPacketSend(timeStamp);
     return;
 }
 
-void NetworkServerSystem::connect(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
+inline void NetworkServerSystem::param(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
 {
+    (void)clientEndpoint;
+    (void)coordinator;
+
+    std::ofstream fichier;
+
+    fichier.open("room.txt", std::ios::app);
+
+    int timeStamp = decodedIntegers.at(0);
+    int index = getClient(decodedIntegers.at(1));
+
+    if (index == -1)
+        return;
+
+    int nbPlayer = decodedIntegers.at(2);
+
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 3);
+
+    std::string name = vectorToString(decodedIntegers);
+
+    int port = findValidPort(_service);
+
+    if (fichier.is_open()) {
+        fichier << std::to_string(port) << "\t" << name << "\t" << std::to_string(nbPlayer) << std::endl;
+        fichier.close();
+
+        std::thread Thread(room, nbPlayer, port);
+
+        Thread.detach();
+        _port++;
+        send({_OK}, {timeStamp}, false, clientEndpoint, index);
+    } else {
+        std::cerr << "Impossible d'ouvrir le fichier." << std::endl;
+        send({_CREATE_ROOM}, {timeStamp}, false, clientEndpoint, index);
+    }
+    return;
+}
+
+inline void NetworkServerSystem::connect(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
+{
+    (void)coordinator;
+
     std::string username = vectorToString(decodedIntegers);
 
     // std::cout << "username: " << username << std::endl;
 
     for (auto client : _clients) {
         if (client.getUsername() == username) {
-            std::vector<unsigned char> buffer = encode(_FAIL_CONNECT);
-            _socket.send_to(asio::buffer(buffer), clientEndpoint);
+            // std::vector<unsigned char> buffer = encode(_FAIL_CONNECT);
+            // _socket.send_to(asio::buffer(buffer), clientEndpoint);
             return;
         }
     }
-    Entity entity = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity, {1, 0});
-    coordinator.AddComponent<Velocity>(entity, {0, 0});
-    coordinator.AddComponent<Hitbox>(entity, {0, 0, 100, 100, PLAYER});
-    coordinator.AddComponent<HealthPoint>(entity, {300, 300});
-    coordinator.AddComponent<Damage>(entity, {100, 100});
-    sendCreate(entity, coordinator);
-    _clients.push_back(Client(username, clientEndpoint, entity));
+    _clients.push_back(Client(username, clientEndpoint, _id));
+    _id++;
     // std::cout << _clients.at(_clients.size() - 1).getClientEndpoint() << std::endl;
+
     std::vector<int> tmp = {_clients.at(_clients.size() - 1).getID()};
     std::vector<unsigned char> buffer = encode(tmp);
+
     _socket.send_to(asio::buffer(buffer), clientEndpoint);
-    sendEcs(coordinator);
 }
 
-void NetworkServerSystem::ping(Coordinator &coordinator)
+inline void NetworkServerSystem::ping(Coordinator &coordinator)
 {
-
-    for (auto client : _clients) {
-        if (client.getAlive() == false) {
-            // std::cout << "DESTROY" << std::endl;
-            coordinator.DestroyEntity(client.getID());
-            sendDestroy(client.getID());
-        }
-    }
+    (void)coordinator;
     _clients.erase(
         std::remove_if(
             _clients.begin(),
@@ -188,218 +250,152 @@ void NetworkServerSystem::ping(Coordinator &coordinator)
         ),
     _clients.end()
     );
+
+    int index = 0;
+    int timeStamp = hourIntNow();
+
     for (auto client : _clients) {
-        std::vector<unsigned char> buffer = encode(_PING);
-        // std::cout << "SEND TO: " << client.getClientEndpoint() << std::endl;
-        _socket.send_to(asio::buffer(buffer), client.getClientEndpoint());
+        send(_PING, {timeStamp}, true, client.getClientEndpoint(), index);
+        index++;
     }
 }
 
-void NetworkServerSystem::pong(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
+inline void NetworkServerSystem::pong(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
 {
-    int index = getClient(decodedIntegers.at(0));
+    (void)coordinator;
 
-    // std::cout << "PONG DECODED INTEGERS: " << decodedIntegers.at(0) << std::endl;
-    // std::cout << "PONG INDEX: " << index << std::endl;
+    int timeStamp = decodedIntegers.at(0);
+    int index = getClient(decodedIntegers.at(1));
+
     if (index == -1) {
         return;
     }
-    std::vector<unsigned char> buffer = encode(_PASS);
-    _socket.send_to(asio::buffer(buffer), _clients.at(index).getClientEndpoint());
+    send({_OK}, {timeStamp}, false, clientEndpoint, index);
+    _clients.at(index).delPacketSend(timeStamp);
     _clients.at(index).setAlive(true);
 }
 
-void NetworkServerSystem::sendDestroy(int entity)
+inline int NetworkServerSystem::checkAlreadyReceive(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint)
 {
-    std::vector<int> data = {Cmd::DESTROY, 1, entity};
-    std::vector<unsigned char> buffer = encode(data);
-    for (auto client : _clients) {
-        _socket.send_to(asio::buffer(buffer), client.getClientEndpoint());
+    int timeStamp = decodedIntegers.at(2);
+    int index = getClient(decodedIntegers.at(3));
+
+
+    // std::cout << "INDEX CLIENT: " << decodedIntegers.at(3) << std::endl;
+    // std::cout << "TIMESTAMP PACKET: " << decodedIntegers.at(2) << std::endl;
+    if(index == -1)
+        return -1;
+
+    auto packets = _clients.at(index).getPacketsReceive();
+    try {
+        auto it = packets.at(timeStamp);
+        // std::cout << "FOUND" << std::endl;
+        send(_STOP_SEND, {timeStamp}, false, clientEndpoint, index);
+        return -1;
+    } catch (...) {
+        // std::cout << "NOT FOUND" << std::endl;
+        return 0;
     }
 }
 
-void NetworkServerSystem::sendCreate(int entity, Coordinator &coordinator)
-{
-    std::vector<int> res;
-    auto& pos = coordinator.GetComponent<Position>(entity);
-    auto& vel = coordinator.GetComponent<Velocity>(entity);
-    auto& hitbox = coordinator.GetComponent<Hitbox>(entity); 
-    res = {Cmd::CREATE, 10, static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x), static_cast<int>(hitbox._y), static_cast<int>(hitbox.width), static_cast<int>(hitbox.height), hitbox.type};
-    std::vector<unsigned char> data = encode(res);
-    for (auto client : _clients) {
-        // std::cout << "SEND TO: " << client.getClientEndpoint() << std::endl;
-        _socket.send_to(asio::buffer(data), client.getClientEndpoint());
-    }
-}
-
-int NetworkServerSystem::checkMove(Position& pos, Velocity& vel, Hitbox& hitbox, Entity entity, Coordinator& coordinator)
-{
-    for (auto entity2 : this->_entities) {
-        if (entity == entity2)
-            continue;
-        auto& pos2 = coordinator.GetComponent<Position>(entity2);
-        auto& hitbox2 = coordinator.GetComponent<Hitbox>(entity2);
-
-        if ((pos._x + vel._x) + hitbox._x + hitbox.width >= pos2._x + hitbox2._x &&
-            (pos._x + vel._x) + hitbox._x <= pos2._x + hitbox2._x + hitbox2.width &&
-            (pos._y + vel._y) + hitbox._y + hitbox.height >= pos2._y + hitbox2._y &&
-            (pos._y + vel._y) + hitbox._y <= pos2._y + hitbox2._y + hitbox2.height &&
-            hitbox.type == PLAYER && hitbox2.type == PLAYER) {
-            return -1;
-        }
-        if ((pos._x + vel._x) + hitbox._x + hitbox.width >= pos2._x + hitbox2._x &&
-            (pos._x + vel._x) + hitbox._x <= pos2._x + hitbox2._x + hitbox2.width &&
-            (pos._y + vel._y) + hitbox._y + hitbox.height >= pos2._y + hitbox2._y &&
-            (pos._y + vel._y) + hitbox._y <= pos2._y + hitbox2._y + hitbox2.height &&
-            hitbox.type == PLAYER && hitbox2.type == ENNEMY) {
-            return -1;
-        }
-    }
-    return 0;
-}
-
-void NetworkServerSystem::move(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
-{
-    for (auto entity : this->_entities) {
-        if (entity == decodedIntegers.at(0)) {
-            auto& vel = coordinator.GetComponent<Velocity>(entity);
-            auto& pos = coordinator.GetComponent<Position>(entity);
-            auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
-
-            if (checkMove(pos, vel, hitbox, entity, coordinator) == -1) {
-                std::vector<unsigned char> buffer = encode(_UNKNOW);
-                _socket.send_to(asio::buffer(buffer), clientEndpoint);
-                return;
-            }
-
-            vel._x = decodedIntegers.at(1);
-            vel._y = decodedIntegers.at(2);
-            std::vector<unsigned char> buffer = encode(_PASS);
-            _socket.send_to(asio::buffer(buffer), clientEndpoint);
-            return;
-        }
-    }
-    std::vector<unsigned char> buffer = encode(_UNKNOW);
-    _socket.send_to(asio::buffer(buffer), clientEndpoint);
-}
-
-void NetworkServerSystem::shoot(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
-{
-    for (auto entity : this->_entities) {
-        if (entity == decodedIntegers.at(0)) {
-            Entity bullet = coordinator.CreateEntity();
-            auto pos = coordinator.GetComponent<Position>(decodedIntegers.at(0));
-            coordinator.AddComponent<Position>(bullet, {pos._x + 100, pos._y + 20});
-            coordinator.AddComponent<Velocity>(bullet, {20, 0});
-            coordinator.AddComponent<Hitbox>(bullet, {0, 0, 60, 60, BULLET});
-            coordinator.AddComponent<Controllable>(bullet, {ENGINE});
-            coordinator.AddComponent<HealthPoint>(bullet, {1, 1});
-            coordinator.AddComponent<Damage>(bullet, {50, 50});
-            std::vector<unsigned char> buffer = encode(_PASS);
-            _socket.send_to(asio::buffer(buffer), clientEndpoint);
-            this->sendCreate(bullet, coordinator);
-            return;
-        }
-    }
-    std::vector<unsigned char> buffer = encode(_UNKNOW);
-    _socket.send_to(asio::buffer(buffer), clientEndpoint);
-}
-
-
-void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint, Coordinator &coordinator)
+inline void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint, Coordinator &coordinator)
 {
     int index = decodedIntegers.at(0);
 
     // std::cout << "INDEX: " << index << std::endl;
-    if (index < 0 || index > 12)
+    // std::cout << "SIZE: " << decodedIntegers.size() << std::endl;
+    if (index < 0 || index > 14)
         return;
+    if (decodedIntegers.at(0) == 1) {
+        _functions[index](decodedIntegers, clientEndpoint, coordinator);
+        return;
+    }
+    if (decodedIntegers.size() < 4)
+        return;
+    if (checkAlreadyReceive(decodedIntegers, clientEndpoint) == -1)
+        return;
+    int indexClient = getClient(decodedIntegers.at(3));
+    _clients.at(indexClient).addPacketReceive(decodedIntegers.at(2), decodedIntegers);
     if (_functions[index] != nullptr) {
         decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
         _functions[index](decodedIntegers, clientEndpoint, coordinator);
     }
     else {
-        std::vector<unsigned char> buffer = encode(_UNKNOW);
-        _socket.send_to(asio::buffer(buffer), clientEndpoint);
+        // std::vector<unsigned char> buffer = encode(_UNKNOW);
+        // _socket.send_to(asio::buffer(buffer), clientEndpoint);
     }
 }
 
-void NetworkServerSystem::processReceiveData(const std::vector<unsigned char>& data, udp::endpoint clientEndpoint, std::size_t bytesReceived, Coordinator &coordinator)
+inline void NetworkServerSystem::processReceiveData(udp::endpoint clientEndpoint, Coordinator &coordinator, std::vector<int> res)
 {
     // std::cout << clientEndpoint << std::endl;
     if (clientEndpoint != asio::ip::udp::endpoint(asio::ip::make_address("0.0.0.0"), 0)) {
-        std::vector<int> res = decode(data, bytesReceived);
         handleCmd(res, clientEndpoint, coordinator);
     } else {
         return;
     }
 }
 
-void NetworkServerSystem::sendEcs(Coordinator &coordinator)
+inline void NetworkServerSystem::send(std::vector<int> header, std::vector<int> data, bool stock, udp::endpoint client, int index)
 {
-    for (auto client : _clients) {
-        std::vector<int> res = {Cmd::POS};
-        for (auto entity : this->_entities) {
-            auto& pos = coordinator.GetComponent<Position>(entity);
-            auto& vel = coordinator.GetComponent<Velocity>(entity);
-            auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
+    int timeStamp;
 
-            std::vector<int> encode_ = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x), static_cast<int>(hitbox._y), static_cast<int>(hitbox.width), static_cast<int>(hitbox.height), hitbox.type};
-            for (auto i : encode_)
-                res.push_back(i);
-        }
-        // std::cout << "SEND ECS" << std::endl;
-        // for (auto i : res)
-        //     std::cout << i << std::endl;
-        std::vector<unsigned char> data = encode(res);
-        _socket.send_to(asio::buffer(data), client.getClientEndpoint());
+    if (stock == true) {
+        timeStamp = hourIntNow();
+        header.push_back(timeStamp);
     }
+
+    std::vector<int> res = mergeVectors(header, data);
+    std::vector<unsigned char> buffer = encode(res);
+
+    _socket.send_to(asio::buffer(buffer), client);
+    if (stock == true) {
+        _clients.at(index).addPacketSend(timeStamp, buffer);
+    }
+    return;
 }
 
-void NetworkServerSystem::checkEvent(Coordinator &coordinator)
-{
-    while (1) {
-        auto event = coordinator.GetEvent();
-        
-        if (event._type == Event::actions::EMPTY) {
-            break;
-        }
-        if (event._type == Event::actions::SPAWN) {
-            Entity ennemy = coordinator.CreateEntity();
-            coordinator.AddComponent<Position>(ennemy, {1990, (std::any_cast<int>(event._data[0]))});
-            coordinator.AddComponent<Velocity>(ennemy, {-20, 0});
-            coordinator.AddComponent<Hitbox>(ennemy, {0, 0, 100, 100, ENNEMY});
-            coordinator.AddComponent<Controllable>(ennemy, {IA});
-            coordinator.AddComponent<HealthPoint>(ennemy, {150, 150});
-            coordinator.AddComponent<Damage>(ennemy, {50, 50});
-            this->sendCreate(ennemy, coordinator);
-            break;
-        }
-        if (event._type == Event::actions::DESTROY) {
-            this->sendDestroy(event._entity);
-        }
-    }
-}
-
-void NetworkServerSystem::Update(Coordinator &coordinator)
+inline std::tuple<std::vector<int>, udp::endpoint> NetworkServerSystem::receive()
 {
     std::vector<unsigned char> data(1024);
     udp::endpoint clientEndpoint;
+    size_t length = _socket.receive_from(asio::buffer(data), clientEndpoint, 0);
+    std::vector<int> decodedIntegers = decode(data, length);
+
+    return std::make_tuple(decodedIntegers, clientEndpoint);
+}
+
+inline void NetworkServerSystem::packetLoss()
+{
+    for (auto client : _clients) {
+        auto packet = client.getPacketsSend();
+        for (auto pair : packet) {
+            _socket.send_to(asio::buffer(pair.second), client.getClientEndpoint());
+        }
+    }
+}
+
+inline void NetworkServerSystem::Update(Coordinator &coordinator)
+{
     std::chrono::seconds interval(5);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::duration elapsedTime = currentTime - _startTime;
 
-    checkEvent(coordinator);
     while (1) {
         try {
-            size_t length = _socket.receive_from(asio::buffer(data), clientEndpoint, 0);
-            processReceiveData(data, clientEndpoint, length, coordinator);
+            std::vector<int> decodedIntegers;
+            udp::endpoint clientEndpoint;
+
+            std::tie(decodedIntegers, clientEndpoint) = receive();
+            processReceiveData(clientEndpoint, coordinator, decodedIntegers);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } catch (...) {
             break;
         }
     }
-    sendEcs(coordinator);
     if (elapsedTime >= interval) {
         ping(coordinator);
+        packetLoss();
         _startTime = currentTime;
     }
 }

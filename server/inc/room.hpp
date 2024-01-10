@@ -1,14 +1,14 @@
 /*
 ** EPITECH PROJECT, 2023
-** R-Type
+** RType [WSL: Fedora]
 ** File description:
-** main
+** room
 */
 
-#ifndef MAIN_HPP_
-#define MAIN_HPP_
+#ifndef ROOM_HPP_
+#define ROOM_HPP_
 
 #include <memory>
 #include "../../ECS/ECSServer.hpp"
 
-#endif /* !MAIN_HPP_ */
+#endif /* !ROOM_HPP_ */

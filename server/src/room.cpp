@@ -1,19 +1,15 @@
 /*
 ** EPITECH PROJECT, 2023
-** R-Type
+** RType [WSL: Fedora]
 ** File description:
-** main
+** room
 */
 
-#include "main.hpp"
-#include "../../ECS/ECSServer.hpp"
+#include "room.hpp"
 
-int main(int argc, char **argv)
+int room(int nbPlayer, int port)
 {
-    if (argc != 1)
-        return 84;
-    (void)argv;
-
+    (void)nbPlayer;
     Coordinator coordinator;
 
     coordinator.Init();
@@ -28,14 +24,18 @@ int main(int argc, char **argv)
 
     auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
     auto controlSystem = coordinator.RegisterSystem<ControlSystem>();
-    auto networkServerSystem = coordinator.RegisterSystem<NetworkServerSystem>();
+    auto networkRoomSystem = coordinator.RegisterSystem<NetworkRoomSystem>();
     auto spawnSystem = coordinator.RegisterSystem<SpawnSystem>();
     auto collisionSystem = coordinator.RegisterSystem<CollisionSystem>();
     auto healthSystem = coordinator.RegisterSystem<HealthSystem>();
     
     Signature signature;
 
-    coordinator.SetSystemSignature<NetworkServerSystem>(signature);
+    signature.set(coordinator.GetComponentType<Position>());
+    signature.set(coordinator.GetComponentType<Velocity>());
+    signature.set(coordinator.GetComponentType<Hitbox>());
+    coordinator.SetSystemSignature<PhysicSystem>(signature);
+    coordinator.SetSystemSignature<NetworkRoomSystem>(signature);
     
     Signature signature2;
 
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
     coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 1, 500, 700});
     coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 3, 200, 900});
 
-    networkServerSystem->Init();
+    networkRoomSystem->Init(port);
     std::chrono::milliseconds interval(10);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
@@ -74,7 +74,12 @@ int main(int argc, char **argv)
         currentTime = std::chrono::steady_clock::now();
         elapsedTime = currentTime - startTime;
         if (elapsedTime >= interval) {
-            networkServerSystem->Update(coordinator);
+            networkRoomSystem->Update(coordinator);
+            physicSystem->Update(coordinator);
+            controlSystem->Update(coordinator);
+            spawnSystem->Update(coordinator);
+            collisionSystem->Update(coordinator);
+            healthSystem->Update(coordinator);
             startTime = currentTime;
         }
     }

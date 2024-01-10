@@ -7,7 +7,7 @@
 
 #include "systems/CollisionSystem.hpp"
 
-void CollisionSystem::Update(Coordinator &coordinator)
+inline void CollisionSystem::Update(Coordinator &coordinator)
 {
     for (auto entity : this->_entities) {
         auto& pos = coordinator.GetComponent<Position>(entity);

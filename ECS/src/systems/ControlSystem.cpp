@@ -7,7 +7,7 @@
 
 #include "systems/ControlSystem.hpp"
 
-void ControlSystem::Update(Coordinator &coordinator)
+inline void ControlSystem::Update(Coordinator &coordinator)
 {
     // std::cout << "ControlSystem update :" << std::endl;
     for (auto entity : this->_entities) {

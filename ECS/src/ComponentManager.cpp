@@ -8,7 +8,7 @@
 #include "ComponentManager.hpp"
 
 template<typename T>
-void ComponentManager::RegisterComponent()
+inline void ComponentManager::RegisterComponent()
 {
 	std::type_index typeName = std::type_index(typeid(T));
 
@@ -24,7 +24,7 @@ void ComponentManager::RegisterComponent()
 }
 
 template<typename T>
-ComponentType ComponentManager::GetComponentType()
+inline ComponentType ComponentManager::GetComponentType()
 {
 	std::type_index typeName = std::type_index(typeid(T));
 
@@ -36,24 +36,24 @@ ComponentType ComponentManager::GetComponentType()
 }
 
 template<typename T>
-void ComponentManager::AddComponent(Entity entity, T component)
+inline void ComponentManager::AddComponent(Entity entity, T component)
 {
 	GetComponentArray<T>()->InsertData(entity, component);
 }
 
 template<typename T>
-void ComponentManager::RemoveComponent(Entity entity)
+inline void ComponentManager::RemoveComponent(Entity entity)
 {
 	GetComponentArray<T>()->RemoveData(entity);
 }
 
 template<typename T>
-T& ComponentManager::GetComponent(Entity entity)
+inline T& ComponentManager::GetComponent(Entity entity)
 {
 	return GetComponentArray<T>()->GetData(entity);
 }
 
-void ComponentManager::EntityDestroyed(Entity entity)
+inline void ComponentManager::EntityDestroyed(Entity entity)
 {
 	for (auto const& pair : this->_componentArrays) {
 		auto const& component = pair.second;

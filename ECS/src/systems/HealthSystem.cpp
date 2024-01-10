@@ -7,7 +7,7 @@
 
 #include "HealthSystem.hpp"
 
-void HealthSystem::Update(Coordinator &coordinator)
+inline void HealthSystem::Update(Coordinator &coordinator)
 {
     for (auto entity : this->_entities) {
         auto& hp = coordinator.GetComponent<HealthPoint>(entity);
