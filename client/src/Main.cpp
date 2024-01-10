@@ -100,7 +100,7 @@ int main(int ac, char **av)
             parallax.draw();
             if (!chat.isOpen())
                 movableSystem->Update(coordinator);
-            eventSystem->RunEvents(coordinator);
+            eventSystem->RunEvents(coordinator, assetManager);
             graphicSystem->Update(coordinator);
             networkClientSystem->Update(coordinator);
             eventSystem->RunEvents(coordinator, assetManager);

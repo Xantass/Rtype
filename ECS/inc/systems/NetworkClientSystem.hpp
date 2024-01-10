@@ -145,6 +145,10 @@ public:
      */
     void createEntity(std::vector<int> decodedIntegers, Coordinator &coordinator);
 
+    void createRoom(std::vector<int>& decodedIntegers, Coordinator &coordinator);
+
+    void createMessage(std::vector<int>& decodedIntegers, Coordinator &coordinator);
+
     /**
      * @brief Destroys an entity based on the provided decoded integers.
      * @param decodedIntegers The vector of integers containing entity destruction data.
@@ -242,7 +246,7 @@ private:
     io_context _service; /**< The Boost ASIO io_service. */
     udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v4(), findValidPort(_service))); /**< The UDP socket for communication. */
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
-    std::function<void(std::vector<int>&, Coordinator &coordinator)> _functions[14]; /**< Array of function pointers. */
+    std::function<void(std::vector<int>&, Coordinator &coordinator)> _functions[16]; /**< Array of function pointers. */
     int _id; /**< The ID of the client. */
     std::map<int, std::vector<int>> _packetsSend; /**< Packets sent with associated timestamps. */
     std::map<int, std::vector<int>> _packetsReceive; /**< Packets received with associated timestamps. */
