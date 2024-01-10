@@ -1,4 +1,5 @@
-![R-Type banner](./images/rtype_banner.jpg)
+![R-Type banner](./images/rtype_banner.png)
+
 This project is a reimplementation of the famous R-Type game. Our version is playable in network with multiple clients able to connect to the server.
 
 This project works on :
