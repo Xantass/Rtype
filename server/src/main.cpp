@@ -23,11 +23,15 @@ int main(int argc, char **argv)
     coordinator.RegisterComponent<Hitbox>();
     coordinator.RegisterComponent<Controllable>();
     coordinator.RegisterComponent<SpawnClock>();
+    coordinator.RegisterComponent<HealthPoint>();
+    coordinator.RegisterComponent<Damage>();
 
     auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
     auto controlSystem = coordinator.RegisterSystem<ControlSystem>();
     auto networkServerSystem = coordinator.RegisterSystem<NetworkServerSystem>();
     auto spawnSystem = coordinator.RegisterSystem<SpawnSystem>();
+    auto collisionSystem = coordinator.RegisterSystem<CollisionSystem>();
+    auto healthSystem = coordinator.RegisterSystem<HealthSystem>();
     
     Signature signature;
 
@@ -44,9 +48,22 @@ int main(int argc, char **argv)
     
     signature3.set(coordinator.GetComponentType<SpawnClock>());
     coordinator.SetSystemSignature<SpawnClock>(signature3);
+    
+    Signature signature4;
+    signature4.set(coordinator.GetComponentType<Position>());
+    signature4.set(coordinator.GetComponentType<Hitbox>());
+    signature4.set(coordinator.GetComponentType<HealthPoint>());
+    signature4.set(coordinator.GetComponentType<Damage>());
+    coordinator.SetSystemSignature<CollisionSystem>(signature4);
+
+    Signature signature5;
+    signature5.set(coordinator.GetComponentType<HealthPoint>());
+    coordinator.SetSystemSignature<HealthSystem>(signature5);
 
     Entity ent = coordinator.CreateEntity();
-    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 3});
+    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 2, 100, 1000});
+    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 1, 500, 700});
+    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 3, 200, 900});
 
     networkServerSystem->Init();
     std::chrono::milliseconds interval(16);
@@ -58,9 +75,6 @@ int main(int argc, char **argv)
         elapsedTime = currentTime - startTime;
         if (elapsedTime >= interval) {
             networkServerSystem->Update(coordinator);
-            physicSystem->Update(coordinator);
-            controlSystem->Update(coordinator);
-            spawnSystem->Update(coordinator);
             startTime = currentTime;
         }
     }

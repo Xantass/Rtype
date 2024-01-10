@@ -30,6 +30,7 @@ int main(int ac, char **av)
 
     coordinator.Init();
     Graphic::init(1920, 1080, "R-Type");
+    Graphic::toggleFullScreen();
     Music music = Graphic::loadMusic("assets/Theme.mp3");
     Parallax parallax("assets/parallax/");
 

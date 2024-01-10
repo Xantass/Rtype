@@ -15,23 +15,27 @@ inline void MovableSystem::Update(Coordinator &coordinator)
         //auto& mov = coordinator.GetComponent<Movable>(entity);
         auto& vel = coordinator.GetComponent<Velocity>(entity);
 
+        float moveX = 0;
+        float moveY = 0;
+
         if (Graphic::isKeyPressed(KEY_SPACE)) {
             coordinator.AddEvent(Event{Event::actions::SHOOT, 0, {std::any(Velocity{1, 0})}});
-        } else if (Graphic::isKeyPressed(KEY_W)) {
-            coordinator.AddEvent(Event{Event::actions::MOVE, entity, {std::any(Velocity{0, -1})}});
-            vel = {vel._x, -1};
-        } else if (Graphic::isKeyPressed(KEY_D)) {
-            coordinator.AddEvent(Event{Event::actions::MOVE, entity, {std::any(Velocity{1, 0})}});
-            vel = {1, vel._y};
-        } else if (Graphic::isKeyPressed(KEY_S)) {
-            coordinator.AddEvent(Event{Event::actions::MOVE, entity, {std::any(Velocity{0, 1})}});
-            vel = {vel._x, 1};
-        } else if (Graphic::isKeyPressed(KEY_A)) {
-            coordinator.AddEvent(Event{Event::actions::MOVE, entity, {std::any(Velocity{-1, 0})}});
-            vel = {-1, vel._y};
-        } else if (Graphic::isKeyReleased(KEY_W) || Graphic::isKeyReleased(KEY_D) || Graphic::isKeyReleased(KEY_S) || Graphic::isKeyReleased(KEY_A)) {
-            coordinator.AddEvent(Event{Event::actions::MOVE, entity, {std::any(Velocity{0, 0})}});
-            vel = {0, 0};
+        }
+        if (Graphic::isKeyDown(KEY_W))
+            moveY = -1;
+        if (Graphic::isKeyDown(KEY_D))
+            moveX = 1;
+        if (Graphic::isKeyDown(KEY_S))
+            moveY = 1;
+        if (Graphic::isKeyDown(KEY_A))
+            moveX = -1;
+        if (moveX != vel._x || moveY != vel._y) {
+            if (moveX != 0 && moveY != 0) {
+                moveX *= 0.7;
+                moveY *= 0.7;
+            }
+            coordinator.AddEvent(Event{Event::actions::MOVE, entity, {std::any(Velocity{moveX, moveY})}});
+            vel = {moveX, moveY};
         }
     }
 }

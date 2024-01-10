@@ -436,11 +436,7 @@ inline void NetworkClientSystem::checkEvent(Coordinator &coordinator)
         if (event._type == Event::actions::SHOOT) {
             for (auto entity : _entities) {
                 if (this->_id == static_cast<int>(entity)) {
-
-                    std::vector<int> tmp = mergeVectors({CHECK_ACTION(event._type), 0}, {static_cast<int>(entity)});
-                    std::vector<unsigned char> buffer = encode(tmp);
-
-                    _socket.send_to(asio::buffer(buffer), _serverEndpoint);
+                    send({CHECK_ACTION(event._type), 1}, {static_cast<int>(entity)}, true);
                     std::this_thread::sleep_for(std::chrono::milliseconds(1));
                     break;
                 }
