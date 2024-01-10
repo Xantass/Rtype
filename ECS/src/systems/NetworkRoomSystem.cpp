@@ -139,7 +139,7 @@ inline unsigned short NetworkRoomSystem::findValidPort(asio::io_context& service
 
 inline void NetworkRoomSystem::sendDestroy(int entity)
 {
-    std::vector<int> data = {Action::DESTROY, 1, entity};
+    std::vector<int> data = {entity};
     int index = 0;
 
     for (auto client : _clients) {
