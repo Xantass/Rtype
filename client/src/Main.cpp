@@ -28,6 +28,7 @@ int main(int ac, char **av)
     coordinator.RegisterComponent<Sprite>();
     coordinator.RegisterComponent<Hitbox>();
     coordinator.RegisterComponent<Movable>();
+    coordinator.RegisterComponent<HealthPoint>();
 
     auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
     auto graphicSystem = coordinator.RegisterSystem<GraphicalSystem>();
@@ -47,6 +48,7 @@ int main(int ac, char **av)
     signature3.set(coordinator.GetComponentType<Position>());
     signature3.set(coordinator.GetComponentType<Velocity>());
     signature3.set(coordinator.GetComponentType<Hitbox>());
+    signature3.set(coordinator.GetComponentType<HealthPoint>());
     coordinator.SetSystemSignature<PhysicSystem>(signature3);
     coordinator.SetSystemSignature<NetworkClientSystem>(signature3);
 
