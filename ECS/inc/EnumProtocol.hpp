@@ -28,6 +28,7 @@ enum Cmd {
     PING = 5, /**< Ping command. */
     PONG = 6, /**< Pong command. */
     DISCONNECT = 7, /**< Quit command. */
+    CREATE_ROOM_CMD = 14,
 };
 
 /**
