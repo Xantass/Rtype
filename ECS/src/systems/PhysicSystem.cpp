@@ -7,7 +7,7 @@
 
 #include "systems/PhysicSystem.hpp"
 
-void PhysicSystem::Update(Coordinator &coordinator) {
+inline void PhysicSystem::Update(Coordinator &coordinator) {
     // std::cout << "----------------------" << std::endl << "PhysicSystem update :" << std::endl; // TEST - TO BE REMOVED
     for (auto entity : this->_entities) {
         auto& pos = coordinator.GetComponent<Position>(entity);

@@ -8,6 +8,7 @@
 #include "../inc/Client.hpp"
 #include "../../ECS/ECSClient.hpp"
 #include "Parallax.hpp"
+#include "Menu.hpp"
 
 int main(int ac, char **av)
 {
@@ -58,8 +59,9 @@ int main(int ac, char **av)
     std::string port = av[2];
     std::string name = av[3];
     int portClient = atoi(av[4]);
+    Menu menu(host, std::to_string(portClient), name, coordinator);
 
-    networkClientSystem->Init(coordinator, host, port, name, portClient);
+    networkClientSystem->Init(host, port, name, portClient);
 
     Graphic::playMusic(music);
     std::chrono::milliseconds interval(10);
@@ -73,13 +75,20 @@ int main(int ac, char **av)
             Graphic::updateMusic(music);
             Graphic::beginDrawing();
             Graphic::clearBackground(RBLACK);
+            if (menu.action == "Launch Game") {
+                menu.action = "";
+                std::string infos[] = {menu._port, menu._name, menu._nbPlayer};
+                coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::make_any<std::string>(infos[0]), std::make_any<std::string>(infos[1]), std::make_any<std::string>(infos[2])}});
+            }
             parallax.draw();
             movableSystem->Update(coordinator);
             eventSystem->RunEvents(coordinator);
             graphicSystem->Update(coordinator);
             networkClientSystem->Update(coordinator);
+            eventSystem->RunEvents(coordinator);
             physicSystem->Update(coordinator);
             startTime = currentTime;
+            menu.displayMenu();
             Graphic::endDrawing();
         }
     }

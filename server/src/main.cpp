@@ -5,12 +5,15 @@
 ** main
 */
 
-#include <memory>
 #include "main.hpp"
 #include "../../ECS/ECSServer.hpp"
 
 int main(int argc, char **argv)
 {
+    if (argc != 1)
+        return 84;
+    (void)argv;
+
     Coordinator coordinator;
 
     coordinator.Init();
@@ -28,10 +31,6 @@ int main(int argc, char **argv)
     
     Signature signature;
 
-    signature.set(coordinator.GetComponentType<Position>());
-    signature.set(coordinator.GetComponentType<Velocity>());
-    signature.set(coordinator.GetComponentType<Hitbox>());
-    coordinator.SetSystemSignature<PhysicSystem>(signature);
     coordinator.SetSystemSignature<NetworkServerSystem>(signature);
     
     Signature signature2;

@@ -7,7 +7,7 @@
 
 #include "Coordinator.hpp"
 
-void Coordinator::Init()
+inline void Coordinator::Init()
 {
 	this->_componentManager = std::make_unique<ComponentManager>();
 	this->_entityManager = std::make_unique<EntityManager>();
@@ -15,12 +15,12 @@ void Coordinator::Init()
 	this->_eventManager = std::make_unique<EventManager>();
 }
 
-Entity Coordinator::CreateEntity()
+inline Entity Coordinator::CreateEntity()
 {
 	return this->_entityManager->CreateEntity();
 }
 
-void Coordinator::DestroyEntity(Entity entity)
+inline void Coordinator::DestroyEntity(Entity entity)
 {
 	this->_entityManager->DestroyEntity(entity);
 	this->_componentManager->EntityDestroyed(entity);
@@ -28,13 +28,13 @@ void Coordinator::DestroyEntity(Entity entity)
 }
 
 template<typename T>
-void Coordinator::RegisterComponent()
+inline void Coordinator::RegisterComponent()
 {
 	this->_componentManager->RegisterComponent<T>();
 }
 
 template<typename T>
-void Coordinator::AddComponent(Entity entity, T component)
+inline void Coordinator::AddComponent(Entity entity, T component)
 {
 	auto signature = this->_entityManager->GetSignature(entity);
 
@@ -45,7 +45,7 @@ void Coordinator::AddComponent(Entity entity, T component)
 }
 
 template<typename T>
-void Coordinator::RemoveComponent(Entity entity)
+inline void Coordinator::RemoveComponent(Entity entity)
 {
 	auto signature = this->_entityManager->GetSignature(entity);
 
@@ -56,40 +56,40 @@ void Coordinator::RemoveComponent(Entity entity)
 }
 
 template<typename T>
-T& Coordinator::GetComponent(Entity entity)
+inline T& Coordinator::GetComponent(Entity entity)
 {
 	return this->_componentManager->GetComponent<T>(entity);
 }
 
 template<typename T>
-ComponentType Coordinator::GetComponentType()
+inline ComponentType Coordinator::GetComponentType()
 {
 	return this->_componentManager->GetComponentType<T>();
 }
 
 template<typename T>
-std::shared_ptr<T> Coordinator::RegisterSystem()
+inline std::shared_ptr<T> Coordinator::RegisterSystem()
 {
 	return this->_systemManager->RegisterSystem<T>();
 }
 
 template<typename T>
-void Coordinator::SetSystemSignature(Signature signature)
+inline void Coordinator::SetSystemSignature(Signature signature)
 {
 	this->_systemManager->SetSignature<T>(signature);
 }
 
-void Coordinator::AddEvent(Event event)
+inline void Coordinator::AddEvent(Event event)
 {
 	this->_eventManager->AddEvent(event);
 }
 
-Event Coordinator::GetEvent()
+inline Event Coordinator::GetEvent()
 {
 	return this->_eventManager->GetEvent();
 }
 
-std::queue<Event> Coordinator::GetEventQueue() const
+inline std::queue<Event> Coordinator::GetEventQueue() const
 {
 	return this->_eventManager->GetEventQueue();
 }

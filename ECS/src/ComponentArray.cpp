@@ -8,7 +8,7 @@
 #include "ComponentArray.hpp"
 
 template <typename T>
-void ComponentArray<T>::InsertData(Entity entity, T component)
+inline void ComponentArray<T>::InsertData(Entity entity, T component)
 {
     if (this->_entityToIndex.find(entity) == this->_entityToIndex.end()) {
         // ERROR : Component added to same entity more than once.
@@ -23,7 +23,7 @@ void ComponentArray<T>::InsertData(Entity entity, T component)
 }
 
 template <typename T>
-void ComponentArray<T>::RemoveData(Entity entity)
+inline void ComponentArray<T>::RemoveData(Entity entity)
 {
 	if (this->_entityToIndex.find(entity) == this->_entityToIndex.end()) {
 		// ERROR : "Retrieving non-existent component."
@@ -43,7 +43,7 @@ void ComponentArray<T>::RemoveData(Entity entity)
 }
 
 template <typename T>
-T& ComponentArray<T>::GetData(Entity entity)
+inline T& ComponentArray<T>::GetData(Entity entity)
 {
 	if (this->_entityToIndex.find(entity) == this->_entityToIndex.end()) {
 		// ERROR : "Retrieving non-existent component."
@@ -52,7 +52,7 @@ T& ComponentArray<T>::GetData(Entity entity)
 }
 
 template <typename T>
-void ComponentArray<T>::EntityDestroyed(Entity entity)
+inline void ComponentArray<T>::EntityDestroyed(Entity entity)
 {
 	if (this->_entityToIndex.find(entity) == this->_entityToIndex.end())
 		RemoveData(entity);

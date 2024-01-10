@@ -5,8 +5,14 @@
 ** ECSServer
 */
 
+#ifndef _ECS_SERVER_
+#define _ECS_SERVER_
+
 #include "inc/Coordinator.hpp"
 #include "inc/systems/NetworkServerSystem.hpp"
 #include "inc/systems/PhysicSystem.hpp"
 #include "systems/ControlSystem.hpp"
 #include "systems/SpawnSystem.hpp"
+#include "inc/systems/NetworkRoomSystem.hpp"
+
+#endif
