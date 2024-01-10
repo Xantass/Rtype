@@ -27,6 +27,7 @@ int main(int ac, char **av)
     }
 
     Coordinator coordinator;
+    AssetManager assetManager;
 
     coordinator.Init();
     Graphic::init(1920, 1080, "R-Type");
@@ -96,10 +97,10 @@ int main(int ac, char **av)
             }
             parallax.draw();
             movableSystem->Update(coordinator);
-            eventSystem->RunEvents(coordinator);
+            eventSystem->RunEvents(coordinator, assetManager);
             graphicSystem->Update(coordinator);
             networkClientSystem->Update(coordinator);
-            eventSystem->RunEvents(coordinator);
+            eventSystem->RunEvents(coordinator, assetManager);
             physicSystem->Update(coordinator);
             startTime = currentTime;
             menu.displayMenu();
