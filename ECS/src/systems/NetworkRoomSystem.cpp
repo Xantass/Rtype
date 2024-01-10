@@ -10,6 +10,7 @@
 inline void NetworkRoomSystem::Init(int port)
 {
     udp::endpoint endpoint(udp::v4(), port);
+
     _socket.close();
     _socket.open(endpoint.protocol());
     _socket.bind(endpoint);
@@ -28,6 +29,7 @@ inline void NetworkRoomSystem::Init(int port)
     _functions[11] = std::bind(&NetworkRoomSystem::move, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[12] = nullptr;
     _functions[13] = nullptr;
+    _functions[14] = nullptr;
     return;
 }
 
@@ -67,16 +69,20 @@ inline std::vector<int> NetworkRoomSystem::mergeVectors(const std::vector<int>& 
 inline std::string NetworkRoomSystem::vectorToString(const std::vector<int>& data)
 {
     std::stringstream ss;
+
     for (int num : data) {
         ss << static_cast<char>(num); // Conversion des entiers en caractères
     }
+
     std::string myString = ss.str();
+
     return myString;
 }
 
 inline std::vector<unsigned char> NetworkRoomSystem::encode(const std::vector<int>& values)
 {
     std::vector<unsigned char> encodedData;
+
     for (int value : values) {
         unsigned int intValue = (value >= 0) ? (static_cast<unsigned int>(value) << 1) : ((-value) << 1 | 1);
 
@@ -126,7 +132,9 @@ inline unsigned short NetworkRoomSystem::findValidPort(asio::io_context& service
 
     for (unsigned short port = 1024; port < 65535; ++port) {
         try {
+
             asio::ip::udp::endpoint endpoint(asio::ip::udp::v4(), port);
+
             socket.open(endpoint.protocol());
             socket.bind(endpoint);
             return port;
@@ -153,9 +161,7 @@ inline void NetworkRoomSystem::sendCreate(int entity, Coordinator &coordinator)
     auto& pos = coordinator.GetComponent<Position>(entity);
     auto& vel = coordinator.GetComponent<Velocity>(entity);
     auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
-
     std::vector<int> res = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type};
-
     int index = 0;
 
     for (auto client : _clients) {
@@ -191,7 +197,9 @@ inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::e
             return;
         }
     }
+
     Entity entity = coordinator.CreateEntity();
+
     coordinator.AddComponent<Position>(entity, {1, 0});
     coordinator.AddComponent<Velocity>(entity, {0, 0});
     coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
@@ -199,9 +207,10 @@ inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::e
     coordinator.AddComponent<Damage>(entity, {0, 0});
     sendCreate(entity, coordinator);
     _clients.push_back(Client(username, clientEndpoint, entity));
-    // std::cout << _clients.at(_clients.size() - 1).getClientEndpoint() << std::endl;
+
     std::vector<int> tmp = {_clients.at(_clients.size() - 1).getID()};
     std::vector<unsigned char> buffer = encode(tmp);
+
     _socket.send_to(asio::buffer(buffer), clientEndpoint);
     sendEcs(coordinator);
 }
@@ -211,7 +220,6 @@ inline void NetworkRoomSystem::ping(Coordinator &coordinator)
 
     for (auto client : _clients) {
         if (client.getAlive() == false) {
-            // std::cout << "DESTROY" << std::endl;
             coordinator.DestroyEntity(client.getID());
             sendDestroy(client.getID());
         }
@@ -237,7 +245,6 @@ inline void NetworkRoomSystem::ping(Coordinator &coordinator)
 
     for (auto client : _clients) {
         send(_PING, {timeStamp}, true, client.getClientEndpoint(), index);
-        // std::cout << "ROOM SEND TO: " << client.getClientEndpoint() << std::endl;
         index++;
     }
 }
@@ -262,6 +269,7 @@ inline int NetworkRoomSystem::checkMove(Position& pos, Velocity& vel, Hitbox& hi
     for (auto entity2 : this->_entities) {
         if (entity == entity2)
             continue;
+
         auto& pos2 = coordinator.GetComponent<Position>(entity2);
         auto& hitbox2 = coordinator.GetComponent<Hitbox>(entity2);
 
@@ -292,6 +300,7 @@ inline void NetworkRoomSystem::move(std::vector<int>& decodedIntegers, udp::endp
         return;
     for (auto entity : this->_entities) {
         if (static_cast<int>(entity) == decodedIntegers.at(2)) {
+
             auto& vel = coordinator.GetComponent<Velocity>(entity);
             auto& pos = coordinator.GetComponent<Position>(entity);
             auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
@@ -306,7 +315,9 @@ inline void NetworkRoomSystem::move(std::vector<int>& decodedIntegers, udp::endp
             return;
         }
     }
+
     std::vector<unsigned char> buffer = encode(_UNKNOW);
+
     _socket.send_to(asio::buffer(buffer), clientEndpoint);
 }
 
@@ -360,8 +371,7 @@ inline void NetworkRoomSystem::handleCmd(std::vector<int>& decodedIntegers, udp:
 {
     int index = decodedIntegers.at(0);
 
-    // std::cout << "INDEX: " << index << std::endl;
-    if (index < 0 || index > 14)
+    if (index < 0 || index > 15)
         return;
     if (index == 1) {
         _functions[index](decodedIntegers, clientEndpoint, coordinator);
@@ -371,7 +381,9 @@ inline void NetworkRoomSystem::handleCmd(std::vector<int>& decodedIntegers, udp:
         return;
     if (checkAlreadyReceive(decodedIntegers, clientEndpoint) == -1)
         return;
+
     int indexClient = getClient(decodedIntegers.at(3));
+
     _clients.at(indexClient).addPacketReceive(decodedIntegers.at(2), decodedIntegers);
     if (_functions[index] != nullptr) {
         decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
@@ -392,6 +404,7 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
             break;
         }
         if (event._type == Event::actions::SPAWN) {
+
             Entity ennemy = coordinator.CreateEntity();
             coordinator.AddComponent<Position>(ennemy, {1990, (static_cast<float>(std::any_cast<int>(event._data[0])))});
             coordinator.AddComponent<Velocity>(ennemy, {-20, 0});
@@ -431,14 +444,10 @@ inline void NetworkRoomSystem::sendEcs(Coordinator &coordinator)
             auto& pos = coordinator.GetComponent<Position>(entity);
             auto& vel = coordinator.GetComponent<Velocity>(entity);
             auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
-
             std::vector<int> tmp = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type};
 
             encode_ = mergeVectors(encode_, tmp);
         }
-        // std::cout << "SEND ECS" << std::endl;
-        // for (auto i : res)
-        //     std::cout << i << std::endl;
         send(header, encode_, true, client.getClientEndpoint(), index);
         index++;
     }
@@ -476,7 +485,9 @@ inline std::tuple<std::vector<int>, udp::endpoint> NetworkRoomSystem::receive()
 inline void NetworkRoomSystem::packetLoss()
 {
     for (auto client : _clients) {
+
         auto packet = client.getPacketsSend();
+
         for (auto pair : packet) {
             _socket.send_to(asio::buffer(pair.second), client.getClientEndpoint());
         }
@@ -491,13 +502,15 @@ inline void NetworkRoomSystem::Update(Coordinator& coordinator)
     std::chrono::steady_clock::duration elapsedTime = currentTime - _startTime;
 
     checkEvent(coordinator);
-    packetLoss();
+    if (elapsedTime >= interval) {
+        packetLoss();
+    }
     while (1) {
         try {
             std::vector<int> decodedIntegers;
             udp::endpoint clientEndpoint;
-
             std::tie(decodedIntegers, clientEndpoint) = receive();
+
             processReceiveData(clientEndpoint, coordinator, decodedIntegers);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } catch (...) {
