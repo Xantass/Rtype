@@ -153,8 +153,9 @@ inline void NetworkRoomSystem::sendCreate(int entity, Coordinator &coordinator)
     auto& pos = coordinator.GetComponent<Position>(entity);
     auto& vel = coordinator.GetComponent<Velocity>(entity);
     auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
+    auto& health = coordinator.GetComponent<HealthPoint>(entity);
 
-    std::vector<int> res = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type};
+    std::vector<int> res = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp)};
 
     int index = 0;
 
@@ -327,7 +328,7 @@ inline void NetworkRoomSystem::shoot(std::vector<int>& decodedIntegers, udp::end
             coordinator.AddComponent<Velocity>(bullet, {20, 0});
             coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, BULLET});
             coordinator.AddComponent<Damage>(bullet, {1, 1});
-            coordinator.AddComponent<HealthPoint>(bullet, {1, 1});
+            coordinator.AddComponent<HealthPoint>(bullet, {-1, -1});
             coordinator.AddComponent<Controllable>(bullet, {ENGINE});
 
             send(_PASS, {timeStamp}, false, clientEndpoint, index);
@@ -431,8 +432,9 @@ inline void NetworkRoomSystem::sendEcs(Coordinator &coordinator)
             auto& pos = coordinator.GetComponent<Position>(entity);
             auto& vel = coordinator.GetComponent<Velocity>(entity);
             auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
+            auto& health = coordinator.GetComponent<HealthPoint>(entity);
 
-            std::vector<int> tmp = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type};
+            std::vector<int> tmp = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp)};
 
             encode_ = mergeVectors(encode_, tmp);
         }
