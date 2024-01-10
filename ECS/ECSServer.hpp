@@ -12,3 +12,4 @@
 #include "inc/systems/HealthSystem.hpp"
 #include "systems/ControlSystem.hpp"
 #include "systems/SpawnSystem.hpp"
+#include "systems/PathSystem.hpp"

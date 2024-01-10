@@ -34,6 +34,8 @@ void EventSystem::RunEvents(Coordinator &coordinator)
 					coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/bullets.png")});
 				if (std::any_cast<float>(event._data[9]) == ENNEMY)
 					coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/carli.png")});
+				if (std::any_cast<float>(event._data[9]) == ENN_BULLET)
+					coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/enn_bullets.png")});
 				break;
 			} case Event::actions::MOVE: {
 				coordinator.GetComponent<Position>(event._entity)._x += coordinator.GetComponent<Velocity>(event._entity)._x;

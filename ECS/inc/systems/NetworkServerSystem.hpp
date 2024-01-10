@@ -38,6 +38,9 @@
 #include "components/Controllable.hpp"
 #include "components/HealthPoint.hpp"
 #include "components/Damage.hpp"
+#include "components/Path.hpp"
+#include "components/SpawnClock.hpp"
+#include "components/SpawnInfo.hpp"
 
 
 using namespace asio;

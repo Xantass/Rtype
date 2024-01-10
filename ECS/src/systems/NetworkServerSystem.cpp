@@ -223,7 +223,7 @@ void NetworkServerSystem::sendCreate(int entity, Coordinator &coordinator)
     std::vector<int> res;
     auto& pos = coordinator.GetComponent<Position>(entity);
     auto& vel = coordinator.GetComponent<Velocity>(entity);
-    auto& hitbox = coordinator.GetComponent<Hitbox>(entity); 
+    auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
     res = {Cmd::CREATE, 10, static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x), static_cast<int>(hitbox._y), static_cast<int>(hitbox.width), static_cast<int>(hitbox.height), hitbox.type};
     std::vector<unsigned char> data = encode(res);
     for (auto client : _clients) {
@@ -336,6 +336,7 @@ void NetworkServerSystem::processReceiveData(const std::vector<unsigned char>& d
 
 void NetworkServerSystem::sendEcs(Coordinator &coordinator)
 {
+    std::cout << "send ECS" << std::endl;
     for (auto client : _clients) {
         std::vector<int> res = {Cmd::POS};
         for (auto entity : this->_entities) {
@@ -346,6 +347,7 @@ void NetworkServerSystem::sendEcs(Coordinator &coordinator)
             std::vector<int> encode_ = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x), static_cast<int>(hitbox._y), static_cast<int>(hitbox.width), static_cast<int>(hitbox.height), hitbox.type};
             for (auto i : encode_)
                 res.push_back(i);
+            std::cout << entity << std::endl;
         }
         // std::cout << "SEND ECS" << std::endl;
         // for (auto i : res)
@@ -365,17 +367,29 @@ void NetworkServerSystem::checkEvent(Coordinator &coordinator)
         }
         if (event._type == Event::actions::SPAWN) {
             Entity ennemy = coordinator.CreateEntity();
-            coordinator.AddComponent<Position>(ennemy, {1990, (std::any_cast<int>(event._data[0]))});
-            coordinator.AddComponent<Velocity>(ennemy, {-20, 0});
-            coordinator.AddComponent<Hitbox>(ennemy, {0, 0, 100, 100, ENNEMY});
+            float y = std::any_cast<float>(event._data[0]);
+            float x = std::any_cast<float>(event._data[1]);
+            // std::cout << "pos : [" << x << "," << y << "]" << std::endl;
+            coordinator.AddComponent<Position>(ennemy, {x, y});
+            coordinator.AddComponent<Velocity>(ennemy, {(std::any_cast<float>(event._data[2])), 0});
+            coordinator.AddComponent<Hitbox>(ennemy, {0, 0, (std::any_cast<float>(event._data[3])), (std::any_cast<float>(event._data[4])), ENNEMY});
             coordinator.AddComponent<Controllable>(ennemy, {IA});
-            coordinator.AddComponent<HealthPoint>(ennemy, {150, 150});
-            coordinator.AddComponent<Damage>(ennemy, {50, 50});
+            coordinator.AddComponent<HealthPoint>(ennemy, {(std::any_cast<int>(event._data[5])), (std::any_cast<int>(event._data[5]))});
+            coordinator.AddComponent<Damage>(ennemy, {(std::any_cast<int>(event._data[6])), (std::any_cast<int>(event._data[6]))});
+            coordinator.AddComponent<Path>(ennemy, {y, (std::any_cast<float>(event._data[7])), (std::any_cast<float>(event._data[8]))});
+            // if (std::any_cast<int>(event._data[9]) != 0) {
+            //     std::cout << "adding SpawnClock to ennemy" << std::endl;
+            //     coordinator.AddComponent<SpawnClock>(ennemy, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 500, 0, 0});
+            //     coordinator.AddComponent<SpawnInfo>(ennemy, {-30, 51, 51, 1, 20, y, 0, 0});
+            // };
+                // coordinator.AddComponent<Hitbox>(ennemy, {0, 0, (std::any_cast<float>(event._data[3])), (std::any_cast<float>(event._data[4])), ENN_BULLET});
+            // }
             this->sendCreate(ennemy, coordinator);
             break;
         }
         if (event._type == Event::actions::DESTROY) {
             this->sendDestroy(event._entity);
+            break;
         }
     }
 }

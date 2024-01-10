@@ -20,8 +20,10 @@ int main(int argc, char **argv)
     coordinator.RegisterComponent<Hitbox>();
     coordinator.RegisterComponent<Controllable>();
     coordinator.RegisterComponent<SpawnClock>();
+    coordinator.RegisterComponent<SpawnInfo>();
     coordinator.RegisterComponent<HealthPoint>();
     coordinator.RegisterComponent<Damage>();
+    coordinator.RegisterComponent<Path>();
 
     auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
     auto controlSystem = coordinator.RegisterSystem<ControlSystem>();
@@ -29,6 +31,7 @@ int main(int argc, char **argv)
     auto spawnSystem = coordinator.RegisterSystem<SpawnSystem>();
     auto collisionSystem = coordinator.RegisterSystem<CollisionSystem>();
     auto healthSystem = coordinator.RegisterSystem<HealthSystem>();
+    auto pathSystem = coordinator.RegisterSystem<PathSystem>();
     
     Signature signature;
 
@@ -48,6 +51,8 @@ int main(int argc, char **argv)
     Signature signature3;
     
     signature3.set(coordinator.GetComponentType<SpawnClock>());
+    signature3.set(coordinator.GetComponentType<SpawnInfo>());
+    signature3.set(coordinator.GetComponentType<Position>());
     coordinator.SetSystemSignature<SpawnClock>(signature3);
     
     Signature signature4;
@@ -60,11 +65,17 @@ int main(int argc, char **argv)
     Signature signature5;
     signature5.set(coordinator.GetComponentType<HealthPoint>());
     coordinator.SetSystemSignature<HealthSystem>(signature5);
+    
+    Signature signature6;
+    signature6.set(coordinator.GetComponentType<Position>());
+    signature6.set(coordinator.GetComponentType<Velocity>());
+    signature6.set(coordinator.GetComponentType<Path>());
+    coordinator.SetSystemSignature<PathSystem>(signature6);
 
     Entity ent = coordinator.CreateEntity();
-    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 2, 100, 1000});
-    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 1, 500, 700});
-    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 3, 200, 900});
+    coordinator.AddComponent<Position>(ent, {1990, 0});
+    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 2000, 100, 1000});
+    coordinator.AddComponent<SpawnInfo>(ent, {-10, 150, 150, 100, 50, 200, 10, 1});
 
     networkServerSystem->Init();
     std::chrono::milliseconds interval(10);
@@ -76,11 +87,12 @@ int main(int argc, char **argv)
         elapsedTime = currentTime - startTime;
         if (elapsedTime >= interval) {
             networkServerSystem->Update(coordinator);
-            physicSystem->Update(coordinator);
-            controlSystem->Update(coordinator);
             spawnSystem->Update(coordinator);
+            pathSystem->Update(coordinator);
+            physicSystem->Update(coordinator);
             collisionSystem->Update(coordinator);
             healthSystem->Update(coordinator);
+            controlSystem->Update(coordinator);
             startTime = currentTime;
         }
     }
