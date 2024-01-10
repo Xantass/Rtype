@@ -10,6 +10,7 @@
 inline void NetworkServerSystem::Init()
 {
     udp::endpoint endpoint(udp::v4(), 4242);
+
     _socket.close();
     _socket.open(endpoint.protocol());
     _socket.bind(endpoint);
@@ -28,6 +29,7 @@ inline void NetworkServerSystem::Init()
     _functions[11] = nullptr;
     _functions[12] = nullptr;
     _functions[13] = nullptr;
+    _functions[14] = nullptr;
     _startTime = std::chrono::steady_clock::now();
 }
 
@@ -112,6 +114,7 @@ inline std::vector<unsigned char> NetworkServerSystem::encode(const std::vector<
     std::vector<unsigned char> encodedData;
 
     for (int value : values) {
+
         unsigned int intValue = (value >= 0) ? (static_cast<unsigned int>(value) << 1) : ((-value) << 1 | 1);
 
         while (intValue >= 128) {
@@ -188,7 +191,6 @@ inline void NetworkServerSystem::param(std::vector<int>& decodedIntegers, udp::e
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 3);
 
     std::string name = vectorToString(decodedIntegers);
-
     int port = findValidPort(_service);
 
     if (fichier.is_open()) {
@@ -213,8 +215,6 @@ inline void NetworkServerSystem::connect(std::vector<int>& decodedIntegers, udp:
 
     std::string username = vectorToString(decodedIntegers);
 
-    // std::cout << "username: " << username << std::endl;
-
     for (auto client : _clients) {
         if (client.getUsername() == username) {
             // std::vector<unsigned char> buffer = encode(_FAIL_CONNECT);
@@ -224,7 +224,6 @@ inline void NetworkServerSystem::connect(std::vector<int>& decodedIntegers, udp:
     }
     _clients.push_back(Client(username, clientEndpoint, _id));
     _id++;
-    // std::cout << _clients.at(_clients.size() - 1).getClientEndpoint() << std::endl;
 
     std::vector<int> tmp = {_clients.at(_clients.size() - 1).getID()};
     std::vector<unsigned char> buffer = encode(tmp);
@@ -280,20 +279,18 @@ inline int NetworkServerSystem::checkAlreadyReceive(std::vector<int>& decodedInt
     int timeStamp = decodedIntegers.at(2);
     int index = getClient(decodedIntegers.at(3));
 
-
-    // std::cout << "INDEX CLIENT: " << decodedIntegers.at(3) << std::endl;
-    // std::cout << "TIMESTAMP PACKET: " << decodedIntegers.at(2) << std::endl;
     if(index == -1)
         return -1;
 
     auto packets = _clients.at(index).getPacketsReceive();
+
     try {
+
         auto it = packets.at(timeStamp);
-        // std::cout << "FOUND" << std::endl;
+
         send(_STOP_SEND, {timeStamp}, false, clientEndpoint, index);
         return -1;
     } catch (...) {
-        // std::cout << "NOT FOUND" << std::endl;
         return 0;
     }
 }
@@ -302,9 +299,7 @@ inline void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, ud
 {
     int index = decodedIntegers.at(0);
 
-    // std::cout << "INDEX: " << index << std::endl;
-    // std::cout << "SIZE: " << decodedIntegers.size() << std::endl;
-    if (index < 0 || index > 14)
+    if (index < 0 || index > 15)
         return;
     if (decodedIntegers.at(0) == 1) {
         _functions[index](decodedIntegers, clientEndpoint, coordinator);
@@ -314,7 +309,9 @@ inline void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, ud
         return;
     if (checkAlreadyReceive(decodedIntegers, clientEndpoint) == -1)
         return;
+
     int indexClient = getClient(decodedIntegers.at(3));
+
     _clients.at(indexClient).addPacketReceive(decodedIntegers.at(2), decodedIntegers);
     if (_functions[index] != nullptr) {
         decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
@@ -328,7 +325,6 @@ inline void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, ud
 
 inline void NetworkServerSystem::processReceiveData(udp::endpoint clientEndpoint, Coordinator &coordinator, std::vector<int> res)
 {
-    // std::cout << clientEndpoint << std::endl;
     if (clientEndpoint != asio::ip::udp::endpoint(asio::ip::make_address("0.0.0.0"), 0)) {
         handleCmd(res, clientEndpoint, coordinator);
     } else {
@@ -368,7 +364,9 @@ inline std::tuple<std::vector<int>, udp::endpoint> NetworkServerSystem::receive(
 inline void NetworkServerSystem::packetLoss()
 {
     for (auto client : _clients) {
+
         auto packet = client.getPacketsSend();
+
         for (auto pair : packet) {
             _socket.send_to(asio::buffer(pair.second), client.getClientEndpoint());
         }
@@ -385,8 +383,8 @@ inline void NetworkServerSystem::Update(Coordinator &coordinator)
         try {
             std::vector<int> decodedIntegers;
             udp::endpoint clientEndpoint;
-
             std::tie(decodedIntegers, clientEndpoint) = receive();
+
             processReceiveData(clientEndpoint, coordinator, decodedIntegers);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } catch (...) {
