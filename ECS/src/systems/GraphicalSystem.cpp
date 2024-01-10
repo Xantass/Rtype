@@ -7,14 +7,21 @@
 
 #include "systems/GraphicalSystem.hpp"
 #include "Graphic.hpp"
+#include "components/HealthPoint.hpp"
 
-void GraphicalSystem::Update(Coordinator &coordinator)
+inline void GraphicalSystem::Update(Coordinator &coordinator)
 {
     // std::cout << "GraphicalSystem update :" << std::endl;
     for (auto &entity : this->_entities) {
         auto& pos = coordinator.GetComponent<Position>(entity);
         auto& sprite = coordinator.GetComponent<Sprite>(entity);
+        auto& health = coordinator.GetComponent<HealthPoint>(entity);
+
 
         Graphic::drawTexture(sprite.texture, pos._x, pos._y, WHITE);
+        if (health._max_hp != -1) {
+            std::string health_str = std::to_string(health._curr_hp) + "/" + std::to_string(health._max_hp);
+            Graphic::drawText(health_str.c_str(), pos._x, pos._y, 20, WHITE);
+        }
     }
 }

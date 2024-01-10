@@ -5,48 +5,47 @@
 ** Main
 */
 
-#include "Client.cpp"
-#include "Coordinator.hpp"
-#include "components/Position.hpp"
-#include "components/Velocity.hpp"
-#include "components/Sprite.hpp"
-#include "components/Hitbox.hpp"
-#include "systems/PhysicSystem.hpp"
-#include "systems/GraphicalSystem.hpp"
-#include "systems/ParallaxSystem.hpp"
-#include "systems/MovableSystem.hpp"
-#include "systems/NetworkClientSystem.hpp"
-#include "Signature.hpp"
-#include "Graphic.hpp"
+#include <fstream>
+#include "../inc/Client.hpp"
+#include "../../ECS/ECSClient.hpp"
+#include "Parallax.hpp"
+#include "Menu.hpp"
 
 int main(int ac, char **av)
 {
-    if (ac != 3)
+    if (ac != 5)
         return -84;
-    Client client("127.0.0.1", "4242");
+    std::ofstream fichier;
+    fichier.open("room.txt", std::ofstream::out | std::ofstream::trunc);
+    
+    if (fichier.is_open()) {
+        fichier << "PORT\tNAME\tNB_PLAYER" << std::endl;
+        fichier.close();
+        std::cout << "Le contenu du fichier a été supprimé." << std::endl;
+    } else {
+        std::cerr << "Impossible d'ouvrir le fichier." << std::endl;
+    }
+
     Coordinator coordinator;
 
     coordinator.Init();
     Graphic::init(1920, 1080, "R-Type");
+    Graphic::toggleFullScreen();
     Music music = Graphic::loadMusic("assets/Theme.mp3");
+    Parallax parallax("assets/parallax/");
 
     coordinator.RegisterComponent<Position>();
     coordinator.RegisterComponent<Velocity>();
     coordinator.RegisterComponent<Sprite>();
     coordinator.RegisterComponent<Hitbox>();
     coordinator.RegisterComponent<Movable>();
+    coordinator.RegisterComponent<HealthPoint>();
 
     auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
     auto graphicSystem = coordinator.RegisterSystem<GraphicalSystem>();
-    auto parallaxSystem = coordinator.RegisterSystem<ParallaxSystem>();
     auto movableSystem = coordinator.RegisterSystem<MovableSystem>();
     auto networkClientSystem = coordinator.RegisterSystem<NetworkClientSystem>();
-
-    Signature signature;
-
-    signature.set(coordinator.GetComponentType<Position>());
-    signature.set(coordinator.GetComponentType<Sprite>());
-    coordinator.SetSystemSignature<ParallaxSystem>(signature);
+    auto eventSystem = coordinator.RegisterSystem<EventSystem>();
 
     Signature signature2;
 
@@ -60,6 +59,7 @@ int main(int ac, char **av)
     signature3.set(coordinator.GetComponentType<Position>());
     signature3.set(coordinator.GetComponentType<Velocity>());
     signature3.set(coordinator.GetComponentType<Hitbox>());
+    signature3.set(coordinator.GetComponentType<HealthPoint>());
     coordinator.SetSystemSignature<PhysicSystem>(signature3);
     coordinator.SetSystemSignature<NetworkClientSystem>(signature3);
 
@@ -69,55 +69,42 @@ int main(int ac, char **av)
     signature4.set(coordinator.GetComponentType<Velocity>());
     coordinator.SetSystemSignature<MovableSystem>(signature4);
 
-
-    Entity entity2 = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity2, {1920, 0});
-    coordinator.AddComponent<Velocity>(entity2, {-2, 0});
-    coordinator.AddComponent<Hitbox>(entity2, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity2, {Graphic::loadTexture("assets/parallax-space-big-planet.png")});
-
-    Entity entity3 = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity3, {1920, 0});
-    coordinator.AddComponent<Velocity>(entity3, {-2.3, 0});
-    coordinator.AddComponent<Hitbox>(entity3, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity3, {Graphic::loadTexture("assets/parallax-space-far-planets.png")});
-
-    Entity entity4 = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity4, {1920, 0});
-    coordinator.AddComponent<Velocity>(entity4, {-2.6, 0});
-    coordinator.AddComponent<Hitbox>(entity4, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity4, {Graphic::loadTexture("assets/parallax-space-ring-planet.png")});
-
-    Entity entity5 = coordinator.CreateEntity();
-    coordinator.AddComponent<Position>(entity5, {1920, 0});
-    coordinator.AddComponent<Velocity>(entity5, {-2.9, 0});
-    coordinator.AddComponent<Hitbox>(entity5, {0, 0, 0, 0, OTHER});
-    coordinator.AddComponent<Sprite>(entity5, {Graphic::loadTexture("assets/parallax-space-stars.png")});
-
     std::string host = av[1];
     std::string port = av[2];
-    networkClientSystem->Init(coordinator, host, port);
+    std::string name = av[3];
+    int portClient = atoi(av[4]);
+    Menu menu(host, std::to_string(portClient), name, coordinator);
+
+    networkClientSystem->Init(host, port, name, portClient);
+
     Graphic::playMusic(music);
-    std::chrono::milliseconds interval(10);
+    std::chrono::milliseconds interval(16);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::duration elapsedTime;
-    physicSystem->Update(coordinator);
     while (!Graphic::shouldCloseWindow()) {
-        Graphic::updateMusic(music);
-        Graphic::beginDrawing();
-        Graphic::clearBackground(RBLACK);
         currentTime = std::chrono::steady_clock::now();
-        elapsedTime = currentTime - startTime; 
-        movableSystem->Update(coordinator);
-        parallaxSystem->Update(coordinator);
-        graphicSystem->Update(coordinator);
-        networkClientSystem->Update(coordinator);
+        elapsedTime = currentTime - startTime;
         if (elapsedTime >= interval) {
+            Graphic::updateMusic(music);
+            Graphic::beginDrawing();
+            Graphic::clearBackground(RBLACK);
+            if (menu.action == "Launch Game") {
+                menu.action = "";
+                std::string infos[] = {menu._port, menu._name, menu._nbPlayer};
+                coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::make_any<std::string>(infos[0]), std::make_any<std::string>(infos[1]), std::make_any<std::string>(infos[2])}});
+            }
+            parallax.draw();
+            movableSystem->Update(coordinator);
+            eventSystem->RunEvents(coordinator);
+            graphicSystem->Update(coordinator);
+            networkClientSystem->Update(coordinator);
+            eventSystem->RunEvents(coordinator);
             physicSystem->Update(coordinator);
             startTime = currentTime;
+            menu.displayMenu();
+            Graphic::endDrawing();
         }
-        Graphic::endDrawing();
     }
     Graphic::unloadMusic(music);
     Graphic::close();

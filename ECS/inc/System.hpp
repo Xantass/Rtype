@@ -25,7 +25,6 @@
  */
 class System {
 public:
-
 	/**
 	 * @brief Entities list
 	 * 

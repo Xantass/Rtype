@@ -28,25 +28,13 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(raylib)
 
-include_directories("./inc/" "../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
-# # Include raylib
-# find_package(raylib CONFIG REQUIRED PATHS ${raylib_DIR}/lib64/cmake/raylib/)
-
+include_directories("./inc/" "./../ECS/" "../ECS/inc/" "./../ECS/inc/systems/" "./../ECS/inc/components/")
 
 # Your project source files
 add_executable(r-type_client
-    ../ECS/src/systems/PhysicSystem.cpp
-    ../ECS/src/systems/GraphicalSystem.cpp
-    ../ECS/src/systems/ParallaxSystem.cpp
-    ../ECS/src/systems/NetworkClientSystem.cpp
-    ../ECS/src/systems/MovableSystem.cpp
-    ../ECS/src/EntityManager.cpp
-    ../ECS/src/ComponentArray.cpp
-    ../ECS/src/ComponentManager.cpp
-    ../ECS/src/SystemManager.cpp
-    ../ECS/src/Coordinator.cpp
-
     src/Main.cpp
+    src/Client.cpp
+    src/Parallax.cpp
     )
 
 if(WIN32)
@@ -63,10 +51,10 @@ if (APPLE AND UNIX)
 endif()
 
 if(UNIX AND NOT APPLE)
-    target_compile_options(r-type_client PRIVATE -std=c++2a -Wall -Wextra -O3)
+    target_compile_options(r-type_client PRIVATE -std=c++2a -Wall -Wextra -O3 -g3)
     target_link_libraries(r-type_client PRIVATE raylib asio)
 endif()
 
 # Link your project with raylib
-# target_link_libraries(r-type_client PRIVATE ${raylib_LIBRARIES})
-# target_include_directories(r-type_client PRIVATE ${raylib_INCLUDE_DIRS})
+target_link_libraries(r-type_client PRIVATE ${raylib_LIBRARIES})
+target_include_directories(r-type_client PRIVATE ${raylib_INCLUDE_DIRS})

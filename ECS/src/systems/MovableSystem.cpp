@@ -8,28 +8,34 @@
 #include "systems/MovableSystem.hpp"
 #include "Graphic.hpp"
 
-void MovableSystem::Update(Coordinator &coordinator)
+inline void MovableSystem::Update(Coordinator &coordinator)
 {
     // std::cout << "MovableSystem update :" << std::endl;
     for (auto &entity : this->_entities) {
-        auto& mov = coordinator.GetComponent<Movable>(entity);
+        //auto& mov = coordinator.GetComponent<Movable>(entity);
         auto& vel = coordinator.GetComponent<Velocity>(entity);
 
-        if (Graphic::isKeyDown(KEY_W)) {
-            coordinator.AddEvent(Event{Event::actions::MOVE, entity, std::any(Velocity{0, -1})});
-            vel = {vel._x, -1};
-        } else if (Graphic::isKeyDown(KEY_D)) {
-            coordinator.AddEvent(Event{Event::actions::MOVE, entity, std::any(Velocity{1, 0})});
-            vel = {1, vel._y};
-        } else if (Graphic::isKeyDown(KEY_S)) {
-            coordinator.AddEvent(Event{Event::actions::MOVE, entity, std::any(Velocity{0, 1})});
-            vel = {vel._x, 1};
-        } else if (Graphic::isKeyDown(KEY_A)) {
-            coordinator.AddEvent(Event{Event::actions::MOVE, entity, std::any(Velocity{-1, 0})});
-            vel = {-1, vel._y};
-        } else if (Graphic::isKeyUp(KEY_W) || Graphic::isKeyUp(KEY_D) || Graphic::isKeyUp(KEY_S) || Graphic::isKeyUp(KEY_A)) {
-            coordinator.AddEvent(Event{Event::actions::MOVE, entity, std::any(Velocity{0, 0})});
-            vel = {0, 0};
+        float moveX = 0;
+        float moveY = 0;
+
+        if (Graphic::isKeyPressed(KEY_SPACE)) {
+            coordinator.AddEvent(Event{Event::actions::SHOOT, 0, {std::any(Velocity{1, 0})}});
+        }
+        if (Graphic::isKeyDown(KEY_W))
+            moveY = -1;
+        if (Graphic::isKeyDown(KEY_D))
+            moveX = 1;
+        if (Graphic::isKeyDown(KEY_S))
+            moveY = 1;
+        if (Graphic::isKeyDown(KEY_A))
+            moveX = -1;
+        if (moveX != vel._x || moveY != vel._y) {
+            if (moveX != 0 && moveY != 0) {
+                moveX *= 0.7;
+                moveY *= 0.7;
+            }
+            coordinator.AddEvent(Event{Event::actions::MOVE, entity, {std::any(Velocity{moveX, moveY})}});
+            vel = {moveX, moveY};
         }
     }
 }

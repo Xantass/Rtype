@@ -7,15 +7,15 @@
 
 #include "EntityManager.hpp"
 
-EntityManager::EntityManager() {
+inline EntityManager::EntityManager() {
     for (Entity entity = 0; entity < MAX_ENTITIES; ++entity)
         this->_availableEntities.push_back(entity);
 }
 
-EntityManager::~EntityManager() {
+inline EntityManager::~EntityManager() {
 }
 
-Entity EntityManager::CreateEntity() {
+inline Entity EntityManager::CreateEntity() {
     if (this->_livingEntityCount < MAX_ENTITIES) {
         //ERROR : Too many entities in existence.
     }
@@ -27,19 +27,19 @@ Entity EntityManager::CreateEntity() {
     return id;
 }
 
-Entity EntityManager::CreateEntity(int id) {
-    if (id >= MAX_ENTITIES) {
+inline Entity EntityManager::CreateEntity(int id) {
+    if (id >= static_cast<int>(MAX_ENTITIES)) {
         //ERROR : Entity out of range.
     }
 
-    Entity entity = this->_availableEntities.at(id);
-    this->_availableEntities.erase(this->_availableEntities.begin() + id - 1);
+    Entity entity = id;
     this->_livingEntityCount++;
+    (void)entity;
 
     return id;
 }
 
-void EntityManager::DestroyEntity(Entity entity) {
+inline void EntityManager::DestroyEntity(Entity entity) {
     if (entity >= MAX_ENTITIES) {
         //ERROR : Entity out of range.
     }
@@ -49,7 +49,7 @@ void EntityManager::DestroyEntity(Entity entity) {
     this->_livingEntityCount--;
 }
 
-void EntityManager::SetSignature(Entity entity, Signature signature) {
+inline void EntityManager::SetSignature(Entity entity, Signature signature) {
     if (entity >= MAX_ENTITIES) {
         //ERROR : Entity out of range.
     }
@@ -57,7 +57,7 @@ void EntityManager::SetSignature(Entity entity, Signature signature) {
     _signatures[entity] = signature;
 }
 
-Signature EntityManager::GetSignature(Entity entity) {
+inline Signature EntityManager::GetSignature(Entity entity) {
     if (entity >= MAX_ENTITIES) {
         //ERROR : Entity out of range.
     }

@@ -8,6 +8,7 @@
 #ifndef MAIN_HPP_
 #define MAIN_HPP_
 
-#include "Server.hpp"
+#include <memory>
+#include "../../ECS/ECSServer.hpp"
 
 #endif /* !MAIN_HPP_ */
