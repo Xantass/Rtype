@@ -192,8 +192,6 @@ inline int NetworkRoomSystem::checkCmdMessage(std::string msg, int index, udp::e
         return -1;
     }
 
-    std::cout << "HERE" << std::endl;
-
     std::string kickCommand = "/kick";
     std::string banCommand = "/ban";
     size_t kickPosition = msg.find(kickCommand);
@@ -207,7 +205,7 @@ inline int NetworkRoomSystem::checkCmdMessage(std::string msg, int index, udp::e
         }
 
         std::string pseudo = msg.substr(kickPosition + kickCommand.length() + 1);
-        std::string msgSystem = "System: " + pseudo + " has kick to the room";
+        std::string msgSystem = "System: " + pseudo + " has been kick to the room";
         int error = -1;
         int i = 0;
 
@@ -222,6 +220,7 @@ inline int NetworkRoomSystem::checkCmdMessage(std::string msg, int index, udp::e
             send({MESSAGE_SEND, 1}, stringToVector(error), true, clientEndpoint, index);
             return -1;
         }
+        i = 0;
         for (auto client : _clients) {
             if (client.getUsername() == pseudo) {
                 send({DISCONNECT, 1}, {}, true, client.getClientEndpoint(), i);
@@ -241,7 +240,7 @@ inline int NetworkRoomSystem::checkCmdMessage(std::string msg, int index, udp::e
         }
 
         std::string pseudo = msg.substr(banPosition + banCommand.length() + 1);
-        std::string msgSystem = "System: " + pseudo + " has ban to the room";
+        std::string msgSystem = "System: " + pseudo + " has been ban to the room";
         int error = -1;
         int i = 0;
 
@@ -256,6 +255,7 @@ inline int NetworkRoomSystem::checkCmdMessage(std::string msg, int index, udp::e
             send({MESSAGE_SEND, 1}, stringToVector(error), true, clientEndpoint, index);
             return -1;
         }
+        i = 0;
         for (auto client : _clients) {
             if (client.getUsername() == pseudo) {
                 _ban.push_back(client.getClientEndpoint());
