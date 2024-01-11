@@ -497,7 +497,7 @@ inline void NetworkRoomSystem::sendEcs(Coordinator &coordinator)
 
 inline void NetworkRoomSystem::send(std::vector<int> header, std::vector<int> data, bool stock, udp::endpoint client, int index)
 {
-    int timeStamp;
+    int timeStamp = 0;
 
     if (stock == true) {
         timeStamp = hourIntNow();
