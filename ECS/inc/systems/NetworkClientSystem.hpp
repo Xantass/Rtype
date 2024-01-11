@@ -251,6 +251,7 @@ private:
     std::map<int, std::vector<int>> _packetsSend; /**< Packets sent with associated timestamps. */
     std::map<int, std::vector<int>> _packetsReceive; /**< Packets received with associated timestamps. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
+    std::string _username;
 };
 
 #include "../../src/systems/NetworkClientSystem.cpp"

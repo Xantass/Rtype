@@ -40,6 +40,7 @@ inline void NetworkClientSystem::Init(std::string host, std::string port, std::s
     _socket.bind(endpoint);
     _id = -1;
     _serverEndpoint = udp::endpoint(asio::ip::make_address(host), atoi(port.c_str()));
+    _username = name;
     send(_CONNECT, stringToVector(name), false);
 
     std::vector<unsigned char> data(1024);
@@ -396,7 +397,7 @@ inline void NetworkClientSystem::joinEvent(Event& event, Coordinator& coordinato
     _serverEndpoint = udp::endpoint(asio::ip::make_address(list.at(0)), atoi(list.at(1).c_str()));
     std::vector<int> header = {CONNECT, 1};
 
-    send(header, stringToVector(list.at(2)), false);
+    send(header, stringToVector(_username), false);
     _socket.non_blocking(false);
     std::cout << "HERE" << std::endl;
 
