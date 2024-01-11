@@ -13,5 +13,7 @@
 #include "inc/systems/NetworkClientSystem.hpp"
 #include "inc/systems/EventSystem.hpp"
 #include "components/Sprite.hpp"
+#include "components/HealthPoint.hpp"
+#include "inc/AssetManager.hpp"
 
 #endif

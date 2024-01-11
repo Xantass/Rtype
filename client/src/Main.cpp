@@ -5,29 +5,43 @@
 ** Main
 */
 
+#include <fstream>
 #include "../inc/Client.hpp"
 #include "../../ECS/ECSClient.hpp"
 #include "Parallax.hpp"
 #include "Menu.hpp"
+#include "Chat.hpp"
 
 int main(int ac, char **av)
 {
     if (ac != 5)
         return -84;
-    // Client client("127.0.0.1", "4242");
+    std::ofstream fichier;
+    fichier.open("room.txt", std::ofstream::out | std::ofstream::trunc);
+    
+    if (fichier.is_open()) {
+        fichier << "PORT\tNAME\tNB_PLAYER" << std::endl;
+        fichier.close();
+    } else {
+        std::cerr << "Impossible d'ouvrir le fichier." << std::endl;
+    }
+
     Coordinator coordinator;
+    AssetManager assetManager;
 
     coordinator.Init();
     Graphic::init(1920, 1080, "R-Type");
     Graphic::toggleFullScreen();
     Music music = Graphic::loadMusic("assets/Theme.mp3");
     Parallax parallax("assets/parallax/");
+    Chat chat(av[3]);
 
     coordinator.RegisterComponent<Position>();
     coordinator.RegisterComponent<Velocity>();
     coordinator.RegisterComponent<Sprite>();
     coordinator.RegisterComponent<Hitbox>();
     coordinator.RegisterComponent<Movable>();
+    coordinator.RegisterComponent<HealthPoint>();
 
     auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
     auto graphicSystem = coordinator.RegisterSystem<GraphicalSystem>();
@@ -47,6 +61,7 @@ int main(int ac, char **av)
     signature3.set(coordinator.GetComponentType<Position>());
     signature3.set(coordinator.GetComponentType<Velocity>());
     signature3.set(coordinator.GetComponentType<Hitbox>());
+    signature3.set(coordinator.GetComponentType<HealthPoint>());
     coordinator.SetSystemSignature<PhysicSystem>(signature3);
     coordinator.SetSystemSignature<NetworkClientSystem>(signature3);
 
@@ -65,7 +80,7 @@ int main(int ac, char **av)
     networkClientSystem->Init(host, port, name, portClient);
 
     Graphic::playMusic(music);
-    std::chrono::milliseconds interval(10);
+    std::chrono::milliseconds interval(16);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::duration elapsedTime;
@@ -82,12 +97,15 @@ int main(int ac, char **av)
                 coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::make_any<std::string>(infos[0]), std::make_any<std::string>(infos[1]), std::make_any<std::string>(infos[2])}});
             }
             parallax.draw();
-            movableSystem->Update(coordinator);
-            eventSystem->RunEvents(coordinator);
+            if (!chat.isOpen())
+                movableSystem->Update(coordinator);
+            eventSystem->RunEvents(coordinator, assetManager);
             graphicSystem->Update(coordinator);
             networkClientSystem->Update(coordinator);
-            eventSystem->RunEvents(coordinator);
+            eventSystem->RunEvents(coordinator, assetManager);
             physicSystem->Update(coordinator);
+            if (menu.action == "Game")
+                chat.displayChatWindow(coordinator);
             startTime = currentTime;
             menu.displayMenu();
             Graphic::endDrawing();
