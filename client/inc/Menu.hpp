@@ -52,7 +52,15 @@ class Menu {
                         list[0] = _host;
                         list[1] = room[0];
                         list[2] = room[1];
-                        _coordinator.AddEvent(Event{Event::actions::JOIN, 0, {std::make_any<std::string>(list[0]), std::make_any<std::string>(list[1]), std::make_any<std::string>(list[2])}});
+                        _coordinator.AddEvent(Event{Event::actions::JOIN, 0, {std::make_any<std::string>(list[0]), std::make_any<std::string>(list[1]), std::make_any<std::string>(list[2]), std::make_any<std::string>("false")}});
+                        action = "Game";
+                        break;
+                    } else if ("Spect.\n" + room[1] == action) {
+                        std::vector<std::string> list(3, "");
+                        list[0] = _host;
+                        list[1] = room[0];
+                        list[2] = room[1];
+                        _coordinator.AddEvent(Event{Event::actions::JOIN, 0, {std::make_any<std::string>(list[0]), std::make_any<std::string>(list[1]), std::make_any<std::string>(list[2]), std::make_any<std::string>("true")}});
                         action = "Game";
                         break;
                     }
@@ -71,6 +79,7 @@ class Menu {
             for (auto room : subVector) {
                 displayButton({760, static_cast<float>(320 + padding * i)}, {310, 80}, room[1], true);
                 displayButton({1080, static_cast<float>(320 + padding * i)}, {80, 80}, room[2], false);
+                displayButton({1170, static_cast<float>(320 + padding * i)}, {80, 80}, "Spect.\n" + room[1], true);
                 i += 1;
             }
 
