@@ -316,6 +316,7 @@ inline void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, ud
     if (index < 0 || index > 15)
         return;
     if (decodedIntegers.at(0) == 1) {
+        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 3);
         _functions[index](decodedIntegers, clientEndpoint, coordinator);
         return;
     }

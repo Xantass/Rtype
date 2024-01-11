@@ -199,6 +199,8 @@ inline void NetworkRoomSystem::message(std::vector<int>& decodedIntegers, udp::e
 
     send(_OK, {timeStamp}, false, clientEndpoint, index);
     
+    std::cout << "Size name client: " << _clients.at(index).getUsername().size() << std::endl;
+
     std::string res = _clients.at(index).getUsername() + ": " + message;
     int i = 0;
 
@@ -411,6 +413,7 @@ inline void NetworkRoomSystem::handleCmd(std::vector<int>& decodedIntegers, udp:
     if (index < 0 || index > 15)
         return;
     if (index == 1) {
+        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 3);
         _functions[index](decodedIntegers, clientEndpoint, coordinator);
         return;
     }

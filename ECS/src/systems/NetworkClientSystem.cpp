@@ -243,7 +243,9 @@ inline void NetworkClientSystem::createMessage(std::vector<int>& decodedIntegers
     std::string user = message.substr(0, position);
     std::string msg = message.substr(position + 1);
 
-    std::cout << "Message from " << user << ": " << msg << std::endl;
+    for (auto i : user) {
+        std::cout << static_cast<int>(i) << std::endl;
+    }
     send(_OK, {timeStamp}, false);
     coordinator.AddEvent(Event{Event::actions::CREATE_MESSAGE, 0, {std::make_any<std::string>(user), std::make_any<std::string>(msg)}});
 }
