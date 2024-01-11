@@ -41,7 +41,8 @@ enum Action {
     SHOOT = 10, /**< Shoot action. */
     MOVE = 11, /**< Move action. */
     DESTROY = 12, /**< Destroy command. */
-    CREATE = 13 /**< Create command. */
+    CREATE = 13, /**< Create command. */
+    MESSAGE_SEND = 15,
 };
 
 /**

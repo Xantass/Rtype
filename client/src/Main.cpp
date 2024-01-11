@@ -10,6 +10,7 @@
 #include "../../ECS/ECSClient.hpp"
 #include "Parallax.hpp"
 #include "Menu.hpp"
+#include "Chat.hpp"
 
 int main(int ac, char **av)
 {
@@ -21,7 +22,6 @@ int main(int ac, char **av)
     if (fichier.is_open()) {
         fichier << "PORT\tNAME\tNB_PLAYER" << std::endl;
         fichier.close();
-        std::cout << "Le contenu du fichier a été supprimé." << std::endl;
     } else {
         std::cerr << "Impossible d'ouvrir le fichier." << std::endl;
     }
@@ -34,6 +34,7 @@ int main(int ac, char **av)
     Graphic::toggleFullScreen();
     Music music = Graphic::loadMusic("assets/Theme.mp3");
     Parallax parallax("assets/parallax/");
+    Chat chat(av[3]);
 
     coordinator.RegisterComponent<Position>();
     coordinator.RegisterComponent<Velocity>();
@@ -96,12 +97,15 @@ int main(int ac, char **av)
                 coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::make_any<std::string>(infos[0]), std::make_any<std::string>(infos[1]), std::make_any<std::string>(infos[2])}});
             }
             parallax.draw();
-            movableSystem->Update(coordinator);
+            if (!chat.isOpen())
+                movableSystem->Update(coordinator);
             eventSystem->RunEvents(coordinator, assetManager);
             graphicSystem->Update(coordinator);
             networkClientSystem->Update(coordinator);
             eventSystem->RunEvents(coordinator, assetManager);
             physicSystem->Update(coordinator);
+            if (menu.action == "Game")
+                chat.displayChatWindow(coordinator);
             startTime = currentTime;
             menu.displayMenu();
             Graphic::endDrawing();

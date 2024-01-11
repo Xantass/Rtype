@@ -30,6 +30,7 @@ inline void NetworkServerSystem::Init()
     _functions[12] = nullptr;
     _functions[13] = nullptr;
     _functions[14] = nullptr;
+    _functions[15] = nullptr;
     _startTime = std::chrono::steady_clock::now();
 }
 
@@ -315,6 +316,7 @@ inline void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, ud
     if (index < 0 || index > 15)
         return;
     if (decodedIntegers.at(0) == 1) {
+        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 3);
         _functions[index](decodedIntegers, clientEndpoint, coordinator);
         return;
     }
@@ -347,7 +349,7 @@ inline void NetworkServerSystem::processReceiveData(udp::endpoint clientEndpoint
 
 inline void NetworkServerSystem::send(std::vector<int> header, std::vector<int> data, bool stock, udp::endpoint client, int index)
 {
-    int timeStamp;
+    int timeStamp = 0;
 
     if (stock == true) {
         timeStamp = hourIntNow();

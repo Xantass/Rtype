@@ -40,6 +40,7 @@ inline void NetworkClientSystem::Init(std::string host, std::string port, std::s
     _socket.bind(endpoint);
     _id = -1;
     _serverEndpoint = udp::endpoint(asio::ip::make_address(host), atoi(port.c_str()));
+    _username = name;
     send(_CONNECT, stringToVector(name), false);
 
     std::vector<unsigned char> data(1024);
@@ -63,6 +64,7 @@ inline void NetworkClientSystem::Init(std::string host, std::string port, std::s
     _functions[12] = std::bind(&NetworkClientSystem::destroyEntity, this, std::placeholders::_1, std::placeholders::_2);
     _functions[13] = std::bind(&NetworkClientSystem::createEntity, this, std::placeholders::_1, std::placeholders::_2);
     _functions[14] = std::bind(&NetworkClientSystem::createRoom, this, std::placeholders::_1, std::placeholders::_2);
+    _functions[15] = std::bind(&NetworkClientSystem::createMessage, this, std::placeholders::_1, std::placeholders::_2);
     _socket.non_blocking(true);
 }
 
@@ -229,9 +231,26 @@ inline void NetworkClientSystem::pos(std::vector<int>& decodedIntegers, Coordina
     send(_OK, {timeStamp}, false);
 }
 
+inline void NetworkClientSystem::createMessage(std::vector<int>& decodedIntegers, Coordinator& coordinator)
+{
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
+
+    int timeStamp = decodedIntegers.at(0);
+
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
+
+    std::string message = vectorToString(decodedIntegers);
+    size_t position = message.find(':');
+    std::string user = message.substr(0, position);
+    std::string msg = message.substr(position + 1);
+
+    send(_OK, {timeStamp}, false);
+    coordinator.AddEvent(Event{Event::actions::CREATE_MESSAGE, 0, {std::make_any<std::string>(user), std::make_any<std::string>(msg)}});
+}
+
 inline void NetworkClientSystem::createRoom(std::vector<int>& decodedIntegers, Coordinator &coordinator)
 {
-    std::cout << "CREATE ROOM" << std::endl;
+    (void)coordinator;
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
 
     int timeStamp = decodedIntegers.at(0);
@@ -375,7 +394,8 @@ inline void NetworkClientSystem::joinEvent(Event& event, Coordinator& coordinato
     _serverEndpoint = udp::endpoint(asio::ip::make_address(list.at(0)), atoi(list.at(1).c_str()));
     std::vector<int> header = {CONNECT, 1};
 
-    send(header, stringToVector(list.at(2)), false);
+    send(header, stringToVector(_username), false);
+    _socket.non_blocking(false);
 
     std::vector<unsigned char> data(1024);
     udp::endpoint receiveEndpoint;
@@ -404,15 +424,19 @@ inline void NetworkClientSystem::joinEvent(Event& event, Coordinator& coordinato
            
     }
     decodedIntegers = decode(data, length);
-    // for (auto i : decodedIntegers)
-    //     std::cout << i << std::endl;
     createEntities(decodedIntegers, coordinator);
+    _socket.non_blocking(true);
     return;
 }
 
 inline void NetworkClientSystem::moveEvent(Event& event)
 {
     send({CHECK_ACTION(event._type), 3}, {static_cast<int>(event._entity), static_cast<int>(std::any_cast<Velocity>(event._data.at(0))._x * 10), static_cast<int>(std::any_cast<Velocity>(event._data.at(0))._y * 10)}, true);
+}
+
+inline void NetworkClientSystem::messageEvent(Event& event)
+{
+    send({event._type, 1}, stringToVector(std::any_cast<std::string>(event._data.at(0))), true);
 }
 
 inline void NetworkClientSystem::checkEvent(Coordinator &coordinator)
@@ -422,6 +446,10 @@ inline void NetworkClientSystem::checkEvent(Coordinator &coordinator)
 
         if (event._type == Event::EMPTY) {
             break;
+        }
+        if (event._type == Event::MESSAGE) {
+            messageEvent(event);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
         if (event._type == Event::MOVE) {
             moveEvent(event);
@@ -497,7 +525,7 @@ inline int NetworkClientSystem::checkAlreadyReceive(std::vector<int> decodedInte
     auto it = _packetsReceive.find(timeStamp);
 
     if (it != _packetsReceive.end()) {
-        std::cout << "Error: Key not found" << std::endl;
+        //std::cout << "Error: Key not found" << std::endl;
         return 0;
     } else {
         send(_STOP_SEND, {timeStamp}, false);

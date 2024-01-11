@@ -18,6 +18,7 @@
 #include <sstream>
 #include <fstream>
 #include <chrono>
+#include <thread>
 #if defined(_WIN32)           
 	#define NOGDI             // All GDI defines and routines
 	#define NOUSER            // All USER defines and routines
@@ -131,8 +132,6 @@ public:
      */
     void response(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
-    void createRoom(std::vector<int>& decodedIntegers, Coordinator &coordinator);
-
     /**
      * @brief Creates entities based on decoded data.
      * @param decodedIntegers The vector of integers representing entity data.
@@ -146,6 +145,10 @@ public:
      * @param coordinator The Coordinator reference.
      */
     void createEntity(std::vector<int> decodedIntegers, Coordinator &coordinator);
+
+    void createRoom(std::vector<int>& decodedIntegers, Coordinator &coordinator);
+
+    void createMessage(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
     /**
      * @brief Destroys an entity based on the provided decoded integers.
@@ -172,6 +175,8 @@ public:
      * @param event The Event object representing the move event.
      */
     void moveEvent(Event& event);
+
+    void messageEvent(Event& event);
 
     /**
      * @brief Checks for pending events and handles them within the coordinator.
@@ -242,11 +247,12 @@ private:
     io_context _service; /**< The Boost ASIO io_service. */
     udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v4(), findValidPort(_service))); /**< The UDP socket for communication. */
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
-    std::function<void(std::vector<int>&, Coordinator &coordinator)> _functions[15]; /**< Array of function pointers. */
+    std::function<void(std::vector<int>&, Coordinator &coordinator)> _functions[16]; /**< Array of function pointers. */
     int _id; /**< The ID of the client. */
     std::map<int, std::vector<int>> _packetsSend; /**< Packets sent with associated timestamps. */
     std::map<int, std::vector<int>> _packetsReceive; /**< Packets received with associated timestamps. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
+    std::string _username;
 };
 
 #include "../../src/systems/NetworkClientSystem.cpp"

@@ -30,6 +30,7 @@ inline void NetworkRoomSystem::Init(int port)
     _functions[12] = nullptr;
     _functions[13] = nullptr;
     _functions[14] = nullptr;
+    _functions[15] = std::bind(&NetworkRoomSystem::message, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     return;
 }
 
@@ -64,6 +65,16 @@ inline std::vector<int> NetworkRoomSystem::mergeVectors(const std::vector<int>& 
 
     mergedVector.insert(mergedVector.end(), vec2.begin(), vec2.end());
     return mergedVector;
+}
+
+inline std::vector<int> NetworkRoomSystem::stringToVector(const std::string& str) 
+{
+    std::vector<int> result;
+
+    for (char c : str) {
+        result.push_back(static_cast<int>(c));
+    }
+    return result;
 }
 
 inline std::string NetworkRoomSystem::vectorToString(const std::vector<int>& data)
@@ -170,6 +181,31 @@ inline void NetworkRoomSystem::sendCreate(int entity, Coordinator &coordinator)
     for (auto client : _clients) {
         send({Action::CREATE, 10}, res, true, client.getClientEndpoint(), index);
         index++;
+    }
+}
+
+inline void NetworkRoomSystem::message(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
+{
+    (void)coordinator;
+    int timeStamp = decodedIntegers.at(0);
+
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
+
+    int index = getClient(decodedIntegers.at(0));
+
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
+
+    std::string message = vectorToString(decodedIntegers);
+
+    send(_OK, {timeStamp}, false, clientEndpoint, index);
+    
+    std::cout << "Size name client: " << _clients.at(index).getUsername().size() << std::endl;
+
+    std::string res = _clients.at(index).getUsername() + ": " + message;
+    int i = 0;
+
+    for (auto client : _clients) {
+        send({MESSAGE_SEND, 1}, stringToVector(res), true, client.getClientEndpoint(), i);
     }
 }
 
@@ -377,6 +413,7 @@ inline void NetworkRoomSystem::handleCmd(std::vector<int>& decodedIntegers, udp:
     if (index < 0 || index > 15)
         return;
     if (index == 1) {
+        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 3);
         _functions[index](decodedIntegers, clientEndpoint, coordinator);
         return;
     }
@@ -460,7 +497,7 @@ inline void NetworkRoomSystem::sendEcs(Coordinator &coordinator)
 
 inline void NetworkRoomSystem::send(std::vector<int> header, std::vector<int> data, bool stock, udp::endpoint client, int index)
 {
-    int timeStamp;
+    int timeStamp = 0;
 
     if (stock == true) {
         timeStamp = hourIntNow();
