@@ -244,9 +244,6 @@ inline void NetworkClientSystem::createMessage(std::vector<int>& decodedIntegers
     std::string user = message.substr(0, position);
     std::string msg = message.substr(position + 1);
 
-    for (auto i : user) {
-        std::cout << static_cast<int>(i) << std::endl;
-    }
     send(_OK, {timeStamp}, false);
     coordinator.AddEvent(Event{Event::actions::CREATE_MESSAGE, 0, {std::make_any<std::string>(user), std::make_any<std::string>(msg)}});
 }
@@ -399,7 +396,6 @@ inline void NetworkClientSystem::joinEvent(Event& event, Coordinator& coordinato
 
     send(header, stringToVector(_username), false);
     _socket.non_blocking(false);
-    std::cout << "HERE" << std::endl;
 
     std::vector<unsigned char> data(1024);
     udp::endpoint receiveEndpoint;
@@ -428,8 +424,6 @@ inline void NetworkClientSystem::joinEvent(Event& event, Coordinator& coordinato
            
     }
     decodedIntegers = decode(data, length);
-    // for (auto i : decodedIntegers)
-    //     std::cout << i << std::endl;
     createEntities(decodedIntegers, coordinator);
     _socket.non_blocking(true);
     return;

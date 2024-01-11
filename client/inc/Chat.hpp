@@ -34,7 +34,6 @@ class Chat {
                 Event event = eventQueue.front();
                 eventQueue.pop();
                 if (event._type == Event::CREATE_MESSAGE) {
-                    std::cout << "CREATE_MESSAGE" << std::endl;
                     std::reverse(chatList.begin(), chatList.end());
                     chatList.push_back(std::make_pair(std::any_cast<std::string>(event._data.at(0)), std::any_cast<std::string>(event._data.at(1))));
                     std::reverse(chatList.begin(), chatList.end());

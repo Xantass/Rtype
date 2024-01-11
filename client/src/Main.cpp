@@ -22,7 +22,6 @@ int main(int ac, char **av)
     if (fichier.is_open()) {
         fichier << "PORT\tNAME\tNB_PLAYER" << std::endl;
         fichier.close();
-        std::cout << "Le contenu du fichier a été supprimé." << std::endl;
     } else {
         std::cerr << "Impossible d'ouvrir le fichier." << std::endl;
     }
