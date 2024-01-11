@@ -200,14 +200,10 @@ inline void NetworkRoomSystem::message(std::vector<int>& decodedIntegers, udp::e
     send(_OK, {timeStamp}, false, clientEndpoint, index);
     
     std::string res = _clients.at(index).getUsername() + ": " + message;
-    std::string perso = "Me: " + message;
     int i = 0;
 
     for (auto client : _clients) {
-        if (i == index)
-            send({MESSAGE_SEND, 1}, stringToVector(perso), true, client.getClientEndpoint(), i);
-        else
-            send({MESSAGE_SEND, 1}, stringToVector(res), true, client.getClientEndpoint(), i);
+        send({MESSAGE_SEND, 1}, stringToVector(res), true, client.getClientEndpoint(), i);
     }
 }
 
