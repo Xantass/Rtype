@@ -110,7 +110,10 @@ class Chat {
             if (std::get<0>(chat) == _user) {
                 nameWidth = Graphic::measureText("Me: ", textHeight);
                 Graphic::drawText("Me: ", 60, y, 20, {39, 33, 219, 255});
-            } else {
+            } else if (std::get<0>(chat) == "System") {
+                Graphic::drawText((std::get<0>(chat) + ": ").c_str(), 60, y, 20, {183, 32, 145, 230});
+            }
+            else {
                 Graphic::drawText((std::get<0>(chat) + ": ").c_str(), 60, y, 20, {38, 138, 4, 255});
             }
             if (nameWidth + textWidth >= 600) {

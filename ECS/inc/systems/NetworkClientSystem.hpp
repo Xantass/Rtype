@@ -119,6 +119,8 @@ public:
      */
     void ping(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
+    void disconnect(std::vector<int>& decodedIntegers, Coordinator &coordinator);
+
     /**
      * @brief Sends position data.
      * @param decodedIntegers The vector of integers for position data.

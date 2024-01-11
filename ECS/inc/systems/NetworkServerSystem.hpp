@@ -43,7 +43,7 @@
 using namespace asio;
 using asio::ip::udp;
 
-int room(int nbPlayer, int port);
+int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameAdmin);
 
 /**
  * @class NetworkServerSystem

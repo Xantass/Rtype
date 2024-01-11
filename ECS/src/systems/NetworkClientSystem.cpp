@@ -56,7 +56,7 @@ inline void NetworkClientSystem::Init(std::string host, std::string port, std::s
     _functions[4] = std::bind(&NetworkClientSystem::pos, this, std::placeholders::_1, std::placeholders::_2);
     _functions[5] = std::bind(&NetworkClientSystem::ping, this, std::placeholders::_1, std::placeholders::_2);
     _functions[6] = nullptr;
-    _functions[7] = nullptr;
+    _functions[7] = std::bind(&NetworkClientSystem::disconnect, this, std::placeholders::_1, std::placeholders::_2);
     _functions[8] = nullptr;
     _functions[9] = nullptr;
     _functions[10] = nullptr;
@@ -195,6 +195,17 @@ inline void NetworkClientSystem::ping(std::vector<int>& decodedIntegers, Coordin
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
     std::vector<int> data = {_id};
     send(_PONG, data, true);
+}
+
+inline void NetworkClientSystem::disconnect(std::vector<int>& decodedIntegers, Coordinator &coordinator)
+{
+    (void)coordinator;
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
+
+    int timeStamp = decodedIntegers.at(0);
+
+    send(_OK, {timeStamp}, false);
+    exit(0);
 }
 
 inline void NetworkClientSystem::pos(std::vector<int>& decodedIntegers, Coordinator &coordinator)
