@@ -26,6 +26,20 @@ class Chat {
         };
 
         void displayChatWindow(Coordinator &coordinator) {
+            std::queue<Event> eventQueue = coordinator.GetEventQueue();
+
+            // std::cout << "EventSystem, last event: " << event._type << std::endl;
+
+            while (!eventQueue.empty()) {
+                Event event = eventQueue.front();
+                eventQueue.pop();
+                if (event._type == Event::CREATE_MESSAGE) {
+                    std::cout << "CREATE_MESSAGE" << std::endl;
+                    std::reverse(chatList.begin(), chatList.end());
+                    chatList.push_back(std::make_pair(std::any_cast<std::string>(event._data.at(0)), std::any_cast<std::string>(event._data.at(1))));
+                    std::reverse(chatList.begin(), chatList.end());
+                }
+            }
             drawWindow(_isOpen, coordinator);
         }
 
@@ -62,7 +76,7 @@ class Chat {
                 _isOpen = !_isOpen;
             if (Graphic::isKeyPressed(KEY_ENTER)) {
                 if (_chat != "" && _isOpen) {
-                    chatList.push_back(std::make_pair(_user, _chat));
+                    //chatList.push_back(std::make_pair(_user, _chat));
                     coordinator.AddEvent(Event{Event::actions::MESSAGE, 0, {std::make_any<std::string>(_chat)}});
                     _chat.clear();
                 } else {
@@ -87,7 +101,7 @@ class Chat {
                     break;
                 displayChat(chat, y);
             }
-            std::reverse(chatList.begin(), chatList.end());
+            //std::reverse(chatList.begin(), chatList.end());
         }
         void displayChat(std::pair<std::string, std::string> chat, int &y) {
             int textHeight = 20;

@@ -31,6 +31,7 @@ struct Event {
         DESTROY = 4,
         SPAWN = 5,
         MESSAGE = 15,
+        CREATE_MESSAGE,
     };
 
     /**

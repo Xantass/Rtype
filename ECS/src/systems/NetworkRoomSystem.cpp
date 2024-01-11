@@ -186,6 +186,7 @@ inline void NetworkRoomSystem::sendCreate(int entity, Coordinator &coordinator)
 
 inline void NetworkRoomSystem::message(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
 {
+    (void)coordinator;
     int timeStamp = decodedIntegers.at(0);
 
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
