@@ -32,6 +32,8 @@ inline void CollisionSystem::Update(Coordinator &coordinator)
                 if (hit.type == PLAYER && c_hit.type == ENNEMY) {    // Permet de tuer l'ennemi si le joueur le touche pour eviter de se faire instant kill
                     c_hp._curr_hp = 0;
                 }
+                coordinator.AddEvent(Event{Event::actions::MAJ, entity, {std::make_any<int>(entity)}});
+                coordinator.AddEvent(Event{Event::actions::MAJ, comp, {std::make_any<int>(comp)}});
                 return;
             }
         }

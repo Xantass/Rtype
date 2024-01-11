@@ -179,7 +179,24 @@ inline void NetworkRoomSystem::sendCreate(int entity, Coordinator &coordinator)
     int index = 0;
 
     for (auto client : _clients) {
-        send({Action::CREATE, 10}, res, true, client.getClientEndpoint(), index);
+        send({Action::CREATE, 12}, res, true, client.getClientEndpoint(), index);
+        index++;
+    }
+}
+
+inline void NetworkRoomSystem::sendMaj(Coordinator &coordinator, int entity)
+{
+    auto& pos = coordinator.GetComponent<Position>(entity);
+    auto& vel = coordinator.GetComponent<Velocity>(entity);
+    auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
+    auto& health = coordinator.GetComponent<HealthPoint>(entity);
+
+    std::vector<int> res = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp)};
+
+    int index = 0;
+
+    for (auto client : _clients) {
+        send({Cmd::POS, 12}, res, true, client.getClientEndpoint(), index);
         index++;
     }
 }
@@ -346,11 +363,13 @@ inline void NetworkRoomSystem::move(std::vector<int>& decodedIntegers, udp::endp
 
             if (checkMove(pos, vel, hitbox, entity, coordinator) == -1) {
                 send(_UNVAILABLE_MOVE, {timeStamp}, false, _clients.at(index).getClientEndpoint(), index);
+                sendMaj(coordinator, decodedIntegers.at(2));
                 return;
             }
             vel._x = decodedIntegers.at(3);
             vel._y = decodedIntegers.at(4);
             send(_PASS, {timeStamp}, false, _clients.at(index).getClientEndpoint(), index);
+            sendMaj(coordinator, decodedIntegers.at(2));
             return;
         }
     }
@@ -442,6 +461,9 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
         
         if (event._type == Event::actions::EMPTY) {
             break;
+        }
+        if (event._type == Event::actions::MAJ) {
+            sendMaj(coordinator, std::any_cast<int>(event._data.at(0)));
         }
         if (event._type == Event::actions::SPAWN) {
 
@@ -559,7 +581,7 @@ inline void NetworkRoomSystem::Update(Coordinator& coordinator)
             break;
         }
     }
-    sendEcs(coordinator);
+    //sendEcs(coordinator);
     if (elapsedTime >= interval) {
         ping(coordinator);
         _startTime = currentTime;

@@ -17,8 +17,10 @@ inline void HealthSystem::Update(Coordinator &coordinator)
                 coordinator.DestroyEntity(entity);
                 return;
             }
-            if (hp._curr_hp >= hp._max_hp)
+            if (hp._curr_hp >= hp._max_hp) {
+                coordinator.AddEvent(Event{Event::actions::MAJ, entity, {std::make_any<int>(entity)}});
                 hp._curr_hp = hp._max_hp;
+            }
         }
     }
 }

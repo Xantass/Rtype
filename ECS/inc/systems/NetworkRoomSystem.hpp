@@ -138,6 +138,8 @@ public:
      */
     void ping(Coordinator& coordinator);
 
+    void sendMaj(Coordinator &coordinator, int entity);
+
     /**
      * @brief Send Ecs to all clients.
      * @param coordinator The Coordinator reference.
