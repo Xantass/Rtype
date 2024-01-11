@@ -406,7 +406,7 @@ inline void NetworkClientSystem::joinEvent(Event& event, Coordinator& coordinato
     std::vector<int> header = {CONNECT, 1};
 
     if (list.at(3) == "true")
-        send(header, stringToVector("SPECTATOR"), false);
+        send(header, stringToVector("(S) " + _username), false);
     else
         send(header, stringToVector(_username), false);
 

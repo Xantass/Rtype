@@ -337,7 +337,7 @@ inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::e
 
     coordinator.AddComponent<Position>(entity, {1, 0});
     coordinator.AddComponent<Velocity>(entity, {0, 0});
-    if (username == "SPECTATOR")
+    if (username.length() > 4 && username.substr(0, 4) == "(S) ")
         coordinator.AddComponent<Hitbox>(entity, {0, 0, 0, 0, SPECTATOR});
     else
         coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
