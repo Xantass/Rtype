@@ -21,6 +21,7 @@ int room(int nbPlayer, int port)
     coordinator.RegisterComponent<SpawnClock>();
     coordinator.RegisterComponent<HealthPoint>();
     coordinator.RegisterComponent<Damage>();
+    coordinator.RegisterComponent<Path>();
 
     auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
     auto controlSystem = coordinator.RegisterSystem<ControlSystem>();
@@ -28,6 +29,7 @@ int room(int nbPlayer, int port)
     auto spawnSystem = coordinator.RegisterSystem<SpawnSystem>();
     auto collisionSystem = coordinator.RegisterSystem<CollisionSystem>();
     auto healthSystem = coordinator.RegisterSystem<HealthSystem>();
+    auto pathSystem = coordinator.RegisterSystem<PathSystem>();
     
     Signature signature;
 
@@ -59,6 +61,13 @@ int room(int nbPlayer, int port)
     Signature signature5;
     signature5.set(coordinator.GetComponentType<HealthPoint>());
     coordinator.SetSystemSignature<HealthSystem>(signature5);
+    
+    Signature signature6;
+
+    signature6.set(coordinator.GetComponentType<Position>());
+    signature6.set(coordinator.GetComponentType<Velocity>());
+    signature6.set(coordinator.GetComponentType<Path>());
+    coordinator.SetSystemSignature<PathSystem>(signature6);
 
     Entity ent = coordinator.CreateEntity();
     coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 2, 100, 1000});
@@ -78,6 +87,7 @@ int room(int nbPlayer, int port)
             physicSystem->Update(coordinator);
             controlSystem->Update(coordinator);
             spawnSystem->Update(coordinator);
+            pathSystem->Update(coordinator);
             collisionSystem->Update(coordinator);
             healthSystem->Update(coordinator);
             startTime = currentTime;

@@ -23,10 +23,10 @@ inline void CollisionSystem::Update(Coordinator &coordinator)
                 pos._y + hit._y <= c_pos._y + c_hit._y + c_hit.height) {
                 if ((hit.type == PLAYER && c_hit.type == PLAYER) || (hit.type == PLAYER && c_hit.type == BULLET) || (hit.type == BULLET && c_hit.type == PLAYER))
                     break;
-                if (hit.type == PLAYER && c_hit.type == ENNEMY) {    // Permet de tuer l'ennemi si le joueur le touche pour eviter de se faire instant kill
-                    auto& c_hp = coordinator.GetComponent<HealthPoint>(comp);
-                    c_hp._curr_hp = 0;
-                }
+                // if (hit.type == PLAYER && c_hit.type == ENNEMY) {    // Permet de tuer l'ennemi si le joueur le touche pour eviter de se faire instant kill
+                //     auto& c_hp = coordinator.GetComponent<HealthPoint>(comp);
+                //     c_hp._curr_hp = 0;
+                // }
                 auto& dmg = coordinator.GetComponent<Damage>(entity);
                 auto& hp = coordinator.GetComponent<HealthPoint>(entity);
                 auto& c_dmg = coordinator.GetComponent<Damage>(comp);

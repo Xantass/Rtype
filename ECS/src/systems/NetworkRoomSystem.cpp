@@ -393,12 +393,13 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
         }
         if (event._type == Event::actions::SPAWN) {
             Entity ennemy = coordinator.CreateEntity();
-            coordinator.AddComponent<Position>(ennemy, {1990, (static_cast<float>(std::any_cast<int>(event._data[0])))});
+            coordinator.AddComponent<Position>(ennemy, {1990, (static_cast<float>(std::any_cast<float>(event._data[0])))});
             coordinator.AddComponent<Velocity>(ennemy, {-20, 0});
             coordinator.AddComponent<Hitbox>(ennemy, {0, 0, 100, 100, ENNEMY});
             coordinator.AddComponent<Controllable>(ennemy, {IA});
             coordinator.AddComponent<HealthPoint>(ennemy, {1, 1});
             coordinator.AddComponent<Damage>(ennemy, {1, 1});
+            coordinator.AddComponent<Path>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[0]))), 200, 10});
             this->sendCreate(ennemy, coordinator);
             break;
         }

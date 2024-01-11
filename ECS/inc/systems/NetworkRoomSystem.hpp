@@ -34,6 +34,7 @@
 #include "components/Hitbox.hpp"
 #include "components/Movable.hpp"
 #include "components/Controllable.hpp"
+#include "components/Path.hpp"
 #include "EnumProtocol.hpp"
 #include "Client.hpp"
 
