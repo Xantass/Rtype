@@ -203,7 +203,7 @@ inline void NetworkServerSystem::param(std::vector<int>& decodedIntegers, udp::e
     int port = findValidPort(_service);
 
     try {
-        std::thread Thread(room, nbPlayer, port);
+        std::thread Thread(room, nbPlayer, port, clientEndpoint, _clients.at(index).getUsername());
 
         Thread.detach();
         send({_OK}, {timeStamp}, false, clientEndpoint, index);

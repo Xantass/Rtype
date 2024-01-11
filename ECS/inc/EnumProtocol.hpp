@@ -59,7 +59,8 @@ enum Error {
     FAIL_START = 6, /**< Failed to start error. */
     CREATE_ROOM = 7,
     STOP_SEND = 8,
-    UNVAILABLE_MOVE = 9
+    UNVAILABLE_MOVE = 9,
+    NO_RIGHT = 10,
 };
 
 enum class DataType {
