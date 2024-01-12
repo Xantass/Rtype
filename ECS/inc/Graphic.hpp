@@ -263,6 +263,14 @@ class Graphic {
         static void toggleFullScreen(void) {
             ToggleFullscreen();
         }
+        /**
+         * @brief Get the FPS
+         *
+         * @return int
+         */
+        static int getFPS(void) {
+            return GetFPS();
+        }
 };
 
 #endif /* !GRAPHIC_HPP_ */
