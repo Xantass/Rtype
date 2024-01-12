@@ -7,10 +7,11 @@
 
 #include "NetworkRoomSystem.hpp"
 
-inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPLayer)
+inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPLayer, std::map<int, std::tuple<std::string, std::string>> sprite)
 {
     udp::endpoint endpoint(udp::v4(), port);
 
+    _sprite = sprite;
     _nbPLayer = nbPLayer;
     _admin = std::make_tuple(clientEndpoint, nameAdmin);
     _socket.close();
@@ -33,6 +34,7 @@ inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std:
     _functions[13] = nullptr;
     _functions[14] = nullptr;
     _functions[15] = std::bind(&NetworkRoomSystem::message, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    _functions[16] = std::bind(&NetworkRoomSystem::sprite, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     return;
 }
 
@@ -40,9 +42,7 @@ inline int NetworkRoomSystem::getClient(int id)
 {
     int index = 0;
 
-    // std::cout << "GET CLIENT" << std::endl;
     for (auto client : _clients) {
-        // std::cout << "CLIENT ID: " << client.getID() << std::endl;
         if (id == client.getID()) {
             return index;
         }
@@ -169,14 +169,14 @@ inline void NetworkRoomSystem::sendDestroy(int entity)
     }
 }
 
-inline void NetworkRoomSystem::sendCreate(int entity, Coordinator &coordinator)
+inline void NetworkRoomSystem::sendCreate(int entity, Coordinator &coordinator, int selectSprite)
 {
     auto& pos = coordinator.GetComponent<Position>(entity);
     auto& vel = coordinator.GetComponent<Velocity>(entity);
     auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
     auto& health = coordinator.GetComponent<HealthPoint>(entity);
 
-    std::vector<int> res = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp)};
+    std::vector<int> res = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp), selectSprite};
 
     int index = 0;
 
@@ -298,6 +298,36 @@ inline void NetworkRoomSystem::message(std::vector<int>& decodedIntegers, udp::e
     }
 }
 
+inline void NetworkRoomSystem::sprite(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
+{
+    (void)clientEndpoint;
+    (void)coordinator;
+
+    int index = decodedIntegers.at(0);
+    int size = decodedIntegers.at(1);
+
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
+
+    std::vector<int> base64 = {};
+    std::vector<int> filePath = {};
+
+    int y = 0;
+    for (auto i : decodedIntegers) {
+        if (y == size)
+            break;
+        base64.push_back(i);
+        y++;
+    }
+    for (size_t i = base64.size(); i < decodedIntegers.size(); ++i)
+        filePath.push_back(decodedIntegers[i]);
+    _sprite[index] = std::make_tuple(vectorToString(base64), vectorToString(filePath));
+    int i = 0;
+    for (auto client : _clients) {
+        send({SPRITE, 3}, mergeVectors({index, size}, decodedIntegers), true, client.getClientEndpoint(), i);
+        i++;
+    }
+}
+
 inline void NetworkRoomSystem::response(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
 {
     (void)clientEndpoint;
@@ -314,10 +344,12 @@ inline void NetworkRoomSystem::response(std::vector<int>& decodedIntegers, udp::
 
 inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
 {
+    int selectSprite = decodedIntegers.at(0);
+
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
+
     std::string username = vectorToString(decodedIntegers);
-
     // std::cout << "username: " << username << std::endl;
-
     for (auto client : _clients) {
         if (client.getUsername() == username) {
             // std::vector<unsigned char> buffer = encode(_FAIL_CONNECT);
@@ -328,6 +360,7 @@ inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::e
 
     int i = 0;
     std::string msgSystem = "System: " + username + " connected to the room";
+
     for (auto client : _clients) {
         send({MESSAGE_SEND, 1}, stringToVector(msgSystem), true, client.getClientEndpoint(), i);
         i++;
@@ -343,8 +376,8 @@ inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::e
         coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
     coordinator.AddComponent<HealthPoint>(entity, {3, 3});
     coordinator.AddComponent<Damage>(entity, {0, 0});
-    sendCreate(entity, coordinator);
-    _clients.push_back(Client(username, clientEndpoint, entity));
+    sendCreate(entity, coordinator, selectSprite);
+    _clients.push_back(Client(username, clientEndpoint, entity, selectSprite));
 
     std::vector<int> tmp = {_clients.at(_clients.size() - 1).getID()};
     std::vector<unsigned char> buffer = encode(tmp);
@@ -480,7 +513,7 @@ inline void NetworkRoomSystem::shoot(std::vector<int>& decodedIntegers, udp::end
             coordinator.AddComponent<Controllable>(bullet, {ENGINE});
 
             send(_PASS, {timeStamp}, false, clientEndpoint, index);
-            this->sendCreate(bullet, coordinator);
+            this->sendCreate(bullet, coordinator, -1);
             return;
         }
     }
@@ -509,10 +542,15 @@ inline void NetworkRoomSystem::handleCmd(std::vector<int>& decodedIntegers, udp:
 {
     int index = decodedIntegers.at(0);
 
-    if (index < 0 || index > 15)
+    if (index < 0 || index > 16)
         return;
     if (index == 1) {
         decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 3);
+        _functions[index](decodedIntegers, clientEndpoint, coordinator);
+        return;
+    }
+    if (index == 16) {
+        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
         _functions[index](decodedIntegers, clientEndpoint, coordinator);
         return;
     }
@@ -551,7 +589,7 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
             coordinator.AddComponent<Controllable>(ennemy, {IA});
             coordinator.AddComponent<HealthPoint>(ennemy, {1, 1});
             coordinator.AddComponent<Damage>(ennemy, {1, 1});
-            this->sendCreate(ennemy, coordinator);
+            this->sendCreate(ennemy, coordinator, -1);
             break;
         }
         if (event._type == Event::actions::DESTROY) {
@@ -588,8 +626,11 @@ inline void NetworkRoomSystem::sendEcs(Coordinator &coordinator)
             auto& vel = coordinator.GetComponent<Velocity>(entity);
             auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
             auto& health = coordinator.GetComponent<HealthPoint>(entity);
+            int selectSprite = -1;
 
-            std::vector<int> tmp = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp)};
+            if (static_cast<int>(entity) == client.getID())
+                selectSprite = client.getSprite();
+            std::vector<int> tmp = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp), static_cast<int>(selectSprite)};
 
             encode_ = mergeVectors(encode_, tmp);
         }
@@ -619,7 +660,7 @@ inline void NetworkRoomSystem::send(std::vector<int> header, std::vector<int> da
 
 inline std::tuple<std::vector<int>, udp::endpoint> NetworkRoomSystem::receive()
 {
-    std::vector<unsigned char> data(1024);
+    std::vector<unsigned char> data(30000);
     udp::endpoint clientEndpoint;
     size_t length = _socket.receive_from(asio::buffer(data), clientEndpoint, 0);
     std::vector<int> decodedIntegers = decode(data, length);

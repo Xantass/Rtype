@@ -15,6 +15,9 @@
 
 #include <functional>
 #include <chrono>
+#include <filesystem>
+#include <fstream>
+#include <map>
 #if defined(_WIN32)           
 	#define NOGDI             // All GDI defines and routines
 	#define NOUSER            // All USER defines and routines
@@ -43,7 +46,7 @@
 using namespace asio;
 using asio::ip::udp;
 
-int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameAdmin);
+int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameAdmin, std::map<int, std::tuple<std::string, std::string>> sprite);
 
 /**
  * @class NetworkServerSystem
@@ -54,7 +57,7 @@ public:
     /**
      * @brief Initializes the NetworkServerSystem.
      */
-    void Init();
+    void Init(std::map<int, std::tuple<std::string, std::string>> sprite);
 
     /**
      * @brief Retrieves the client with the given ID.
@@ -129,6 +132,8 @@ public:
      * @param clientEndpoint The endpoint of the client sending the command.
      */
     void handleCmd(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint, Coordinator &coordinator);
+
+    void sprite(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     /**
      * @brief Sends a response to a client.
@@ -212,11 +217,12 @@ private:
     io_context _service; /**< The Boost ASIO io_service. */
     udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v4(), 4242)); /**< The UDP socket for communication. */
     std::vector<Client> _clients; /**< Vector storing information about connected clients. */
-    std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[16]; /**< Array of function pointers. */
+    std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[17]; /**< Array of function pointers. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
     int _id = 0; /**< The ID of the server. */
     int _port = 4243;
     std::vector<std::tuple<int, int, std::string>> _room;
+    std::map<int, std::tuple<std::string, std::string>> _sprite;
 };
 
 #include "../../src/systems/NetworkServerSystem.cpp"

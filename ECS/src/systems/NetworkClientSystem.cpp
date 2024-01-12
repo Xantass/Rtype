@@ -65,6 +65,7 @@ inline void NetworkClientSystem::Init(std::string host, std::string port, std::s
     _functions[13] = std::bind(&NetworkClientSystem::createEntity, this, std::placeholders::_1, std::placeholders::_2);
     _functions[14] = std::bind(&NetworkClientSystem::createRoom, this, std::placeholders::_1, std::placeholders::_2);
     _functions[15] = std::bind(&NetworkClientSystem::createMessage, this, std::placeholders::_1, std::placeholders::_2);
+    _functions[16] = std::bind(&NetworkClientSystem::createSprite, this, std::placeholders::_1, std::placeholders::_2);
     _socket.non_blocking(true);
 }
 
@@ -110,9 +111,8 @@ inline int NetworkClientSystem::hourIntNow()
 inline void NetworkClientSystem::createEntities(std::vector<int> decodedInteger, Coordinator &coordinator)
 {
     decodedInteger.erase(decodedInteger.begin(), decodedInteger.begin() + 3);
-    // std::cout << "SIZE: " << decodedInteger.size() << std::endl;
     while (decodedInteger.empty() == false) {
-        coordinator.AddEvent(Event{Event::CREATE, static_cast<Entity>(decodedInteger.at(0)), {std::make_any<int>(decodedInteger.at(0)), std::make_any<float>(CHECK_ZERO(decodedInteger.at(1))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(2))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(3))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(4))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(5))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(6))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(7))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(8))), std::make_any<HitboxType>(CHECK_TYPE(decodedInteger.at(9))), std::make_any<int>(_id), std::make_any<int>(decodedInteger.at(10)), std::make_any<int>(decodedInteger.at(11))}});
+        coordinator.AddEvent(Event{Event::CREATE, static_cast<Entity>(decodedInteger.at(0)), {std::make_any<int>(decodedInteger.at(0)), std::make_any<float>(CHECK_ZERO(decodedInteger.at(1))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(2))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(3))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(4))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(5))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(6))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(7))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(8))), std::make_any<HitboxType>(CHECK_TYPE(decodedInteger.at(9))), std::make_any<int>(_id), std::make_any<int>(decodedInteger.at(10)), std::make_any<int>(decodedInteger.at(11)), std::make_any<int>(decodedInteger.at(12))}});
         //ADD INT FOR ID ENTITY
         // Entity entity = coordinator.CreateEntity(decodedInteger.at(0));
         // if (entity == _id) {
@@ -124,7 +124,7 @@ inline void NetworkClientSystem::createEntities(std::vector<int> decodedInteger,
         // coordinator.AddComponent<Position>(entity, {CHECK_ZERO(decodedInteger.at(1)), CHECK_ZERO(decodedInteger.at(2))});
         // coordinator.AddComponent<Velocity>(entity, {CHECK_ZERO(decodedInteger.at(3)), CHECK_ZERO(decodedInteger.at(4))});
         // coordinator.AddComponent<Hitbox>(entity, {CHECK_ZERO(decodedInteger.at(5)), CHECK_ZERO(decodedInteger.at(6)), CHECK_ZERO(decodedInteger.at(7)), CHECK_ZERO(decodedInteger.at(8)), CHECK_TYPE(decodedInteger.at(9))});
-        decodedInteger.erase(decodedInteger.begin(), decodedInteger.begin() + 12);
+        decodedInteger.erase(decodedInteger.begin(), decodedInteger.begin() + 13);
     }
 }
 
@@ -237,9 +237,36 @@ inline void NetworkClientSystem::pos(std::vector<int>& decodedIntegers, Coordina
                 break;
             }
         }
-        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 12);
+        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 13);
     }
     send(_OK, {timeStamp}, false);
+}
+
+inline void NetworkClientSystem::createSprite(std::vector<int>& decodedIntegers, Coordinator& coordinator)
+{
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
+
+    int timeStamp = decodedIntegers.at(0);
+    int index = decodedIntegers.at(1);
+    int size = decodedIntegers.at(2);
+
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 3);
+
+    send(_OK, {timeStamp}, false);
+
+    std::vector<int> base64 = {};
+    std::vector<int> filePath = {};
+
+    int y = 0;
+    for (auto i : decodedIntegers) {
+        if (y == size)
+            break;
+        base64.push_back(i);
+        y++;
+    }
+    for (size_t i = base64.size(); i < decodedIntegers.size(); ++i)
+        filePath.push_back(decodedIntegers[i]);
+    coordinator.AddEvent(Event{Event::actions::CREATE_SPRITE, 0, {std::make_any<std::string>(vectorToString(base64)), std::make_any<std::string>(vectorToString(filePath)), std::make_any<int>(index)}});
 }
 
 inline void NetworkClientSystem::createMessage(std::vector<int>& decodedIntegers, Coordinator& coordinator)
@@ -295,8 +322,8 @@ inline void NetworkClientSystem::createEntity(std::vector<int> decodedIntegers, 
 
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
     while (decodedIntegers.empty() == false) {
-        coordinator.AddEvent(Event{Event::CREATE, static_cast<Entity>(decodedIntegers.at(0)), {std::make_any<int>(decodedIntegers.at(0)), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(1))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(2))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(3))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(4))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(5))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(6))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(7))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(8))), std::make_any<HitboxType>(CHECK_TYPE(decodedIntegers.at(9))), std::make_any<int>(_id), std::make_any<int>(decodedIntegers.at(10)), std::make_any<int>(decodedIntegers.at(11))}});
-        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 12);
+        coordinator.AddEvent(Event{Event::CREATE, static_cast<Entity>(decodedIntegers.at(0)), {std::make_any<int>(decodedIntegers.at(0)), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(1))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(2))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(3))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(4))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(5))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(6))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(7))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(8))), std::make_any<HitboxType>(CHECK_TYPE(decodedIntegers.at(9))), std::make_any<int>(_id), std::make_any<int>(decodedIntegers.at(10)), std::make_any<int>(decodedIntegers.at(11)), std::make_any<int>(decodedIntegers.at(12))}});
+        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 13);
     }
     send(_OK, {timeStamp}, false);
 }
@@ -316,7 +343,7 @@ inline void NetworkClientSystem::handleCmd(std::vector<int>& decodedIntegers, Co
 {
     int index = decodedIntegers.at(0);
 
-    if (index < 0 || index > 15)
+    if (index < 0 || index > 16)
         return;
     if (decodedIntegers.size() < 3)
         return;
@@ -399,16 +426,19 @@ inline void NetworkClientSystem::paramEvent(Event& event)
 inline void NetworkClientSystem::joinEvent(Event& event, Coordinator& coordinator)
 {
     std::vector<std::string> list;
+    int selectSprite = std::any_cast<int>(event._data[0]);
 
-    for (std::size_t i = 0; i < event._data.size(); i++)
+    for (std::size_t i = 1; i < event._data.size(); i++)
         list.push_back(std::any_cast<std::string>(event._data[i]));
     _serverEndpoint = udp::endpoint(asio::ip::make_address(list.at(0)), atoi(list.at(1).c_str()));
     std::vector<int> header = {CONNECT, 1};
 
-    if (list.at(3) == "true")
-        send(header, stringToVector("(S) " + _username), false);
-    else
-        send(header, stringToVector(_username), false);
+    if (list.at(3) == "true") {
+        send(header, mergeVectors({selectSprite}, stringToVector("(S) " + _username)), false);
+    }
+    else {
+        send(header, mergeVectors({selectSprite}, stringToVector(_username)), false);
+    }
 
     _socket.non_blocking(false);
 
@@ -454,6 +484,16 @@ inline void NetworkClientSystem::messageEvent(Event& event)
     send({event._type, 1}, stringToVector(std::any_cast<std::string>(event._data.at(0))), true);
 }
 
+inline void NetworkClientSystem::spriteEvent(Event& event)
+{
+    std::vector<int> data = stringToVector(std::any_cast<std::string>(event._data.at(0)));
+    std::vector<int> name = stringToVector(std::any_cast<std::string>(event._data.at(1)));
+
+    data = mergeVectors({static_cast<int>(data.size())}, data);
+    data = mergeVectors(data, name);
+    send({event._type, 1}, data, true);
+}
+
 inline void NetworkClientSystem::checkEvent(Coordinator &coordinator)
 {
     while (1) {
@@ -479,6 +519,10 @@ inline void NetworkClientSystem::checkEvent(Coordinator &coordinator)
             joinEvent(event, coordinator);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             return;
+        }
+        if (event._type == Event::SEND_SPRITE) {
+            spriteEvent(event);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
         if (event._type == Event::actions::SHOOT) {
             for (auto entity : _entities) {
@@ -513,7 +557,7 @@ inline void NetworkClientSystem::send(std::vector<int> header, std::vector<int> 
 
 inline std::vector<int> NetworkClientSystem::receive()
 {
-    std::vector<unsigned char> data(1024);
+    std::vector<unsigned char> data(30000);
     udp::endpoint receiveEndpoint;
     size_t length = _socket.receive_from(asio::buffer(data), receiveEndpoint, 0);
 

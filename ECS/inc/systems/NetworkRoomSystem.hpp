@@ -183,6 +183,8 @@ public:
 
     void message(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
+    void sprite(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
+
     /**
      * @brief Sends a destroy signal for an entity.
      * @param entity The entity to destroy.
@@ -194,14 +196,14 @@ public:
      * @param entity The entity to create.
      * @param coordinator The Coordinator reference.
      */
-    void sendCreate(int entity, Coordinator &coordinator);
+    void sendCreate(int entity, Coordinator &coordinator, int selectSprite);
 
 
     /**
      * @brief Initializes the NetworkRoomSystem with a specific port.
      * @param port The port to use for communication.
      */
-    void Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPlayer);
+    void Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPlayer, std::map<int, std::tuple<std::string, std::string>> sprite);
 
     /**
      * @brief Sends a packet with header and data to a specific client endpoint, optionally storing it.
@@ -252,11 +254,12 @@ private:
     udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v6(), 0)); /**< The UDP socket for communication. */
     std::vector<Client> _clients; /**< Vector storing information about connected clients. */
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
-    std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[16]; /**< Array of function pointers. */
+    std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[17]; /**< Array of function pointers. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
     std::tuple<udp::endpoint, std::string> _admin;
     int _nbPLayer;
     std::vector<udp::endpoint> _ban;
+    std::map<int, std::tuple<std::string, std::string>> _sprite;
 };
 
 #include "../../src/systems/NetworkRoomSystem.cpp"

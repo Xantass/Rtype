@@ -9,7 +9,9 @@
 #define ASSETMANAGER_HPP_
 
 #include <iostream>
-
+#include <map>
+#include <fstream>
+#include <filesystem>
 #include "Graphic.hpp"
 
 class AssetManager {
@@ -25,6 +27,10 @@ public:
      * @return Texure Texture loaded
      */
     Texture LoadTexture(std::string texturePath);
+
+    void LoadTexture(std::string base64, std::string path, int index);
+
+    std::map<int, std::string> _sprite;
 
 protected:
 private:
