@@ -16,8 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest]
-        # os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
     steps:
       - name: "☁️ checkout repository"
         uses: actions/checkout@v2
@@ -46,41 +45,41 @@ jobs:
       - name: "🏗️ Make"
         run: make
 
-  # RunTests:
-  #   name: Run Tests
-  #   needs: BuildTest
-  #   runs-on: ${{ matrix.os }}
-  #   strategy:
-  #     matrix:
-  #       os: [macos-latest, ubuntu-latest, windows-latest]
-  #   steps:
-  #     - name: "☁️ checkout repository"
-  #       uses: actions/checkout@v2
+  RunTests:
+    name: Run Tests
+    needs: BuildTest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    steps:
+      - name: "☁️ checkout repository"
+        uses: actions/checkout@v2
 
-  #     - name: "🔧 Install Linux dependencies"
-  #       if: matrix.os == 'ubuntu-latest'
-  #       run: |
-  #         sudo apt remove --purge --auto-remove cmake
-  #         sudo apt update && \
-  #         sudo apt install -y software-properties-common lsb-release && \
-  #         sudo apt clean all
-  #         wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
-  #         sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
-  #         sudo apt update
-  #         sudo apt install kitware-archive-keyring -y
-  #         sudo rm /etc/apt/trusted.gpg.d/kitware.gpg
-  #         sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6AF7F09730B3F0A4
-  #         sudo apt update
-  #         sudo apt install cmake libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev -y
+      - name: "🔧 Install Linux dependencies"
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt remove --purge --auto-remove cmake
+          sudo apt update && \
+          sudo apt install -y software-properties-common lsb-release && \
+          sudo apt clean all
+          wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+          sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
+          sudo apt update
+          sudo apt install kitware-archive-keyring -y
+          sudo rm /etc/apt/trusted.gpg.d/kitware.gpg
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6AF7F09730B3F0A4
+          sudo apt update
+          sudo apt install cmake libasound2-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev xorg-dev libgl1-mesa-dev libglu1-mesa-dev -y
 
-  #     - name: "🔧 Install Windows dependencies"
-  #       if: matrix.os == 'windows-latest'
-  #       run: |
-  #         choco install make
-  #         choco install cmake
+      - name: "🔧 Install Windows dependencies"
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install make
+          choco install cmake
 
-  #     - name: "🏗️ Make"
-  #       run: make
+      - name: "🏗️ Make"
+        run: make
 
-  #     - name: "🧪 Run Tests"
-  #       run: echo "Tests not implemented yet"
+      - name: "🧪 Run Tests"
+        run: echo "Tests not implemented yet"

@@ -28,6 +28,7 @@ enum Cmd {
     PING = 5, /**< Ping command. */
     PONG = 6, /**< Pong command. */
     DISCONNECT = 7, /**< Quit command. */
+    CREATE_ROOM_CMD = 14,
 };
 
 /**
@@ -40,7 +41,8 @@ enum Action {
     SHOOT = 10, /**< Shoot action. */
     MOVE = 11, /**< Move action. */
     DESTROY = 12, /**< Destroy command. */
-    CREATE = 13 /**< Create command. */
+    CREATE = 13, /**< Create command. */
+    MESSAGE_SEND = 15,
 };
 
 /**
@@ -57,7 +59,8 @@ enum Error {
     FAIL_START = 6, /**< Failed to start error. */
     CREATE_ROOM = 7,
     STOP_SEND = 8,
-    UNVAILABLE_MOVE = 9
+    UNVAILABLE_MOVE = 9,
+    NO_RIGHT = 10,
 };
 
 enum class DataType {

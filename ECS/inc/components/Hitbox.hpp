@@ -23,7 +23,8 @@ enum HitboxType {
     ENNEMY,
     PLAYER,
     BULLET,
-    OTHER
+    SPECTATOR,
+    OTHER,
 };
 
 /**

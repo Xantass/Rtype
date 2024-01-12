@@ -11,6 +11,7 @@
 #include "System.hpp"
 #include "Coordinator.hpp"
 #include "Entity.hpp"
+#include "AssetManager.hpp"
 
 class EventSystem : public System {
 public:
@@ -18,8 +19,10 @@ public:
     /**
      * @brief Run all the events
      * 
+     * @param coordinator Reference to the coordinator
+     * @param assetManager Reference to the assetManager
      */
-    void RunEvents(Coordinator &coordinator);
+    void RunEvents(Coordinator &coordinator, AssetManager &assetManager);
 
 protected:
 private:
