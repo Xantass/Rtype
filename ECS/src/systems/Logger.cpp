@@ -15,7 +15,7 @@
 
 void Logger::Update(Coordinator &coordinator)
 {
-    if (Graphic::isKeyPressed(KEY_L))
+    if (Graphic::isKeyPressed(KEY_F1))
         _isDisplayed = !_isDisplayed;
     
     if (!_isDisplayed)
