@@ -48,6 +48,7 @@ int main(int ac, char **av)
     auto movableSystem = coordinator.RegisterSystem<MovableSystem>();
     auto networkClientSystem = coordinator.RegisterSystem<NetworkClientSystem>();
     auto eventSystem = coordinator.RegisterSystem<EventSystem>();
+    auto logger = coordinator.RegisterSystem<Logger>();
 
     Signature signature2;
 
@@ -104,8 +105,10 @@ int main(int ac, char **av)
             networkClientSystem->Update(coordinator);
             eventSystem->RunEvents(coordinator, assetManager);
             physicSystem->Update(coordinator);
-            if (menu.action == "Game")
+            if (menu.action == "Game") {
                 chat.displayChatWindow(coordinator);
+                logger->Update(coordinator);
+            }
             startTime = currentTime;
             menu.displayMenu();
             Graphic::endDrawing();
