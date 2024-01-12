@@ -82,18 +82,23 @@ class Menu {
         }
         void displayJoinable(void) {
             getRoomList();
-            int padding = 120;
-            int i = 0;
-            std::size_t startIdx = 4 * page;
-            std::size_t endIdx = std::min(static_cast<std::size_t>(4 * (page + 1) - 1), _roomList.size() - 1);
+            std::size_t endIdx;
+            if (_roomList.size() == 0) {
+                endIdx = -1;
+            } else {
+                int padding = 120;
+                int i = 0;
+                std::size_t startIdx = 4 * page;
+                endIdx = std::min(static_cast<std::size_t>(4 * (page + 1) - 1), _roomList.size() - 1);
 
-            std::vector<std::vector<std::string>> subVector;
-            subVector.insert(subVector.end(), _roomList.begin() + startIdx, _roomList.begin() + endIdx + 1);
-            for (auto room : subVector) {
-                displayButton({760, static_cast<float>(320 + padding * i)}, {310, 80}, room[1], true);
-                displayButton({1080, static_cast<float>(320 + padding * i)}, {80, 80}, room[2], false);
-                displayButton({1170, static_cast<float>(320 + padding * i)}, {80, 80}, "Spect.\n" + room[1], true);
-                i += 1;
+                std::vector<std::vector<std::string>> subVector;
+                subVector.insert(subVector.end(), _roomList.begin() + startIdx, _roomList.begin() + endIdx + 1);
+                for (auto room : subVector) {
+                    displayButton({760, static_cast<float>(320 + padding * i)}, {310, 80}, room[1], true);
+                    displayButton({1080, static_cast<float>(320 + padding * i)}, {80, 80}, room[2], false);
+                    displayButton({1170, static_cast<float>(320 + padding * i)}, {80, 80}, "Spect.\n" + room[1], true);
+                    i += 1;
+                }
             }
             displayButton({900, 800}, {50, 50}, "<", true);
             if ((endIdx + 1) != _roomList.size())
@@ -214,7 +219,7 @@ class Menu {
                 std::istringstream iss(header);
                 std::string token;
                 std::vector<std::string> room;
-                while (iss >> token) {
+                while (std::getline(iss, token, '\t')) {
                     room.push_back(token);
                 }
                 _roomList.push_back(room);
