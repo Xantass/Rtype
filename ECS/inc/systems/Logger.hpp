@@ -29,7 +29,7 @@ private:
      * @brief The id of the selected entity
      * 
      */
-    int _idSelected = -1;
+    unsigned int _idSelected = -1;
 
     /**
      * @brief Event stack

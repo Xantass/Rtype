@@ -6,6 +6,7 @@
 */
 
 #include <iostream>
+#include <iomanip>
 #include <chrono>
 
 #include "Logger.hpp"
@@ -57,8 +58,8 @@ void Logger::Update(Coordinator &coordinator)
         Graphic::drawRectangleLines(position._x + hitbox._x, position._y + hitbox._y, hitbox.width, hitbox.height, RED);
         Graphic::drawText("Entity " + std::to_string(entity), position._x, position._y + hitbox.height, 20, RED);
 
-        if (mouseX > position._x && mouseX < position._x + 100 && mouseY > position._y && mouseY < position._y + 100 ||
-            mouseX > 10 && mouseX < 10 + 100 && mouseY > yOffset && mouseY < yOffset + 20 ||
+        if ((mouseX > position._x && mouseX < position._x + 100 && mouseY > position._y && mouseY < position._y + 100) ||
+            (mouseX > 10 && mouseX < 10 + 100 && mouseY > yOffset && mouseY < yOffset + 20) ||
             _idSelected == entity) {
             if (_idSelected == entity)
                 color = GREEN;
