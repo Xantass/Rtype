@@ -8,6 +8,7 @@
 #ifndef MENU_HPP_
 #define MENU_HPP_
 
+#include <algorithm>
 #include <sstream>
 #include <vector>
 #include <iostream>
@@ -17,19 +18,43 @@
 
 class Menu {
     public:
+        Music _music = Graphic::loadMusic("assets/Theme.mp3");
+        Texture2D settings;
         std::string action = "";
         std::string _host;
         std::string _port;
         std::string _name;
+        std::string _pathSprite;
         std::string _nbPlayer;
+        std::string _errorLoad;
+        std::string _errorSelectSprite;
+        std::string _errorSelectEnnemy;
+        std::string _errorSelectBullet;
+        int _selectSprite = -1;
+        int _selectEnnemy = -1;
+        int _selectBullet = -1;
         std::vector<std::vector<std::string>> _roomList;
         Coordinator &_coordinator;
         int page = 0;
-        Menu(std::string host, std::string port, std::string name, Coordinator &coordinator) : _host(host), _port(port), _name(name), _nbPlayer("4"), _coordinator(coordinator)  {}
-        ~Menu() {}
-        void displayMenu(void) {
-            if (Graphic::isKeyPressed(KEY_TAB)) {
-                action = "";
+        std::string _settingsState = "";
+        float volume = 1;
+        Menu(std::string host, std::string port, std::string name, Coordinator &coordinator) : settings(Graphic::loadTexture("assets/settings.png")), _host(host), _port(port), _name(name), _nbPlayer("4"), _coordinator(coordinator)  {Graphic::playMusic(_music);}
+        ~Menu() {Graphic::unloadMusic(_music);}
+        void displayMenu(AssetManager &assetManager) {
+            Graphic::updateMusic(_music);
+            displaySettings();
+            if (Graphic::isKeyPressed(KEY_TAB) && action != "Game") {
+                if (action == "Select Ennemy" || action == "Select Bullet") {
+                    action = "Create Room";
+                } else {
+                    action = "";
+                    _errorLoad = "";
+                    _errorSelectBullet = "";
+                    _errorSelectEnnemy = "";
+                    _errorSelectSprite = "";
+                    _selectBullet = -1;
+                    _selectEnnemy = -1;
+                }
             }
             if (action == "<") {
                 page = page == 0 ? 0 : page - 1;
@@ -39,20 +64,45 @@ class Menu {
                 action = "Join Room";
             }
             if (action == "") {
-                displayButton({760, 460}, {400, 80}, "Create Room", true);
-                displayButton({760, 620}, {400, 80}, "Join Room", true);
+                displayButton({760, 300}, {400, 80}, "Load Sprite", true);
+                displayButton({760, 460}, {400, 80}, "Select Sprite", true);
+                displayButton({760, 620}, {400, 80}, "Create Room", true);
+                displayButton({760, 780}, {400, 80}, "Join Room", true);
             } else if (action == "Create Room") {
                 createRoom();
             } else if (action == "Join Room") {
                 displayJoinable();
+            } else if (action == "Load Sprite") {
+                displayLoadSprite();
+            } else if (action == "Select Sprite") {
+                displaySelectSprite(assetManager, _selectSprite);
+            } else if (action == "Select Ennemy") {
+                displaySelectSprite(assetManager, _selectEnnemy);
+            } else if (action == "Select Bullet") {
+                displaySelectSprite(assetManager, _selectBullet);
             } else {
                 for (auto room : _roomList) {
                     if (room[1] == action) {
+                        if (_selectSprite == -1) {
+                            action = "Join Room";
+                            _errorSelectSprite = "Error: Choose your skin for the game";
+                            return;
+                        }
                         std::vector<std::string> list(3, "");
                         list[0] = _host;
                         list[1] = room[0];
                         list[2] = room[1];
-                        _coordinator.AddEvent(Event{Event::actions::JOIN, 0, {std::make_any<std::string>(list[0]), std::make_any<std::string>(list[1]), std::make_any<std::string>(list[2])}});
+                        std::cout << "select: " << _selectSprite << std::endl;
+                        _coordinator.AddEvent(Event{Event::actions::JOIN, 0, {std::make_any<int>(_selectSprite), std::make_any<std::string>(list[0]), std::make_any<std::string>(list[1]), std::make_any<std::string>(list[2]), std::make_any<std::string>("false")}});
+                        action = "Game";
+                        _errorSelectSprite = "";
+                        break;
+                    } else if ("Spect.\n" + room[1] == action) {
+                        std::vector<std::string> list(3, "");
+                        list[0] = _host;
+                        list[1] = room[0];
+                        list[2] = room[1];
+                        _coordinator.AddEvent(Event{Event::actions::JOIN, 0, {std::make_any<int>(_selectSprite), std::make_any<std::string>(list[0]), std::make_any<std::string>(list[1]), std::make_any<std::string>(list[2]), std::make_any<std::string>("true")}});
                         action = "Game";
                         break;
                     }
@@ -60,36 +110,93 @@ class Menu {
             }
         }
         void displayJoinable(void) {
-            getRoomList();
-            int padding = 120;
-            int i = 0;
-            std::size_t startIdx = 4 * page;
-            std::size_t endIdx = std::min(static_cast<std::size_t>(4 * (page + 1) - 1), _roomList.size() - 1);
-
-            std::vector<std::vector<std::string>> subVector;
-            subVector.insert(subVector.end(), _roomList.begin() + startIdx, _roomList.begin() + endIdx + 1);
-            for (auto room : subVector) {
-                displayButton({760, static_cast<float>(320 + padding * i)}, {310, 80}, room[1], true);
-                displayButton({1080, static_cast<float>(320 + padding * i)}, {80, 80}, room[2], false);
-                i += 1;
+            if (_errorSelectSprite != "") {
+                displayTextWithBackground(_errorSelectSprite, 800, 100);
             }
+            getRoomList();
+            std::size_t endIdx;
+            if (_roomList.size() == 0) {
+                endIdx = -1;
+            } else {
+                int padding = 120;
+                int i = 0;
+                std::size_t startIdx = 4 * page;
+                endIdx = std::min(static_cast<std::size_t>(4 * (page + 1) - 1), _roomList.size() - 1);
 
+                std::vector<std::vector<std::string>> subVector;
+                subVector.insert(subVector.end(), _roomList.begin() + startIdx, _roomList.begin() + endIdx + 1);
+                for (auto room : subVector) {
+                    displayButton({760, static_cast<float>(320 + padding * i)}, {310, 80}, room[1], true);
+                    displayButton({1080, static_cast<float>(320 + padding * i)}, {80, 80}, room[2], false);
+                    displayButton({1170, static_cast<float>(320 + padding * i)}, {80, 80}, "Spect.\n" + room[1], true);
+                    i += 1;
+                }
+            }
             displayButton({900, 800}, {50, 50}, "<", true);
             if ((endIdx + 1) != _roomList.size())
                 displayButton({970, 800}, {50, 50}, ">", true);
             else
                 displayButton({970, 800}, {50, 50}, ">", false);
         }
-        void createRoom(void) {
-            displayTextInput({760, 380}, {400, 80}, _host);
-            displayTextInput({760, 500}, {400, 80}, _port);
-            displayTextInput({760, 620}, {400, 80}, _name);
-            displayTextInput({760, 740}, {180, 80}, _nbPlayer);
-            displayButton({980, 740}, {180, 80}, "Launch Game", true);
+
+        void displaySelectSprite(AssetManager &assetManager, int& value) {
+            size_t index = 0;
+            size_t i = 1;
+            float xPos = 600.0f;
+            float yPos = 300.0f;
+            int heightMax = 0;
+            for (auto sprite : assetManager._sprite) {
+                Texture tmp = assetManager.LoadTexture(sprite.second);
+
+                DrawTextureRec(tmp, {0, 0, static_cast<float>(tmp.width), static_cast<float>(tmp.height)}, {xPos, yPos}, WHITE);
+
+                if (CheckCollisionPointRec(GetMousePosition(), {xPos, yPos, static_cast<float>(tmp.width), static_cast<float>(tmp.height)})) {
+                    DrawRectangleLines(static_cast<int>(xPos), static_cast<int>(yPos), static_cast<float>(tmp.width), static_cast<float>(tmp.height), RED);
+
+                    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                        value = static_cast<int>(index);
+                    }
+                }
+                xPos = xPos + (static_cast<float>(tmp.width) + 100.0f);
+                if (heightMax < tmp.height)
+                    heightMax = tmp.height;
+                if ((i % 4 == 0 && i != 0)) {
+                    yPos = yPos + static_cast<float>(heightMax) + 100.0f;
+                    xPos = 600.0f;
+                    heightMax = 0;
+                }
+                i++;
+                index++;
+            }
+            xPos = 860.0f;
+            yPos = 100.0f;
+            if (value != -1) {
+                Texture tmp = assetManager.LoadTexture(assetManager._sprite[value]);
+                DrawTextureRec(assetManager.LoadTexture(assetManager._sprite[value]), {0, 0, static_cast<float>(tmp.width), static_cast<float>(tmp.height)}, {xPos, yPos}, WHITE);
+            }
         }
+
+        void displayLoadSprite(void) {
+            if (_errorLoad != "") {
+                displayTextWithBackground(_errorLoad, 860, 100);
+            }
+            displayTextInput({560, 380}, {800, 80}, _pathSprite, 65);
+            displayButton({1180, 500}, {180, 80}, "Send Sprite", true);
+        }
+
+        void createRoom(void) {
+            displayTextInput({760, 380}, {400, 80}, _host, 20);
+            displayTextInput({760, 500}, {400, 80}, _port, 20);
+            displayTextInput({760, 620}, {400, 80}, _name, 20);
+            displayButton({760, 740}, {400, 80}, "Select Ennemy", true);
+            displayButton({760, 860}, {400, 80}, "Select Bullet", true);
+            displayTextInput({760, 980}, {180, 80}, _nbPlayer, 20);
+            displayButton({980, 980}, {180, 80}, "Launch Game", true);
+        }
+
     protected:
     private:
-        void displayTextInput(Vector2 pos, Vector2 size, std::string &text) {
+        void displayTextInput(Vector2 pos, Vector2 size, std::string &text, std::size_t length) {
             Graphic::drawRectangle(pos.x, pos.y, size.x, size.y, LIGHTGRAY);
             Graphic::drawRectangleLines(pos.x, pos.y, size.x, size.y, GRAY);
 
@@ -104,7 +211,7 @@ class Menu {
 
             if (selected) {
                 int key = Graphic::getCharPressed();
-                if ((key >= 32) && (key <= 125) && text.length() < 20) {
+                if ((key >= 32) && (key <= 125) && text.length() < length) {
                     text += static_cast<char>(key);
                 }
 
@@ -132,6 +239,14 @@ class Menu {
                     this->action = text;
             }
         }
+        void displayTextWithBackground(std::string text, int xPos, int yPos) {
+            int textHeight = 20;
+            int textWidth = Graphic::measureText(text.c_str(), textHeight);
+
+            Graphic::drawRectangle(xPos, yPos, textWidth + 20, textHeight + 20, LIGHTGRAY);
+            Graphic::drawRectangleLines(xPos, yPos, textWidth + 20, textHeight + 20, GRAY);
+            Graphic::drawText(text.c_str(), xPos + 10, yPos + 10, 20, DARKGRAY);
+        }
         void getRoomList(void) {
             _roomList.clear();
             std::ifstream input("room.txt");
@@ -147,13 +262,44 @@ class Menu {
                 std::istringstream iss(header);
                 std::string token;
                 std::vector<std::string> room;
-                while (iss >> token) {
+                while (std::getline(iss, token, '\t')) {
                     room.push_back(token);
                 }
                 _roomList.push_back(room);
                 room.clear();
             }
             input.close();
+        }
+        void displaySettings(void) {
+            if (_settingsState == "") {
+                Graphic::drawTexture(settings, 1790, 0, RWHITE);
+                Vector2 mousePosition = Graphic::getMousePosition();
+                if (Graphic::checkCollisionPointRec(mousePosition.x, mousePosition.y, 1790, 0, 150, 100) && Graphic::isMouseButtonPressed()) {
+                    _settingsState = "Settings";
+                }
+            } else if (_settingsState == "Settings") {
+                Graphic::drawRectangle(1610, 10, 300, 70, {0, 0, 0, 50});
+                Graphic::drawRectangleLines(1610, 10, 300, 70, RWHITE);
+                Rectangle sliderBar = { 1660, 35, 200, 20 };
+                Rectangle sliderKnob = { sliderBar.x + (sliderBar.width - 20) * volume, sliderBar.y - 10, 20, 40 };
+                Vector2 mousePosition = Graphic::getMousePosition();
+                bool knobHovered = Graphic::checkCollisionPointRec(mousePosition.x, mousePosition.y, sliderKnob.x, sliderKnob.y, sliderKnob.width, sliderKnob.height);
+                if (Graphic::isMouseButtonDown()) {
+                    if (knobHovered) {
+                        mousePosition = Graphic::getMousePosition();
+                        sliderKnob.x = std::clamp(mousePosition.x - sliderKnob.width / 2, sliderBar.x, sliderBar.x + sliderBar.width - sliderKnob.width);
+                        float relativeX = sliderKnob.x - sliderBar.x;
+                        float normalizedX = relativeX / (sliderBar.width - sliderKnob.width);
+                        volume = normalizedX;
+                        Graphic::setMusicVolume(_music, volume);
+                    }
+                }
+                if (Graphic::isMouseButtonPressed() && !knobHovered) {
+                    _settingsState = "";
+                }
+                DrawRectangleRec(sliderBar, GRAY);
+                DrawRectangleRec(sliderKnob, knobHovered ? DARKGRAY : LIGHTGRAY);
+            }
         }
 };
 

@@ -10,6 +10,20 @@
 #include "../../ECS/ECSClient.hpp"
 #include "Parallax.hpp"
 #include "Menu.hpp"
+#include "Chat.hpp"
+
+std::string fileToBase64(const std::string& filePath) {
+    std::ifstream file(filePath, std::ios::binary);
+    if (!file) {
+        std::cerr << "Erreur lors de l'ouverture du fichier." << std::endl;
+        return "";
+    }
+
+    std::ostringstream base64Stream;
+    base64Stream << file.rdbuf();
+
+    return base64Stream.str();
+}
 
 int main(int ac, char **av)
 {
@@ -17,22 +31,22 @@ int main(int ac, char **av)
         return -84;
     std::ofstream fichier;
     fichier.open("room.txt", std::ofstream::out | std::ofstream::trunc);
-    
+
     if (fichier.is_open()) {
         fichier << "PORT\tNAME\tNB_PLAYER" << std::endl;
         fichier.close();
-        std::cout << "Le contenu du fichier a été supprimé." << std::endl;
     } else {
         std::cerr << "Impossible d'ouvrir le fichier." << std::endl;
     }
 
     Coordinator coordinator;
+    AssetManager assetManager;
 
     coordinator.Init();
     Graphic::init(1920, 1080, "R-Type");
     Graphic::toggleFullScreen();
-    Music music = Graphic::loadMusic("assets/Theme.mp3");
     Parallax parallax("assets/parallax/");
+    Chat chat(av[3]);
 
     coordinator.RegisterComponent<Position>();
     coordinator.RegisterComponent<Velocity>();
@@ -46,6 +60,7 @@ int main(int ac, char **av)
     auto movableSystem = coordinator.RegisterSystem<MovableSystem>();
     auto networkClientSystem = coordinator.RegisterSystem<NetworkClientSystem>();
     auto eventSystem = coordinator.RegisterSystem<EventSystem>();
+    auto logger = coordinator.RegisterSystem<Logger>();
 
     Signature signature2;
 
@@ -77,7 +92,6 @@ int main(int ac, char **av)
 
     networkClientSystem->Init(host, port, name, portClient);
 
-    Graphic::playMusic(music);
     std::chrono::milliseconds interval(16);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
@@ -86,27 +100,49 @@ int main(int ac, char **av)
         currentTime = std::chrono::steady_clock::now();
         elapsedTime = currentTime - startTime;
         if (elapsedTime >= interval) {
-            Graphic::updateMusic(music);
             Graphic::beginDrawing();
             Graphic::clearBackground(RBLACK);
             if (menu.action == "Launch Game") {
-                menu.action = "";
-                std::string infos[] = {menu._port, menu._name, menu._nbPlayer};
-                coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::make_any<std::string>(infos[0]), std::make_any<std::string>(infos[1]), std::make_any<std::string>(infos[2])}});
+                if (menu._selectBullet == -1 || menu._selectEnnemy == -1) {
+                    menu.action = "Create Room";
+                } else {
+                    menu.action = "";
+                    std::string infos[] = {menu._port, menu._name, menu._nbPlayer};
+                    coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::make_any<int>(menu._selectBullet), std::make_any<int>(menu._selectEnnemy), std::make_any<std::string>(infos[0]), std::make_any<std::string>(infos[1]), std::make_any<std::string>(infos[2])}});
+                    menu._selectBullet = -1;
+                    menu._selectEnnemy = -1;
+                }
+            }
+            if (menu.action == "Send Sprite") {
+                std::string base64 = fileToBase64(menu._pathSprite);
+                if (base64 == "") {
+                    menu._errorLoad = "Error: can't open file";
+                    menu.action = "Load Sprite";
+                } else {
+                    menu.action = "";
+                    menu._errorLoad = "";
+                    std::string fileName = std::filesystem::path(menu._pathSprite).filename().string();
+                    coordinator.AddEvent(Event{Event::actions::SEND_SPRITE, 0, {std::make_any<std::string>(base64), std::make_any<std::string>(fileName)}});
+                }
+
             }
             parallax.draw();
-            movableSystem->Update(coordinator);
-            eventSystem->RunEvents(coordinator);
+            if (!chat.isOpen())
+                movableSystem->Update(coordinator);
+            eventSystem->RunEvents(coordinator, assetManager);
             graphicSystem->Update(coordinator);
             networkClientSystem->Update(coordinator);
-            eventSystem->RunEvents(coordinator);
+            eventSystem->RunEvents(coordinator, assetManager);
             physicSystem->Update(coordinator);
+            if (menu.action == "Game") {
+                chat.displayChatWindow(coordinator);
+                logger->Update(coordinator);
+            }
             startTime = currentTime;
-            menu.displayMenu();
+            menu.displayMenu(assetManager);
             Graphic::endDrawing();
         }
     }
-    Graphic::unloadMusic(music);
     Graphic::close();
     return 0;
 }

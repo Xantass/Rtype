@@ -1,3 +1,0 @@
-PORT	NAME	NB_PLAYER
-1024	jules	4
-1024	jules	4

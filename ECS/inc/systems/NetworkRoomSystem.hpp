@@ -60,6 +60,14 @@ public:
     int hourIntNow();
 
     /**
+     * @brief Splits a vector of integers into subvectors with a specified maximum size.
+     * @param originalVector The original vector to split.
+     * @param maxSize The maximum size of each subvector.
+     * @return A vector of vectors containing the split subvectors.
+     */
+    std::vector<std::vector<int>> splitVector(const std::vector<int> &originalVector, size_t maxSize);
+
+    /**
      * @brief Merges two vectors of integers into a single vector.
      * @param vec1 The first vector of integers.
      * @param vec2 The second vector of integers.
@@ -97,6 +105,13 @@ public:
      * @return A string generated from the vector of integers.
      */
     std::string vectorToString(const std::vector<int>& data);
+
+    /**
+     * @brief Converts a string into a vector of integers.
+     * @param str The string to convert.
+     * @return A vector of integers generated from the string.
+     */
+    std::vector<int> stringToVector(const std::string& str);
 
     /**
      * @brief Finds a valid port to use.
@@ -177,6 +192,30 @@ public:
      */
     void shoot(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
+    /**
+     * @brief Checks the command in a text message and performs related actions.
+     * @param msg The text message containing the command.
+     * @param index The index associated with the client sending the message.
+     * @param clientEndpoint The endpoint of the client sending the message.
+     * @return An integer indicating the result of the command check.
+     */
+    int checkCmdMessage(std::string msg, int index, udp::endpoint& clientEndpoint);
+
+    /**
+     * @brief Handles message-related data received from a client.
+     * @param decodedIntegers The vector of integers representing the message data.
+     * @param clientEndpoint The endpoint of the client sending the message.
+     * @param coordinator The Coordinator reference.
+     */
+    void message(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
+
+    /**
+     * @brief Handles sprite-related data received from a client.
+     * @param decodedIntegers The vector of integers representing the sprite data.
+     * @param clientEndpoint The endpoint of the client sending the sprite data.
+     * @param coordinator The Coordinator reference.
+     */
+    void sprite(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     /**
      * @brief Sends a destroy signal for an entity.
@@ -189,13 +228,14 @@ public:
      * @param entity The entity to create.
      * @param coordinator The Coordinator reference.
      */
-    void sendCreate(int entity, Coordinator &coordinator);
+    void sendCreate(int entity, Coordinator &coordinator, int selectSprite);
+
 
     /**
      * @brief Initializes the NetworkRoomSystem with a specific port.
      * @param port The port to use for communication.
      */
-    void Init(int port);
+    void Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPlayer, std::map<int, std::tuple<std::string, std::string>> sprite, int selectBullet, int selectEnnemy);
 
     /**
      * @brief Sends a packet with header and data to a specific client endpoint, optionally storing it.
@@ -246,8 +286,14 @@ private:
     udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v6(), 0)); /**< The UDP socket for communication. */
     std::vector<Client> _clients; /**< Vector storing information about connected clients. */
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
-    std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[15]; /**< Array of function pointers. */
+    std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[17]; /**< Array of function pointers. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
+    std::tuple<udp::endpoint, std::string> _admin; /**< Tuple containing the admin's endpoint and username. */
+    int _nbPLayer; /**< The number of players for the room. */
+    std::vector<udp::endpoint> _ban; /**< Vector storing the endpoints of banned clients. */
+    std::map<int, std::tuple<std::string, std::string>> _sprite; /**< Map associating indices to sprite-related data. */
+    int _spriteEnnemy; /**< The sprite index for enemy entities. */
+    int _spriteBullet; /**< The sprite index for bullet entities. */
 };
 
 #include "../../src/systems/NetworkRoomSystem.cpp"

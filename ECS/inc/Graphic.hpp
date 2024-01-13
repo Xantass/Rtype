@@ -88,6 +88,10 @@ class Graphic {
         static void drawTexture(Texture texture, int posX, int posY, Color color) {
             DrawTexture(texture, posX, posY, color);
         }
+
+        static void drawTextureEx(Texture2D texture, Vector2 position, float rotation, float scale, Color tint) {
+            DrawTextureEx(texture, position, rotation, scale, tint);
+        }
         /**
          * @brief Check if a key is currently down
          *
@@ -262,6 +266,32 @@ class Graphic {
          */
         static void toggleFullScreen(void) {
             ToggleFullscreen();
+        }
+        /**
+         * @brief Get the FPS
+         *
+         * @return int
+         */
+        static int getFPS(void) {
+            return GetFPS();
+        }
+        /**
+         * @brief Check if left mouse button is currently down
+         *
+         * @return true
+         * @return false
+         */
+        static bool isMouseButtonDown(void) {
+            return IsMouseButtonDown(0);
+        }
+        /**
+         * @brief Set the volume of Music object
+         *
+         * @param music
+         * @param volume
+         */
+        static void setMusicVolume(Music music, float volume) {
+            SetMusicVolume(music, volume);
         }
 };
 

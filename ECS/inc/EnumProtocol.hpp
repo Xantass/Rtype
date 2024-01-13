@@ -28,7 +28,8 @@ enum Cmd {
     PING = 5, /**< Ping command. */
     PONG = 6, /**< Pong command. */
     DISCONNECT = 7, /**< Quit command. */
-    CREATE_ROOM_CMD = 14,
+    CREATE_ROOM_CMD = 14, /**< Create room command. */
+    SPRITE = 16, /**< Create sprite command. */
 };
 
 /**
@@ -41,7 +42,8 @@ enum Action {
     SHOOT = 10, /**< Shoot action. */
     MOVE = 11, /**< Move action. */
     DESTROY = 12, /**< Destroy command. */
-    CREATE = 13 /**< Create command. */
+    CREATE = 13, /**< Create command. */
+    MESSAGE_SEND = 15, /**< Send message command. */
 };
 
 /**
@@ -56,14 +58,10 @@ enum Error {
     ALREADY_STOP = 4, /**< Already stopped error. */
     FAIL_CONNECT = 5, /**< Failed to connect error. */
     FAIL_START = 6, /**< Failed to start error. */
-    CREATE_ROOM = 7,
-    STOP_SEND = 8,
-    UNVAILABLE_MOVE = 9
-};
-
-enum class DataType {
-    INTEGER,
-    FLOAT,
+    CREATE_ROOM = 7, /**< Failed to create room error. */
+    STOP_SEND = 8, /**< Send to stop send this packet. */
+    UNVAILABLE_MOVE = 9, /**< Failed move error. */
+    NO_RIGHT = 10, /**< Permission denied for cmd. */
 };
 
 /** 

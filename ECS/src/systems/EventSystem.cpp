@@ -11,8 +11,9 @@
 #include "components/Controllable.hpp"
 #include "components/HealthPoint.hpp"
 #include "Graphic.hpp"
+#include "AssetManager.hpp"
 
-void EventSystem::RunEvents(Coordinator &coordinator)
+void EventSystem::RunEvents(Coordinator &coordinator, AssetManager &assetManager)
 {
 	std::queue<Event> eventQueue = coordinator.GetEventQueue();
 
@@ -27,15 +28,16 @@ void EventSystem::RunEvents(Coordinator &coordinator)
 				coordinator.AddComponent<Position>(entity, {std::any_cast<float>(event._data[1]), std::any_cast<float>(event._data[2])});
 				coordinator.AddComponent<Velocity>(entity, {std::any_cast<float>(event._data[3]), std::any_cast<float>(event._data[4])});
 				coordinator.AddComponent<Hitbox>(entity, {std::any_cast<float>(event._data[5]), std::any_cast<float>(event._data[6]), std::any_cast<float>(event._data[7]), std::any_cast<float>(event._data[8]), std::any_cast<HitboxType>(event._data[9])});
-				coordinator.AddComponent<HealthPoint>(entity, {std::any_cast<int>(event._data[10]), std::any_cast<int>(event._data[11])});
-				if (std::any_cast<HitboxType>(event._data[9]) == (PLAYER))
-					coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/spaceship.png")});
-				if (std::any_cast<int>(event._data[10]) == static_cast<int>(entity))
-					coordinator.AddComponent<Movable>(entity, {NONE});
+				coordinator.AddComponent<HealthPoint>(entity, {std::any_cast<int>(event._data[11]), std::any_cast<int>(event._data[12])});
+				if (std::any_cast<HitboxType>(event._data[9]) == (PLAYER)) {
+					coordinator.AddComponent<Sprite>(entity, {assetManager.LoadTexture(assetManager._sprite[std::any_cast<int>(event._data[13])]), 1});
+					if (std::any_cast<int>(event._data[10]) == static_cast<int>(entity))
+						coordinator.AddComponent<Movable>(entity, {NONE});
+				}
 				if (std::any_cast<HitboxType>(event._data[9]) == (BULLET))
-					coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/bullets.png")});
+					coordinator.AddComponent<Sprite>(entity, {assetManager.LoadTexture(assetManager._sprite[std::any_cast<int>(event._data[13])]), 1});
 				if (std::any_cast<HitboxType>(event._data[9]) == (ENNEMY))
-					coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/carli.png")});
+					coordinator.AddComponent<Sprite>(entity, {assetManager.LoadTexture(assetManager._sprite[std::any_cast<int>(event._data[13])]), 1});
 				break;
 			} case Event::actions::MOVE: {
 				coordinator.GetComponent<Position>(event._entity)._x += coordinator.GetComponent<Velocity>(event._entity)._x;
@@ -43,6 +45,9 @@ void EventSystem::RunEvents(Coordinator &coordinator)
 				break;
 			} case Event::actions::DESTROY: {
 				coordinator.DestroyEntity(event._entity);
+				break;
+			} case Event::actions::CREATE_SPRITE: {
+				assetManager.LoadTexture(std::any_cast<std::string>(event._data.at(0)), std::any_cast<std::string>(event._data.at(1)), std::any_cast<int>(event._data.at(2)));
 				break;
 			} default:
 				break;

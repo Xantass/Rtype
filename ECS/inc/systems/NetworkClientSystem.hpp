@@ -18,6 +18,7 @@
 #include <sstream>
 #include <fstream>
 #include <chrono>
+#include <thread>
 #if defined(_WIN32)           
 	#define NOGDI             // All GDI defines and routines
 	#define NOUSER            // All USER defines and routines
@@ -68,6 +69,14 @@ public:
     int hourIntNow();
 
     /**
+     * @brief Splits a vector of integers into subvectors with a specified maximum size.
+     * @param originalVector The original vector to split.
+     * @param maxSize The maximum size of each subvector.
+     * @return A vector of vectors containing the split subvectors.
+     */
+    std::vector<std::vector<int>> splitVector(const std::vector<int> &originalVector, size_t maxSize);
+
+    /**
      * @brief Determines the HitboxType based on the given integer.
      * @param x The integer value used to determine the HitboxType.
      * @return The HitboxType determined from the given integer.
@@ -104,6 +113,11 @@ public:
      */
     std::vector<int> stringToVector(const std::string& str);
 
+    /**
+     * @brief Converts a vector of integers into a string.
+     * @param data The vector of integers to convert.
+     * @return A string generated from the vector of integers.
+     */
     std::string vectorToString(const std::vector<int>& data);
 
     /**
@@ -119,6 +133,13 @@ public:
     void ping(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
     /**
+     * @brief Handles disconnection-related data received from a client.
+     * @param decodedIntegers The vector of integers representing the disconnection data.
+     * @param coordinator The Coordinator reference.
+     */
+    void disconnect(std::vector<int>& decodedIntegers, Coordinator &coordinator);
+
+    /**
      * @brief Sends position data.
      * @param decodedIntegers The vector of integers for position data.
      */
@@ -130,8 +151,6 @@ public:
      * @param coordinator The Coordinator reference.
      */
     void response(std::vector<int>& decodedIntegers, Coordinator &coordinator);
-
-    void createRoom(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
     /**
      * @brief Creates entities based on decoded data.
@@ -146,6 +165,27 @@ public:
      * @param coordinator The Coordinator reference.
      */
     void createEntity(std::vector<int> decodedIntegers, Coordinator &coordinator);
+
+    /**
+     * @brief Handles data to create a room received from a client.
+     * @param decodedIntegers The vector of integers representing the room creation data.
+     * @param coordinator The Coordinator reference.
+     */
+    void createRoom(std::vector<int>& decodedIntegers, Coordinator &coordinator);
+
+    /**
+     * @brief Handles message creation-related data received from a client.
+     * @param decodedIntegers The vector of integers representing the message creation data.
+     * @param coordinator The Coordinator reference.
+     */
+    void createMessage(std::vector<int>& decodedIntegers, Coordinator &coordinator);
+
+    /**
+     * @brief Handles sprite creation-related data received from a client.
+     * @param decodedIntegers The vector of integers representing the sprite creation data.
+     * @param coordinator The Coordinator reference.
+     */
+    void createSprite(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
     /**
      * @brief Destroys an entity based on the provided decoded integers.
@@ -172,6 +212,18 @@ public:
      * @param event The Event object representing the move event.
      */
     void moveEvent(Event& event);
+
+    /**
+     * @brief Handles an event related to a message.
+     * @param event The Event object representing the message-related event.
+     */
+    void messageEvent(Event& event);
+
+    /**
+     * @brief Handles an event related to a sprite.
+     * @param event The Event object representing the sprite-related event.
+     */
+    void spriteEvent(Event& event);
 
     /**
      * @brief Checks for pending events and handles them within the coordinator.
@@ -242,11 +294,12 @@ private:
     io_context _service; /**< The Boost ASIO io_service. */
     udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v4(), findValidPort(_service))); /**< The UDP socket for communication. */
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
-    std::function<void(std::vector<int>&, Coordinator &coordinator)> _functions[15]; /**< Array of function pointers. */
+    std::function<void(std::vector<int>&, Coordinator &coordinator)> _functions[17]; /**< Array of function pointers. */
     int _id; /**< The ID of the client. */
     std::map<int, std::vector<int>> _packetsSend; /**< Packets sent with associated timestamps. */
     std::map<int, std::vector<int>> _packetsReceive; /**< Packets received with associated timestamps. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
+    std::string _username; /**< Username to log into server. */
 };
 
 #include "../../src/systems/NetworkClientSystem.cpp"
