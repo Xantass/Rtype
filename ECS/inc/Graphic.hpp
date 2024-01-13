@@ -271,6 +271,24 @@ class Graphic {
         static int getFPS(void) {
             return GetFPS();
         }
+        /**
+         * @brief Check if left mouse button is currently down
+         *
+         * @return true
+         * @return false
+         */
+        static bool isMouseButtonDown(void) {
+            return IsMouseButtonDown(0);
+        }
+        /**
+         * @brief Set the volume of Music object
+         *
+         * @param music
+         * @param volume
+         */
+        static void setMusicVolume(Music music, float volume) {
+            SetMusicVolume(music, volume);
+        }
 };
 
 #endif /* !GRAPHIC_HPP_ */
