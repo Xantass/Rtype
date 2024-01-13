@@ -340,9 +340,9 @@ inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::e
     if (username.length() > 4 && username.substr(0, 4) == "(S) ")
         coordinator.AddComponent<Hitbox>(entity, {0, 0, 0, 0, SPECTATOR});
     else
-        coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
-    coordinator.AddComponent<HealthPoint>(entity, {3, 3});
-    coordinator.AddComponent<Damage>(entity, {0, 0});
+        coordinator.AddComponent<Hitbox>(entity, {0, 0, 100, 100, PLAYER});
+    coordinator.AddComponent<HealthPoint>(entity, {3000, 3000});
+    coordinator.AddComponent<Damage>(entity, {1, 1});
     sendCreate(entity, coordinator);
     _clients.push_back(Client(username, clientEndpoint, entity));
 
@@ -474,9 +474,9 @@ inline void NetworkRoomSystem::shoot(std::vector<int>& decodedIntegers, udp::end
 
             coordinator.AddComponent<Position>(bullet, coordinator.GetComponent<Position>(decodedIntegers.at(0)));
             coordinator.AddComponent<Velocity>(bullet, {20, 0});
-            coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, BULLET});
+            coordinator.AddComponent<Hitbox>(bullet, {0, 0, 60, 60, BULLET});
             coordinator.AddComponent<Damage>(bullet, {1, 1});
-            coordinator.AddComponent<HealthPoint>(bullet, {-1, -1});
+            coordinator.AddComponent<HealthPoint>(bullet, {1, 1});
             coordinator.AddComponent<Controllable>(bullet, {ENGINE});
 
             send(_PASS, {timeStamp}, false, clientEndpoint, index);
@@ -545,13 +545,17 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
         if (event._type == Event::actions::SPAWN) {
 
             Entity ennemy = coordinator.CreateEntity();
-            coordinator.AddComponent<Position>(ennemy, {1990, (static_cast<float>(std::any_cast<int>(event._data[0])))});
-            coordinator.AddComponent<Velocity>(ennemy, {-20, 0});
-            coordinator.AddComponent<Hitbox>(ennemy, {0, 0, 100, 100, ENNEMY});
+            coordinator.AddComponent<Position>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[1]))), (static_cast<float>(std::any_cast<int>(event._data[0])))});
+            coordinator.AddComponent<Velocity>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[2]))), 0});
+            coordinator.AddComponent<Hitbox>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[3]))), (static_cast<float>(std::any_cast<float>(event._data[4]))), (static_cast<float>(std::any_cast<float>(event._data[5]))), (static_cast<float>(std::any_cast<float>(event._data[6]))), ENNEMY});
             coordinator.AddComponent<Controllable>(ennemy, {IA});
-            coordinator.AddComponent<HealthPoint>(ennemy, {1, 1});
-            coordinator.AddComponent<Damage>(ennemy, {1, 1});
+            coordinator.AddComponent<HealthPoint>(ennemy, {(static_cast<int>(std::any_cast<int>(event._data[7]))), (static_cast<int>(std::any_cast<int>(event._data[7])))});
+            coordinator.AddComponent<Damage>(ennemy, {(static_cast<int>(std::any_cast<int>(event._data[8]))), (static_cast<int>(std::any_cast<int>(event._data[8])))});
             this->sendCreate(ennemy, coordinator);
+            if ((static_cast<int>(std::any_cast<int>(event._data[9]))) == 1) {
+                coordinator.AddComponent<SpawnClock>(ennemy, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0});
+                coordinator.AddComponent<SpawnInfo>(ennemy, {1, 0, 0, -20, 30, 20, 100, 110, 1, 1, 0});
+            }
             break;
         }
         if (event._type == Event::actions::DESTROY) {

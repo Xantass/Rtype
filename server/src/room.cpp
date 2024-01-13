@@ -19,6 +19,7 @@ int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameA
     coordinator.RegisterComponent<Hitbox>();
     coordinator.RegisterComponent<Controllable>();
     coordinator.RegisterComponent<SpawnClock>();
+    coordinator.RegisterComponent<SpawnInfo>();
     coordinator.RegisterComponent<HealthPoint>();
     coordinator.RegisterComponent<Damage>();
 
@@ -47,6 +48,8 @@ int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameA
     Signature signature3;
     
     signature3.set(coordinator.GetComponentType<SpawnClock>());
+    signature3.set(coordinator.GetComponentType<SpawnInfo>());
+    signature3.set(coordinator.GetComponentType<Position>());
     coordinator.SetSystemSignature<SpawnClock>(signature3);
     
     Signature signature4;
@@ -60,10 +63,18 @@ int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameA
     signature5.set(coordinator.GetComponentType<HealthPoint>());
     coordinator.SetSystemSignature<HealthSystem>(signature5);
 
-    Entity ent = coordinator.CreateEntity();
-    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 2, 100, 1000});
-    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 1, 500, 700});
-    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 3, 200, 900});
+    Entity cl1 = coordinator.CreateEntity();
+    coordinator.AddComponent<Position>(cl1, {1990, 0});
+    coordinator.AddComponent<SpawnClock>(cl1, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0});
+    coordinator.AddComponent<SpawnInfo>(cl1, {2, 100, 900, -10, 30, 20, 100, 110, 1, 1, 1});
+    Entity cl2 = coordinator.CreateEntity();
+    coordinator.AddComponent<Position>(cl2, {1990, 0});
+    coordinator.AddComponent<SpawnClock>(cl2, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0});
+    coordinator.AddComponent<SpawnInfo>(cl2, {1, 300, 700, -10, 30, 20, 100, 110, 1, 1, 1});
+    Entity cl3 = coordinator.CreateEntity();
+    coordinator.AddComponent<Position>(cl3, {1990, 0});
+    coordinator.AddComponent<SpawnClock>(cl3, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0});
+    coordinator.AddComponent<SpawnInfo>(cl3, {3, 200, 900, -30, 30, 20, 100, 110, 1, 1, 1});
 
     networkRoomSystem->Init(port, clientEndpoint, nameAdmin, nbPlayer);
     std::chrono::milliseconds interval(16);
