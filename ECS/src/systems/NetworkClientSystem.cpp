@@ -139,7 +139,7 @@ inline void NetworkClientSystem::createEntities(std::vector<int> decodedInteger,
 {
     decodedInteger.erase(decodedInteger.begin(), decodedInteger.begin() + 3);
     while (decodedInteger.empty() == false) {
-        coordinator.AddEvent(Event{Event::CREATE, static_cast<Entity>(decodedInteger.at(0)), {std::make_any<int>(decodedInteger.at(0)), std::make_any<float>(CHECK_ZERO(decodedInteger.at(1))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(2))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(3))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(4))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(5))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(6))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(7))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(8))), std::make_any<HitboxType>(CHECK_TYPE(decodedInteger.at(9))), std::make_any<int>(_id), std::make_any<int>(decodedInteger.at(10)), std::make_any<int>(decodedInteger.at(11)), std::make_any<int>(decodedInteger.at(12))}});
+        coordinator.AddEvent(Event{Event::CREATE, static_cast<Entity>(decodedInteger.at(0)), {std::make_any<int>(decodedInteger.at(0)), std::make_any<float>(CHECK_ZERO(decodedInteger.at(1))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(2))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(3))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(4))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(5))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(6))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(7))), std::make_any<float>(CHECK_ZERO(decodedInteger.at(8))), std::make_any<HitboxType>(CHECK_TYPE(decodedInteger.at(9))), std::make_any<int>(_id), std::make_any<int>(decodedInteger.at(10)), std::make_any<int>(decodedInteger.at(11)), std::make_any<int>(decodedInteger.at(12)), std::make_any<float>(CHECK_ZERO(decodedInteger.at(13)))}});
         //ADD INT FOR ID ENTITY
         // Entity entity = coordinator.CreateEntity(decodedInteger.at(0));
         // if (entity == _id) {
@@ -151,7 +151,7 @@ inline void NetworkClientSystem::createEntities(std::vector<int> decodedInteger,
         // coordinator.AddComponent<Position>(entity, {CHECK_ZERO(decodedInteger.at(1)), CHECK_ZERO(decodedInteger.at(2))});
         // coordinator.AddComponent<Velocity>(entity, {CHECK_ZERO(decodedInteger.at(3)), CHECK_ZERO(decodedInteger.at(4))});
         // coordinator.AddComponent<Hitbox>(entity, {CHECK_ZERO(decodedInteger.at(5)), CHECK_ZERO(decodedInteger.at(6)), CHECK_ZERO(decodedInteger.at(7)), CHECK_ZERO(decodedInteger.at(8)), CHECK_TYPE(decodedInteger.at(9))});
-        decodedInteger.erase(decodedInteger.begin(), decodedInteger.begin() + 13);
+        decodedInteger.erase(decodedInteger.begin(), decodedInteger.begin() + 14);
     }
 }
 
@@ -264,7 +264,7 @@ inline void NetworkClientSystem::pos(std::vector<int>& decodedIntegers, Coordina
                 break;
             }
         }
-        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 13);
+        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 14);
     }
     send(_OK, {timeStamp}, false);
 }
@@ -349,8 +349,8 @@ inline void NetworkClientSystem::createEntity(std::vector<int> decodedIntegers, 
 
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
     while (decodedIntegers.empty() == false) {
-        coordinator.AddEvent(Event{Event::CREATE, static_cast<Entity>(decodedIntegers.at(0)), {std::make_any<int>(decodedIntegers.at(0)), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(1))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(2))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(3))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(4))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(5))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(6))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(7))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(8))), std::make_any<HitboxType>(CHECK_TYPE(decodedIntegers.at(9))), std::make_any<int>(_id), std::make_any<int>(decodedIntegers.at(10)), std::make_any<int>(decodedIntegers.at(11)), std::make_any<int>(decodedIntegers.at(12))}});
-        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 13);
+        coordinator.AddEvent(Event{Event::CREATE, static_cast<Entity>(decodedIntegers.at(0)), {std::make_any<int>(decodedIntegers.at(0)), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(1))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(2))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(3))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(4))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(5))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(6))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(7))), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(8))), std::make_any<HitboxType>(CHECK_TYPE(decodedIntegers.at(9))), std::make_any<int>(_id), std::make_any<int>(decodedIntegers.at(10)), std::make_any<int>(decodedIntegers.at(11)), std::make_any<int>(decodedIntegers.at(12)), std::make_any<float>(CHECK_ZERO(decodedIntegers.at(13)))}});
+        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 14);
     }
     send(_OK, {timeStamp}, false);
 }
