@@ -46,7 +46,7 @@
 using namespace asio;
 using asio::ip::udp;
 
-int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameAdmin, std::map<int, std::tuple<std::string, std::string>> sprite);
+int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameAdmin, std::map<int, std::tuple<std::string, std::string>> sprite, int selectBullet, int selectEnnemy);
 
 /**
  * @class NetworkServerSystem

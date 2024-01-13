@@ -35,9 +35,9 @@ void EventSystem::RunEvents(Coordinator &coordinator, AssetManager &assetManager
 						coordinator.AddComponent<Movable>(entity, {NONE});
 				}
 				if (std::any_cast<HitboxType>(event._data[9]) == (BULLET))
-					coordinator.AddComponent<Sprite>(entity, {assetManager.LoadTexture("assets/bullets.png")});
+					coordinator.AddComponent<Sprite>(entity, {assetManager.LoadTexture(assetManager._sprite[std::any_cast<int>(event._data[13])])});
 				if (std::any_cast<HitboxType>(event._data[9]) == (ENNEMY))
-					coordinator.AddComponent<Sprite>(entity, {assetManager.LoadTexture("assets/carli.png")});
+					coordinator.AddComponent<Sprite>(entity, {assetManager.LoadTexture(assetManager._sprite[std::any_cast<int>(event._data[13])])});
 				break;
 			} case Event::actions::MOVE: {
 				coordinator.GetComponent<Position>(event._entity)._x += coordinator.GetComponent<Velocity>(event._entity)._x;

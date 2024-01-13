@@ -285,14 +285,16 @@ inline void NetworkServerSystem::param(std::vector<int>& decodedIntegers, udp::e
         return;
 
     int nbPlayer = decodedIntegers.at(2);
+    int selectBullet = decodedIntegers.at(3);
+    int selectEnnemy = decodedIntegers.at(4);
 
-    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 3);
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 5);
 
     std::string name = vectorToString(decodedIntegers);
     int port = findValidPort(_service);
 
     try {
-        std::thread Thread(room, nbPlayer, port, clientEndpoint, _clients.at(index).getUsername(), _sprite);
+        std::thread Thread(room, nbPlayer, port, clientEndpoint, _clients.at(index).getUsername(), _sprite, selectBullet, selectEnnemy);
 
         Thread.detach();
         send({_OK}, {timeStamp}, false, clientEndpoint, index);

@@ -23,7 +23,13 @@ class Menu {
         std::string _name;
         std::string _pathSprite;
         std::string _nbPlayer;
+        std::string _errorLoad;
+        std::string _errorSelectSprite;
+        std::string _errorSelectEnnemy;
+        std::string _errorSelectBullet;
         int _selectSprite = -1;
+        int _selectEnnemy = -1;
+        int _selectBullet = -1;
         std::vector<std::vector<std::string>> _roomList;
         Coordinator &_coordinator;
         int page = 0;
@@ -31,7 +37,17 @@ class Menu {
         ~Menu() {}
         void displayMenu(AssetManager &assetManager) {
             if (Graphic::isKeyPressed(KEY_TAB)) {
-                action = "";
+                if (action == "Select Ennemy" || action == "Select Bullet") {
+                    action = "Create Room";
+                } else {
+                    action = "";
+                    _errorLoad = "";
+                    _errorSelectBullet = "";
+                    _errorSelectEnnemy = "";
+                    _errorSelectSprite = "";
+                    _selectBullet = -1;
+                    _selectEnnemy = -1;
+                }
             }
             if (action == "<") {
                 page = page == 0 ? 0 : page - 1;
@@ -52,12 +68,17 @@ class Menu {
             } else if (action == "Load Sprite") {
                 displayLoadSprite();
             } else if (action == "Select Sprite") {
-                displaySelectSprite(assetManager);
+                displaySelectSprite(assetManager, _selectSprite);
+            } else if (action == "Select Ennemy") {
+                displaySelectSprite(assetManager, _selectEnnemy);
+            } else if (action == "Select Bullet") {
+                displaySelectSprite(assetManager, _selectBullet);
             } else {
                 for (auto room : _roomList) {
                     if (room[1] == action) {
                         if (_selectSprite == -1) {
                             action = "Join Room";
+                            _errorSelectSprite = "Error: Choose your skin for the game";
                             return;
                         }
                         std::vector<std::string> list(3, "");
@@ -67,6 +88,7 @@ class Menu {
                         std::cout << "select: " << _selectSprite << std::endl;
                         _coordinator.AddEvent(Event{Event::actions::JOIN, 0, {std::make_any<int>(_selectSprite), std::make_any<std::string>(list[0]), std::make_any<std::string>(list[1]), std::make_any<std::string>(list[2]), std::make_any<std::string>("false")}});
                         action = "Game";
+                        _errorSelectSprite = "";
                         break;
                     } else if ("Spect.\n" + room[1] == action) {
                         std::vector<std::string> list(3, "");
@@ -81,6 +103,9 @@ class Menu {
             }
         }
         void displayJoinable(void) {
+            if (_errorSelectSprite != "") {
+                displayTextWithBackground(_errorSelectSprite, 800, 100);
+            }
             getRoomList();
             std::size_t endIdx;
             if (_roomList.size() == 0) {
@@ -107,14 +132,13 @@ class Menu {
                 displayButton({970, 800}, {50, 50}, ">", false);
         }
 
-        void displaySelectSprite(AssetManager &assetManager) {
+        void displaySelectSprite(AssetManager &assetManager, int& value) {
             size_t index = 0;
             size_t i = 1;
             float xPos = 600.0f;
             float yPos = 300.0f;
             int heightMax = 0;
             for (auto sprite : assetManager._sprite) {
-                // Calculer les positions en fonction du nombre de colonnes
                 Texture tmp = assetManager.LoadTexture(sprite.second);
 
                 DrawTextureRec(tmp, {0, 0, static_cast<float>(tmp.width), static_cast<float>(tmp.height)}, {xPos, yPos}, WHITE);
@@ -123,7 +147,7 @@ class Menu {
                     DrawRectangleLines(static_cast<int>(xPos), static_cast<int>(yPos), static_cast<float>(tmp.width), static_cast<float>(tmp.height), RED);
 
                     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                        _selectSprite = static_cast<int>(index);
+                        value = static_cast<int>(index);
                     }
                 }
                 xPos = xPos + (static_cast<float>(tmp.width) + 100.0f);
@@ -137,16 +161,18 @@ class Menu {
                 i++;
                 index++;
             }
-        xPos = 860.0f;
-        yPos = 100.0f;
-        if (_selectSprite != -1) {
-            // Calculer la position du sprite sélectionné en dehors de la grille
-            Texture tmp = assetManager.LoadTexture(assetManager._sprite[_selectSprite]);
-            DrawTextureRec(assetManager.LoadTexture(assetManager._sprite[_selectSprite]), {0, 0, static_cast<float>(tmp.width), static_cast<float>(tmp.height)}, {xPos, yPos}, WHITE);
-        }
+            xPos = 860.0f;
+            yPos = 100.0f;
+            if (value != -1) {
+                Texture tmp = assetManager.LoadTexture(assetManager._sprite[value]);
+                DrawTextureRec(assetManager.LoadTexture(assetManager._sprite[value]), {0, 0, static_cast<float>(tmp.width), static_cast<float>(tmp.height)}, {xPos, yPos}, WHITE);
+            }
         }
 
         void displayLoadSprite(void) {
+            if (_errorLoad != "") {
+                displayTextWithBackground(_errorLoad, 860, 100);
+            }
             displayTextInput({560, 380}, {800, 80}, _pathSprite, 65);
             displayButton({1180, 500}, {180, 80}, "Send Sprite", true);
         }
@@ -155,8 +181,10 @@ class Menu {
             displayTextInput({760, 380}, {400, 80}, _host, 20);
             displayTextInput({760, 500}, {400, 80}, _port, 20);
             displayTextInput({760, 620}, {400, 80}, _name, 20);
-            displayTextInput({760, 740}, {180, 80}, _nbPlayer, 20);
-            displayButton({980, 740}, {180, 80}, "Launch Game", true);
+            displayButton({760, 740}, {400, 80}, "Select Ennemy", true);
+            displayButton({760, 860}, {400, 80}, "Select Bullet", true);
+            displayTextInput({760, 980}, {180, 80}, _nbPlayer, 20);
+            displayButton({980, 980}, {180, 80}, "Launch Game", true);
         }
 
     protected:
@@ -203,6 +231,14 @@ class Menu {
                 if (selected && Graphic::isMouseButtonPressed())
                     this->action = text;
             }
+        }
+        void displayTextWithBackground(std::string text, int xPos, int yPos) {
+            int textHeight = 20;
+            int textWidth = Graphic::measureText(text.c_str(), textHeight);
+
+            Graphic::drawRectangle(xPos, yPos, textWidth + 20, textHeight + 20, LIGHTGRAY);
+            Graphic::drawRectangleLines(xPos, yPos, textWidth + 20, textHeight + 20, GRAY);
+            Graphic::drawText(text.c_str(), xPos + 10, yPos + 10, 20, DARKGRAY);
         }
         void getRoomList(void) {
             _roomList.clear();

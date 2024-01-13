@@ -7,10 +7,12 @@
 
 #include "NetworkRoomSystem.hpp"
 
-inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPLayer, std::map<int, std::tuple<std::string, std::string>> sprite)
+inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPLayer, std::map<int, std::tuple<std::string, std::string>> sprite, int selectBullet, int selectEnnemy)
 {
     udp::endpoint endpoint(udp::v4(), port);
 
+    _spriteBullet = selectBullet;
+    _spriteEnnemy = selectEnnemy;
     _sprite = sprite;
     _nbPLayer = nbPLayer;
     _admin = std::make_tuple(clientEndpoint, nameAdmin);
@@ -540,7 +542,7 @@ inline void NetworkRoomSystem::shoot(std::vector<int>& decodedIntegers, udp::end
             coordinator.AddComponent<Controllable>(bullet, {ENGINE});
 
             send(_PASS, {timeStamp}, false, clientEndpoint, index);
-            this->sendCreate(bullet, coordinator, -1);
+            this->sendCreate(bullet, coordinator, _spriteBullet);
             return;
         }
     }
@@ -616,7 +618,7 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
             coordinator.AddComponent<Controllable>(ennemy, {IA});
             coordinator.AddComponent<HealthPoint>(ennemy, {1, 1});
             coordinator.AddComponent<Damage>(ennemy, {1, 1});
-            this->sendCreate(ennemy, coordinator, -1);
+            this->sendCreate(ennemy, coordinator, _spriteEnnemy);
             break;
         }
         if (event._type == Event::actions::DESTROY) {
