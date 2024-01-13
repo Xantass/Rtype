@@ -28,6 +28,7 @@ inline void SpawnSystem::Update(Coordinator &coordinator)
                 coordinator.AddEvent(Event{Event::actions::SPAWN, 0, {y(rdm), pos._x, info._y_vel, info._x, info._y, info.width, info.height, info._hp, info._dmg, info._shoot}});
             else
                 coordinator.AddEvent(Event{Event::actions::SPAWN, 0, {(static_cast<int>(pos._y)), pos._x, info._y_vel, info._x, info._y, info.width, info.height, info._hp, info._dmg, info._shoot}});
+            return;
         }
     }
 }

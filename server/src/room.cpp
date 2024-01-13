@@ -7,7 +7,7 @@
 
 #include "room.hpp"
 
-int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameAdmin, std::map<int, std::tuple<std::string, std::string>> sprite, int selectBullet, int selectEnnemy)
+int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameAdmin, std::map<int, std::tuple<std::string, std::string>> sprite, std::vector<int> selectSprites)
 {
     (void)nbPlayer;
     Coordinator coordinator;
@@ -66,17 +66,17 @@ int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameA
     Entity cl1 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(cl1, {1990, 0});
     coordinator.AddComponent<SpawnClock>(cl1, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0});
-    coordinator.AddComponent<SpawnInfo>(cl1, {2, 100, 900, -10, 30, 20, 100, 110, 1, 1, 1});
+    coordinator.AddComponent<SpawnInfo>(cl1, {3, 100, 900, -5, 30, 20, 100, 110, 1, 1, 1});
     Entity cl2 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(cl2, {1990, 0});
     coordinator.AddComponent<SpawnClock>(cl2, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0});
-    coordinator.AddComponent<SpawnInfo>(cl2, {1, 300, 700, -10, 30, 20, 100, 110, 1, 1, 1});
+    coordinator.AddComponent<SpawnInfo>(cl2, {2, 300, 700, -10, 30, 20, 100, 110, 1, 1, 1});
     Entity cl3 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(cl3, {1990, 0});
     coordinator.AddComponent<SpawnClock>(cl3, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0});
-    coordinator.AddComponent<SpawnInfo>(cl3, {3, 200, 900, -30, 30, 20, 100, 110, 1, 1, 1});
+    coordinator.AddComponent<SpawnInfo>(cl3, {5, 200, 900, -15, 30, 20, 100, 110, 1, 1, 1});
 
-    networkRoomSystem->Init(port, clientEndpoint, nameAdmin, nbPlayer, sprite, selectBullet, selectEnnemy);
+    networkRoomSystem->Init(port, clientEndpoint, nameAdmin, nbPlayer, sprite, selectSprites);
     std::chrono::milliseconds interval(16);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();

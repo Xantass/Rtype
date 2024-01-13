@@ -437,14 +437,18 @@ inline void NetworkClientSystem::paramEvent(Event& event)
     std::vector<std::string> list;
     int selectBullet = std::any_cast<int>(event._data.at(0));
     int selectEnnemy = std::any_cast<int>(event._data.at(1));
+    int selectEnnemyTwo = std::any_cast<int>(event._data.at(2));
+    int selectEnnemyElite = std::any_cast<int>(event._data.at(3));
+    int selectEnnemyBoss = std::any_cast<int>(event._data.at(4));
+    int selectEnnemyBullet = std::any_cast<int>(event._data.at(5));
 
-    for (std::size_t i = 2; i < event._data.size(); i++)
+    for (std::size_t i = 6; i < event._data.size(); i++)
         list.push_back(std::any_cast<std::string>(event._data[i]));
     // int port = atoi(list.at(0).c_str());
     int nbPlayer = atoi(list.at(2).c_str());
 
     std::vector<int> header = {PARAM, 3};
-    std::vector<int> data = {nbPlayer, selectBullet, selectEnnemy};
+    std::vector<int> data = {nbPlayer, selectBullet, selectEnnemy, selectEnnemyTwo, selectEnnemyElite, selectEnnemyBoss, selectEnnemyBullet};
     std::vector<int> name = stringToVector(list.at(1));
 
     data = mergeVectors(data, name);

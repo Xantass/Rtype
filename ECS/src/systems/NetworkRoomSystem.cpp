@@ -7,12 +7,16 @@
 
 #include "NetworkRoomSystem.hpp"
 
-inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPLayer, std::map<int, std::tuple<std::string, std::string>> sprite, int selectBullet, int selectEnnemy)
+inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPLayer, std::map<int, std::tuple<std::string, std::string>> sprite, std::vector<int> selectSprites)
 {
     udp::endpoint endpoint(udp::v4(), port);
 
-    _spriteBullet = selectBullet;
-    _spriteEnnemy = selectEnnemy;
+    _spriteBullet = selectSprites.at(0);
+    _spriteEnnemy = selectSprites.at(1);
+    _spriteEnnemyTwo = selectSprites.at(2);
+    _spriteEnnemyElite = selectSprites.at(3);
+    _spriteEnnemyBoss = selectSprites.at(4);
+    _spriteEnnemyBullet = selectSprites.at(5);
     _sprite = sprite;
     _nbPLayer = nbPLayer;
     _admin = std::make_tuple(clientEndpoint, nameAdmin);
@@ -610,7 +614,7 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
             break;
         }
         if (event._type == Event::actions::SPAWN) {
-
+            int enn_sprite = _spriteEnnemyBullet;
             Entity ennemy = coordinator.CreateEntity();
             coordinator.AddComponent<Position>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[1]))), (static_cast<float>(std::any_cast<int>(event._data[0])))});
             coordinator.AddComponent<Velocity>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[2]))), 0});
@@ -621,8 +625,9 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
             if ((static_cast<int>(std::any_cast<int>(event._data[9]))) == 1) {
                 coordinator.AddComponent<SpawnClock>(ennemy, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0});
                 coordinator.AddComponent<SpawnInfo>(ennemy, {1, 0, 0, -20, 30, 20, 100, 110, 1, 1, 0});
+                enn_sprite = _spriteEnnemy;
             }
-            this->sendCreate(ennemy, coordinator, _spriteEnnemy);
+            this->sendCreate(ennemy, coordinator, enn_sprite);
             break;
         }
         if (event._type == Event::actions::DESTROY) {

@@ -205,7 +205,7 @@ public:
      * @brief Initializes the NetworkRoomSystem with a specific port.
      * @param port The port to use for communication.
      */
-    void Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPlayer, std::map<int, std::tuple<std::string, std::string>> sprite, int selectBullet, int selectEnnemy);
+    void Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPlayer, std::map<int, std::tuple<std::string, std::string>> sprite, std::vector<int> selectSprites);
 
     /**
      * @brief Sends a packet with header and data to a specific client endpoint, optionally storing it.
@@ -264,6 +264,10 @@ private:
     std::map<int, std::tuple<std::string, std::string>> _sprite;
     int _spriteEnnemy;
     int _spriteBullet;
+    int _spriteEnnemyTwo;
+    int _spriteEnnemyElite;
+    int _spriteEnnemyBoss;
+    int _spriteEnnemyBullet;
 };
 
 #include "../../src/systems/NetworkRoomSystem.cpp"
