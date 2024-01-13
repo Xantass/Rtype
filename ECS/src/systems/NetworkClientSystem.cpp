@@ -108,6 +108,33 @@ inline int NetworkClientSystem::hourIntNow()
     return currentTime_ms;
 }
 
+inline std::vector<std::vector<int>> NetworkClientSystem::splitVector(const std::vector<int> &originalVector, size_t maxSize)
+{
+    std::vector<std::vector<int>> result;
+    
+    size_t startIndex = 0;
+
+    while (startIndex < originalVector.size()) {
+
+        size_t endIndex = startIndex + maxSize;
+
+        if (endIndex >= originalVector.size()) {
+            endIndex = originalVector.size();
+        }
+
+        std::vector<int> partie(originalVector.begin() + startIndex, originalVector.begin() + endIndex);
+
+        if ((startIndex + maxSize) >= originalVector.size())
+            result.push_back(partie);
+        else {
+            result.push_back(mergeVectors({-1}, partie));
+        }
+        startIndex = endIndex;
+    }
+
+    return result;
+}
+
 inline void NetworkClientSystem::createEntities(std::vector<int> decodedInteger, Coordinator &coordinator)
 {
     decodedInteger.erase(decodedInteger.begin(), decodedInteger.begin() + 3);
@@ -548,26 +575,63 @@ inline void NetworkClientSystem::send(std::vector<int> header, std::vector<int> 
     header.push_back(_id);
 
     std::vector<int> res = mergeVectors(header, data);
-    std::vector<unsigned char> buffer = encode(res);
+    if (res.size() > 5000) {
+        std::vector<unsigned char> buffer;
+        std::vector<std::vector<int>> data = splitVector(res, 5000);
 
-    _socket.send_to(asio::buffer(buffer), _serverEndpoint);
-    if (stock == true)
-        _packetsSend[timeStamp] = res;
+        for (size_t i = 0; i < data.size(); i++) {
+            buffer = encode(data.at(i));
+            _socket.send_to(asio::buffer(buffer), _serverEndpoint);
+        }
+        if (stock == true) {
+            _packetsSend[timeStamp] = res;
+        }
+    } else {
+        std::vector<unsigned char> buffer = encode(res);
+
+        _socket.send_to(asio::buffer(buffer), _serverEndpoint);
+        if (stock == true) {
+            _packetsSend[timeStamp] = res;
+        }
+    }
 }
 
 inline std::vector<int> NetworkClientSystem::receive()
 {
-    std::vector<unsigned char> data(30000);
+    std::vector<unsigned char> data(15000);
     udp::endpoint receiveEndpoint;
     size_t length = _socket.receive_from(asio::buffer(data), receiveEndpoint, 0);
+    std::vector<int> split = {};
 
     if (receiveEndpoint != _serverEndpoint)
         throw std::runtime_error("Bad Ip");
 
     std::vector<int> decodedIntegers = decode(data, length);
+    int block = 0;
 
+    if (decodedIntegers.at(0) == -1) {
+        block = -1;
+        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
+    }
+    while (block == -1) {
+        data.clear();
+        std::vector<unsigned char> dataBis(15000);
+        udp::endpoint clientEndpointBis;
+        _socket.non_blocking(false);
+        length = _socket.receive_from(asio::buffer(dataBis),clientEndpointBis, 0);
+        _socket.non_blocking(true);
+        split = decode(dataBis, length);
+        if (split.at(0) == -1) {
+            split.erase(split.begin(), split.begin() + 1);
+            decodedIntegers = mergeVectors(decodedIntegers, split);
+        } else {
+            decodedIntegers = mergeVectors(decodedIntegers, split);
+            block = 0;
+        }
+    }
     _packetsReceive[decodedIntegers.at(2)] = decodedIntegers;
 
+    data.clear();
     return decodedIntegers;
 }
 

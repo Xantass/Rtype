@@ -68,6 +68,8 @@ public:
      */
     int hourIntNow();
 
+    std::vector<std::vector<int>> splitVector(const std::vector<int> &originalVector, size_t maxSize);
+
     /**
      * @brief Determines the HitboxType based on the given integer.
      * @param x The integer value used to determine the HitboxType.

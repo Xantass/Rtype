@@ -27,6 +27,7 @@ int main(int argc, char **argv)
                 if (file) {
                     std::ostringstream fileContent;
                     fileContent << file.rdbuf();
+                    std::cout << "spriteData[" << index << "]: " << filepath << std::endl;
                     spriteData[index] = std::make_tuple(fileContent.str(), filepath);
                 } else {
                     std::cerr << "Erreur lors de la lecture du fichier : " << filepath << std::endl;

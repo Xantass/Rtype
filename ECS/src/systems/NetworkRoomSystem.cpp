@@ -61,6 +61,33 @@ inline int NetworkRoomSystem::hourIntNow()
     return currentTime_ms;
 }
 
+inline std::vector<std::vector<int>> NetworkRoomSystem::splitVector(const std::vector<int> &originalVector, size_t maxSize)
+{
+    std::vector<std::vector<int>> result;
+    
+    size_t startIndex = 0;
+
+    while (startIndex < originalVector.size()) {
+
+        size_t endIndex = startIndex + maxSize;
+
+        if (endIndex >= originalVector.size()) {
+            endIndex = originalVector.size();
+        }
+
+        std::vector<int> partie(originalVector.begin() + startIndex, originalVector.begin() + endIndex);
+
+        if ((startIndex + maxSize) >= originalVector.size())
+            result.push_back(partie);
+        else {
+            result.push_back(mergeVectors({-1}, partie));
+        }
+        startIndex = endIndex;
+    }
+
+    return result;
+}
+
 inline std::vector<int> NetworkRoomSystem::mergeVectors(const std::vector<int>& vec1, const std::vector<int>& vec2)
 {
     std::vector<int> mergedVector = vec1;
@@ -649,22 +676,56 @@ inline void NetworkRoomSystem::send(std::vector<int> header, std::vector<int> da
     }
 
     std::vector<int> res = mergeVectors(header, data);
-    std::vector<unsigned char> buffer = encode(res);
+    if (res.size() > 5000) {
+        std::vector<unsigned char> buffer;
+        std::vector<std::vector<int>> data = splitVector(res, 5000);
 
-    _socket.send_to(asio::buffer(buffer), client);
-    if (stock == true) {
-        _clients.at(index).addPacketSend(timeStamp, buffer);
+        for (size_t i = 0; i < data.size(); i++) {
+            buffer = encode(data.at(i));
+            _socket.send_to(asio::buffer(buffer), client);
+        }
+    } else {
+        std::vector<unsigned char> buffer = encode(res);
+
+        _socket.send_to(asio::buffer(buffer), client);
+        if (stock == true) {
+            _clients.at(index).addPacketSend(timeStamp, buffer);
+        }
+        buffer.clear();
     }
     return;
 }
 
 inline std::tuple<std::vector<int>, udp::endpoint> NetworkRoomSystem::receive()
 {
-    std::vector<unsigned char> data(30000);
+    std::vector<unsigned char> data(15000);
     udp::endpoint clientEndpoint;
     size_t length = _socket.receive_from(asio::buffer(data), clientEndpoint, 0);
     std::vector<int> decodedIntegers = decode(data, length);
+    std::vector<int> split = {};
+    int block = 0;
 
+    if (decodedIntegers.at(0) == -1) {
+        block = -1;
+        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
+    }
+    while (block == -1) {
+        data.clear();
+        std::vector<unsigned char> dataBis(15000);
+        udp::endpoint clientEndpointBis;
+        _socket.non_blocking(false);
+        length = _socket.receive_from(asio::buffer(dataBis),clientEndpointBis, 0);
+        _socket.non_blocking(true);
+        split = decode(dataBis, length);
+        if (split.at(0) == -1) {
+            split.erase(split.begin(), split.begin() + 1);
+            decodedIntegers = mergeVectors(decodedIntegers, split);
+        } else {
+            decodedIntegers = mergeVectors(decodedIntegers, split);
+            block = 0;
+        }
+    }
+    data.clear();
     return std::make_tuple(decodedIntegers, clientEndpoint);
 }
 

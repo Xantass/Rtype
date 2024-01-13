@@ -72,6 +72,8 @@ public:
      */
     int hourIntNow();
 
+    std::vector<std::vector<int>> splitVector(const std::vector<int> &originalVector, size_t maxSize);
+
     /**
      * @brief Finds a valid port to use.
      * @param service The io_service to use for port validation.

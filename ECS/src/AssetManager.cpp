@@ -18,6 +18,7 @@ void AssetManager::LoadTexture(std::string base64, std::string path, int index)
 {
     if (_sprite.find(index) == _sprite.end()) {
         _sprite[index] = path;
+        std::cout << "_sprite[" << index << "]: " << path << std::endl;
         if (std::filesystem::exists(path) == true) {
             return;
         }

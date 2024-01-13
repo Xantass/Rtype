@@ -59,6 +59,8 @@ public:
      */
     int hourIntNow();
 
+    std::vector<std::vector<int>> splitVector(const std::vector<int> &originalVector, size_t maxSize);
+
     /**
      * @brief Merges two vectors of integers into a single vector.
      * @param vec1 The first vector of integers.
