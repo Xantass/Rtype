@@ -655,8 +655,12 @@ inline void NetworkRoomSystem::sendEcs(Coordinator &coordinator)
             auto& health = coordinator.GetComponent<HealthPoint>(entity);
             int selectSprite = -1;
 
-            if (static_cast<int>(entity) == client.getID())
-                selectSprite = client.getSprite();
+            for (auto clientBis : _clients) {
+                if (static_cast<int>(entity) == clientBis.getID()) {
+                    selectSprite = clientBis.getSprite();
+                    break;
+                }
+            }
             std::vector<int> tmp = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp), static_cast<int>(selectSprite)};
 
             encode_ = mergeVectors(encode_, tmp);
