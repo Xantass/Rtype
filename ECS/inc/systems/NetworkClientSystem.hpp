@@ -68,6 +68,8 @@ public:
      */
     int hourIntNow();
 
+    std::vector<std::vector<int>> splitVector(const std::vector<int> &originalVector, size_t maxSize);
+
     /**
      * @brief Determines the HitboxType based on the given integer.
      * @param x The integer value used to determine the HitboxType.
@@ -152,6 +154,8 @@ public:
 
     void createMessage(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
+    void createSprite(std::vector<int>& decodedIntegers, Coordinator &coordinator);
+
     /**
      * @brief Destroys an entity based on the provided decoded integers.
      * @param decodedIntegers The vector of integers containing entity destruction data.
@@ -179,6 +183,8 @@ public:
     void moveEvent(Event& event);
 
     void messageEvent(Event& event);
+
+    void spriteEvent(Event& event);
 
     /**
      * @brief Checks for pending events and handles them within the coordinator.
@@ -249,7 +255,7 @@ private:
     io_context _service; /**< The Boost ASIO io_service. */
     udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v4(), findValidPort(_service))); /**< The UDP socket for communication. */
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
-    std::function<void(std::vector<int>&, Coordinator &coordinator)> _functions[16]; /**< Array of function pointers. */
+    std::function<void(std::vector<int>&, Coordinator &coordinator)> _functions[17]; /**< Array of function pointers. */
     int _id; /**< The ID of the client. */
     std::map<int, std::vector<int>> _packetsSend; /**< Packets sent with associated timestamps. */
     std::map<int, std::vector<int>> _packetsReceive; /**< Packets received with associated timestamps. */

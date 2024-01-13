@@ -7,7 +7,7 @@
 
 #include "room.hpp"
 
-int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameAdmin)
+int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameAdmin, std::map<int, std::tuple<std::string, std::string>> sprite, int selectBullet, int selectEnnemy)
 {
     (void)nbPlayer;
     Coordinator coordinator;
@@ -76,7 +76,7 @@ int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameA
     coordinator.AddComponent<SpawnClock>(cl3, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0});
     coordinator.AddComponent<SpawnInfo>(cl3, {3, 200, 900, -30, 30, 20, 100, 110, 1, 1, 1});
 
-    networkRoomSystem->Init(port, clientEndpoint, nameAdmin, nbPlayer);
+    networkRoomSystem->Init(port, clientEndpoint, nameAdmin, nbPlayer, sprite, selectBullet, selectEnnemy);
     std::chrono::milliseconds interval(16);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
