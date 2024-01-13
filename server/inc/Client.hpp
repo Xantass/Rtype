@@ -83,8 +83,16 @@ public:
      */
     bool getAlive() const;
 
+    /**
+     * @brief Gets the map of sent packets.
+     * @return A constant reference to the map associating timestamps to vectors of bytes representing sent packets.
+     */
     std::map<int, std::vector<unsigned char>> getPacketsSend() const;
 
+    /**
+     * @brief Gets the map of received packets.
+     * @return A constant reference to the map associating timestamps to vectors of integers representing received packets.
+     */
     std::map<int, std::vector<int>> getPacketsReceive() const;
 
     // Setters
@@ -113,16 +121,42 @@ public:
      */
     void setAlive(const bool& alive);
 
+    /**
+     * @brief Adds a packet to the send queue with the given timestamp.
+     * @param timeStamp The timestamp for the packet.
+     * @param packet The vector of bytes representing the packet.
+     */
     void addPacketSend(int timeStamp, std::vector<unsigned char> packet);
 
+    /**
+     * @brief Deletes a packet from the send queue based on the timestamp.
+     * @param timeStamp The timestamp of the packet to delete.
+     */
     void delPacketSend(int timeStamp);
 
+    /**
+     * @brief Adds a packet to the receive queue with the given timestamp.
+     * @param timeStamp The timestamp for the packet.
+     * @param packet The vector of integers representing the packet.
+     */
     void addPacketReceive(int timeStamp, std::vector<int> packet);
 
+    /**
+     * @brief Deletes a packet from the receive queue based on the timestamp.
+     * @param timeStamp The timestamp of the packet to delete.
+     */
     void delPacketReceive(int timeStamp);
 
+    /**
+     * @brief Sets the sprite value.
+     * @param value The new sprite value to set.
+     */
     void setSprite(int value);
 
+    /**
+     * @brief Gets the sprite value.
+     * @return The current sprite value.
+     */
     int getSprite() const;
 
 protected:
@@ -131,9 +165,9 @@ private:
     int _ID; /**< The ID of the client. */
     udp::endpoint _clientEndpoint; /**< The UDP endpoint of the client. */
     bool _alive; /**< The status of the client (alive or not). */
-    std::map<int, std::vector<unsigned char>> _packetsSend;
-    std::map<int, std::vector<int>> _packetsReceive;
-    int _sprite;
+    std::map<int, std::vector<unsigned char>> _packetsSend; /**< Map associating timestamps to vectors of bytes representing sent packets. */
+    std::map<int, std::vector<int>> _packetsReceive; /**< Map associating timestamps to vectors of integers representing received packets. */
+    int _sprite; /**< The sprite value for the network system. */
 };
 
 #endif /* !CLIENT_HPP_ */
