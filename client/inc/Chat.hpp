@@ -8,6 +8,7 @@
 #ifndef CHAT_HPP_
 #define CHAT_HPP_
 
+#include <chrono>
 #include <algorithm>
 #include <vector>
 #include <iostream>
@@ -20,6 +21,8 @@ class Chat {
             _isOpen = false;
             _chat = "";
             _user = user;
+            _duration = std::chrono::seconds(2);
+            receiveTime = std::chrono::high_resolution_clock::now();
         };
         ~Chat() {
 
@@ -27,7 +30,6 @@ class Chat {
 
         void displayChatWindow(Coordinator &coordinator) {
             std::queue<Event> eventQueue = coordinator.GetEventQueue();
-
             // std::cout << "EventSystem, last event: " << event._type << std::endl;
 
             while (!eventQueue.empty()) {
@@ -35,10 +37,22 @@ class Chat {
                 eventQueue.pop();
                 if (event._type == Event::CREATE_MESSAGE) {
                     std::reverse(chatList.begin(), chatList.end());
-                    chatList.push_back(std::make_pair(std::any_cast<std::string>(event._data.at(0)), std::any_cast<std::string>(event._data.at(1))));
+                    std::pair<std::string, std::string> chat = std::make_pair(std::any_cast<std::string>(event._data.at(0)), std::any_cast<std::string>(event._data.at(1)));
+                    chatList.push_back(chat);
                     std::reverse(chatList.begin(), chatList.end());
-                    _isOpen = true;
+                    receiveTime = std::chrono::high_resolution_clock::now();
                 }
+            }
+            if (std::chrono::high_resolution_clock::now() - receiveTime < _duration) {
+                std::pair<std::string, std::string> chat = chatList[0];
+                int nameWidth = Graphic::measureText((std::get<0>(chat) + ": ").c_str(), 20);
+                if (std::get<0>(chat) == "System") {
+                    Graphic::drawText((std::get<0>(chat) + ": ").c_str(), 60, 925, 20, {183, 32, 145, 255});
+                }
+                else {
+                    Graphic::drawText((std::get<0>(chat) + ": ").c_str(), 60, 925, 20, {38, 138, 4, 255});
+                }
+                Graphic::drawText(std::get<1>(chat).c_str(), 60 + nameWidth, 925, 20, {255, 255, 255, 255});
             }
             drawWindow(_isOpen, coordinator);
         }
@@ -136,6 +150,8 @@ class Chat {
         bool _isOpen;
         std::string _chat;
         std::string _user;
+        std::chrono::seconds _duration;
+        std::chrono::_V2::system_clock::time_point receiveTime;
 };
 
 #endif /* !CHAT_HPP_ */
