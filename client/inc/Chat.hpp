@@ -37,6 +37,7 @@ class Chat {
                     std::reverse(chatList.begin(), chatList.end());
                     chatList.push_back(std::make_pair(std::any_cast<std::string>(event._data.at(0)), std::any_cast<std::string>(event._data.at(1))));
                     std::reverse(chatList.begin(), chatList.end());
+                    _isOpen = true;
                 }
             }
             drawWindow(_isOpen, coordinator);
@@ -88,7 +89,7 @@ class Chat {
             if ((key >= 32) && (key <= 125) && Graphic::measureText(_chat.c_str(), 20) < 580) {
                 _chat += static_cast<char>(key);
             }
-            if (Graphic::isKeyDown(KEY_BACKSPACE) && _chat.length() > 0) {
+            if (Graphic::isKeyPressed(KEY_BACKSPACE) && _chat.length() > 0) {
                 _chat.pop_back();
             }
         }
