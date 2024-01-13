@@ -624,7 +624,7 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
             coordinator.AddComponent<Damage>(ennemy, {(static_cast<int>(std::any_cast<int>(event._data[8]))), (static_cast<int>(std::any_cast<int>(event._data[8])))});
             if ((static_cast<int>(std::any_cast<int>(event._data[9]))) == 1) {
                 coordinator.AddComponent<SpawnClock>(ennemy, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0});
-                coordinator.AddComponent<SpawnInfo>(ennemy, {1, 0, 0, -20, 0, 0, 51, 51, 1, 1, 0});
+                coordinator.AddComponent<SpawnInfo>(ennemy, {2, 0, 0, -20, 0, 0, 51, 51, 1, 1, 0});
                 enn_sprite = _spriteEnnemy;
             }
             this->sendCreate(ennemy, coordinator, enn_sprite);
@@ -632,6 +632,7 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
         }
         if (event._type == Event::actions::DESTROY) {
             this->sendDestroy(event._entity);
+            break;
         }
     }
 }
