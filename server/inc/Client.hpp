@@ -44,7 +44,7 @@ public:
      * @param clientEndpoint The UDP endpoint of the client.
      * @param id The ID of the client.
      */
-    Client(std::string username, udp::endpoint clientEndpoint, int id);
+    Client(std::string username, udp::endpoint clientEndpoint, int id, int sprite);
 
     /**
      * @brief Copy constructor for the Client class.
@@ -121,6 +121,10 @@ public:
 
     void delPacketReceive(int timeStamp);
 
+    void setSprite(int value);
+
+    int getSprite() const;
+
 protected:
 private:
     std::string _username; /**< The username of the client. */
@@ -129,6 +133,7 @@ private:
     bool _alive; /**< The status of the client (alive or not). */
     std::map<int, std::vector<unsigned char>> _packetsSend;
     std::map<int, std::vector<int>> _packetsReceive;
+    int _sprite;
 };
 
 #endif /* !CLIENT_HPP_ */

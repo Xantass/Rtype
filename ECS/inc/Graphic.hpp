@@ -88,6 +88,10 @@ class Graphic {
         static void drawTexture(Texture texture, int posX, int posY, Color color) {
             DrawTexture(texture, posX, posY, color);
         }
+
+        static void drawTextureEx(Texture2D texture, Vector2 position, float rotation, float scale, Color tint) {
+            DrawTextureEx(texture, position, rotation, scale, tint);
+        }
         /**
          * @brief Check if a key is currently down
          *
