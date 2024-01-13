@@ -7,6 +7,7 @@
 
 #include "systems/MovableSystem.hpp"
 #include "Graphic.hpp"
+#include <chrono>
 
 inline void MovableSystem::Update(Coordinator &coordinator)
 {
@@ -14,12 +15,18 @@ inline void MovableSystem::Update(Coordinator &coordinator)
     for (auto &entity : this->_entities) {
         //auto& mov = coordinator.GetComponent<Movable>(entity);
         auto& vel = coordinator.GetComponent<Velocity>(entity);
+        static std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
         float moveX = 0;
         float moveY = 0;
 
         if (Graphic::isKeyPressed(KEY_SPACE)) {
-            coordinator.AddEvent(Event{Event::actions::SHOOT, 0, {std::any(Velocity{1, 0})}});
+            std::chrono::steady_clock::time_point check = std::chrono::steady_clock::now();
+            auto elapsed_time = std::chrono::duration_cast<std::chrono::seconds>(check - start).count();
+            if (elapsed_time >= 1) {
+                coordinator.AddEvent(Event{Event::actions::SHOOT, 0, {std::any(Velocity{1, 0})}});
+                start = std::chrono::steady_clock::now();
+            }
         }
         if (Graphic::isKeyDown(KEY_W))
             moveY = -1;
