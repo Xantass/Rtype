@@ -151,7 +151,7 @@ class Chat {
         std::string _chat;
         std::string _user;
         std::chrono::seconds _duration;
-        std::chrono::_V2::system_clock::time_point receiveTime;
+        std::chrono::system_clock::time_point receiveTime;
 };
 
 #endif /* !CHAT_HPP_ */
