@@ -19,16 +19,11 @@ inline void PathSystem::Update(Coordinator &coordinator)
             vel._y = path._y_vel;
             return;
         }
-        if (diff < 0) {
-            if ((diff * -1) > path._y_end) {
-                vel._y = (path._y_vel * -1);
-                return;
-            }
-        } else {
-            if (diff > path._y_end) {
-                vel._y = (path._y_vel * -1);
-                return;
-            }
+        if (diff < 0)
+            diff = diff * -1;
+        if (diff > path._y_end) {
+            vel._y = (path._y_vel * -1);
+            return;
         }
     }
 }
