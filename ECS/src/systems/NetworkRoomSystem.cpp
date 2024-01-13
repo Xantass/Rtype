@@ -676,9 +676,9 @@ inline void NetworkRoomSystem::send(std::vector<int> header, std::vector<int> da
     }
 
     std::vector<int> res = mergeVectors(header, data);
-    if (res.size() > 1000) {
+    if (res.size() > 500) {
         std::vector<unsigned char> buffer;
-        std::vector<std::vector<int>> data = splitVector(res, 1000);
+        std::vector<std::vector<int>> data = splitVector(res, 500);
 
         for (size_t i = 0; i < data.size(); i++) {
             buffer = encode(data.at(i));
