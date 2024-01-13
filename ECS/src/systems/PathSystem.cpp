@@ -13,22 +13,39 @@ inline void PathSystem::Update(Coordinator &coordinator)
         auto& vel = coordinator.GetComponent<Velocity>(entity);
         auto& pos = coordinator.GetComponent<Position>(entity);
         auto& path = coordinator.GetComponent<Path>(entity);
-        float diff = path._y_start - pos._y;
 
-        if (diff == 0) {
-            vel._y = path._y_vel;
-            return;
+        std::vector<Position> pathToFollow = {
+            {1500, 200},
+            {1400, 500},
+            {1100, 300},
+            {800, 10}
+        };
+
+        if (path._currentAim >= pathToFollow.size()) {
+            vel._x = -5;
+            vel._y = 0;
+            continue;
         }
-        if (diff < 0) {
-            if ((diff * -1) > path._y_end) {
-                vel._y = (path._y_vel * -1);
-                return;
-            }
-        } else {
-            if (diff > path._y_end) {
-                vel._y = (path._y_vel * -1);
-                return;
-            }
+
+        float xToReach = pathToFollow[path._currentAim]._x;
+        float yToReach = pathToFollow[path._currentAim]._y;
+
+        if (pos._x < xToReach)
+            vel._x = 5;
+        else if (pos._x > xToReach)
+            vel._x = -5;
+        else
+            vel._x = 0;
+        
+        if (pos._y < yToReach)
+            vel._y = 5;
+        else if (pos._y > yToReach)
+            vel._y = -5;
+        else
+            vel._y = 0;
+
+        if (fmod(pos._x, xToReach) <= 10 && fmod(pos._y, yToReach) <= 10) {
+            path._currentAim++;
         }
     }
 }
