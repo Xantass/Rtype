@@ -59,7 +59,7 @@ inline int NetworkRoomSystem::getClient(int id)
 
 inline int NetworkRoomSystem::hourIntNow()
 {
-    auto currentTime = std::chrono::high_resolution_clock::now();
+    auto currentTime = std::chrono::steady_clock::now();
     auto timeSinceEpoch = currentTime.time_since_epoch();
     auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch);
     int currentTime_ms = static_cast<int>(milliseconds.count());
@@ -617,6 +617,17 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
         }
         if (event._type == Event::actions::SPAWN) {
             int enn_sprite = _spriteEnnemyBullet;
+            int check = 1;
+            if (event._entity != 0) {
+                check = 0;
+                for (auto entity : this->_entities) {
+                    auto& hit = coordinator.GetComponent<Hitbox>(entity);
+                    if (entity == event._entity && hit.type == ENNEMY && hit.height != 51)
+                        check = 1;
+                }
+            }
+            if (check == 0)
+                break;
             Entity ennemy = coordinator.CreateEntity();
             coordinator.AddComponent<Position>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[1]))), (static_cast<float>(std::any_cast<int>(event._data[0])))});
             coordinator.AddComponent<Velocity>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[2]))), 0});
@@ -625,7 +636,7 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
             coordinator.AddComponent<HealthPoint>(ennemy, {(static_cast<int>(std::any_cast<int>(event._data[7]))), (static_cast<int>(std::any_cast<int>(event._data[7])))});
             coordinator.AddComponent<Damage>(ennemy, {(static_cast<int>(std::any_cast<int>(event._data[8]))), (static_cast<int>(std::any_cast<int>(event._data[8])))});
             if ((static_cast<int>(std::any_cast<int>(event._data[9]))) == 1) {
-                coordinator.AddComponent<SpawnClock>(ennemy, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0});
+                coordinator.AddComponent<SpawnClock>(ennemy, {std::chrono::steady_clock::now(), std::chrono::steady_clock::now(), 0});
                 coordinator.AddComponent<SpawnInfo>(ennemy, {2, 0, 0, -20, 0, 0, 51, 51, 1, 1, 0});
                 enn_sprite = _spriteEnnemy;
             }
@@ -634,6 +645,7 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
         }
         if (event._type == Event::actions::DESTROY) {
             this->sendDestroy(event._entity);
+            coordinator.DestroyEntity(event._entity);
             break;
         }
     }

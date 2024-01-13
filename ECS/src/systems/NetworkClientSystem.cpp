@@ -100,7 +100,7 @@ inline HitboxType NetworkClientSystem::deterType(int x)
 
 inline int NetworkClientSystem::hourIntNow()
 {
-    auto currentTime = std::chrono::high_resolution_clock::now();
+    auto currentTime = std::chrono::steady_clock::now();
     auto timeSinceEpoch = currentTime.time_since_epoch();
     auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch);
     int currentTime_ms = static_cast<int>(milliseconds.count());

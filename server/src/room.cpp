@@ -65,15 +65,21 @@ int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameA
 
     Entity cl1 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(cl1, {1990, 0});
-    coordinator.AddComponent<SpawnClock>(cl1, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0});
-    coordinator.AddComponent<SpawnInfo>(cl1, {4, 100, 900, -5, 30, 20, 100, 110, 1, 1, 1});
+    coordinator.AddComponent<Velocity>(cl1, {0, 0});
+    coordinator.AddComponent<Hitbox>(cl1, {0, 0, 0, 0, SPECTATOR});
+    coordinator.AddComponent<SpawnClock>(cl1, {std::chrono::steady_clock::now(), std::chrono::steady_clock::now(), 0});
+    coordinator.AddComponent<SpawnInfo>(cl1, {3, 100, 900, -5, 30, 20, 100, 110, 1, 1, 1});
     Entity cl2 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(cl2, {1990, 0});
-    coordinator.AddComponent<SpawnClock>(cl2, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0});
+    coordinator.AddComponent<Velocity>(cl2, {0, 0});
+    coordinator.AddComponent<Hitbox>(cl2, {0, 0, 0, 0, SPECTATOR});
+    coordinator.AddComponent<SpawnClock>(cl2, {std::chrono::steady_clock::now(), std::chrono::steady_clock::now(), 0});
     coordinator.AddComponent<SpawnInfo>(cl2, {3, 300, 700, -10, 30, 20, 100, 110, 1, 1, 1});
     Entity cl3 = coordinator.CreateEntity();
     coordinator.AddComponent<Position>(cl3, {1990, 0});
-    coordinator.AddComponent<SpawnClock>(cl3, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0});
+    coordinator.AddComponent<Velocity>(cl3, {0, 0});
+    coordinator.AddComponent<Hitbox>(cl3, {0, 0, 0, 0, SPECTATOR});
+    coordinator.AddComponent<SpawnClock>(cl3, {std::chrono::steady_clock::now(), std::chrono::steady_clock::now(), 0});
     coordinator.AddComponent<SpawnInfo>(cl3, {6, 200, 900, -15, 30, 20, 100, 110, 1, 1, 1});
 
     networkRoomSystem->Init(port, clientEndpoint, nameAdmin, nbPlayer, sprite, selectSprites);
@@ -86,9 +92,9 @@ int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameA
         elapsedTime = currentTime - startTime;
         if (elapsedTime >= interval) {
             networkRoomSystem->Update(coordinator);
+            spawnSystem->Update(coordinator);
             physicSystem->Update(coordinator);
             controlSystem->Update(coordinator);
-            spawnSystem->Update(coordinator);
             collisionSystem->Update(coordinator);
             healthSystem->Update(coordinator);
             startTime = currentTime;
