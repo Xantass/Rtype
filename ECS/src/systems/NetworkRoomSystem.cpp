@@ -209,7 +209,9 @@ inline void NetworkRoomSystem::sendCreate(int entity, Coordinator &coordinator, 
     auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
     auto& health = coordinator.GetComponent<HealthPoint>(entity);
 
-    std::vector<int> res = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp), selectSprite};
+    int scale = selectSprite == _spriteEnnemyBoss ? 2 : 1;
+
+    std::vector<int> res = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp), selectSprite, scale * 10};
 
     int index = 0;
 
@@ -665,6 +667,7 @@ inline void NetworkRoomSystem::sendEcs(Coordinator &coordinator)
             auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
             auto& health = coordinator.GetComponent<HealthPoint>(entity);
             int selectSprite = -1;
+            int scale = 1;
 
             for (auto clientBis : _clients) {
                 if (static_cast<int>(entity) == clientBis.getID()) {
@@ -672,7 +675,7 @@ inline void NetworkRoomSystem::sendEcs(Coordinator &coordinator)
                     break;
                 }
             }
-            std::vector<int> tmp = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp), static_cast<int>(selectSprite)};
+            std::vector<int> tmp = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp), static_cast<int>(selectSprite), scale * 10};
 
             encode_ = mergeVectors(encode_, tmp);
         }

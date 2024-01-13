@@ -30,7 +30,7 @@ void EventSystem::RunEvents(Coordinator &coordinator, AssetManager &assetManager
 				coordinator.AddComponent<Hitbox>(entity, {std::any_cast<float>(event._data[5]), std::any_cast<float>(event._data[6]), std::any_cast<float>(event._data[7]), std::any_cast<float>(event._data[8]), std::any_cast<HitboxType>(event._data[9])});
 				coordinator.AddComponent<HealthPoint>(entity, {std::any_cast<int>(event._data[11]), std::any_cast<int>(event._data[12])});
 				if (std::any_cast<HitboxType>(event._data[9]) != (OTHER)) {
-					coordinator.AddComponent<Sprite>(entity, {assetManager.LoadTexture(assetManager._sprite[std::any_cast<int>(event._data[13])])});
+					coordinator.AddComponent<Sprite>(entity, {assetManager.LoadTexture(assetManager._sprite[std::any_cast<int>(event._data[13])]), std::any_cast<float>(event._data[14])});
 					if (std::any_cast<HitboxType>(event._data[9]) == (PLAYER) && std::any_cast<int>(event._data[10]) == static_cast<int>(entity))
 						coordinator.AddComponent<Movable>(entity, {NONE});
 				}
