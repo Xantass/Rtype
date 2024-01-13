@@ -12,6 +12,19 @@
 #include "Menu.hpp"
 #include "Chat.hpp"
 
+std::string fileToBase64(const std::string& filePath) {
+    std::ifstream file(filePath, std::ios::binary);
+    if (!file) {
+        std::cerr << "Erreur lors de l'ouverture du fichier." << std::endl;
+        return "";
+    }
+
+    std::ostringstream base64Stream;
+    base64Stream << file.rdbuf();
+
+    return base64Stream.str();
+}
+
 int main(int ac, char **av)
 {
     if (ac != 5)
@@ -32,7 +45,7 @@ int main(int ac, char **av)
     coordinator.Init();
     Graphic::init(1920, 1080, "R-Type");
     Graphic::toggleFullScreen();
-    Music music = Graphic::loadMusic("assets/Theme.mp3");
+    Music music = Graphic::loadMusic("assets/music/Theme.mp3");
     Parallax parallax("assets/parallax/");
     Chat chat(av[3]);
 
@@ -93,9 +106,28 @@ int main(int ac, char **av)
             Graphic::beginDrawing();
             Graphic::clearBackground(RBLACK);
             if (menu.action == "Launch Game") {
-                menu.action = "";
-                std::string infos[] = {menu._port, menu._name, menu._nbPlayer};
-                coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::make_any<std::string>(infos[0]), std::make_any<std::string>(infos[1]), std::make_any<std::string>(infos[2])}});
+                if (menu._selectBullet == -1 || menu._selectEnnemy == -1) {
+                    menu.action = "Create Room";
+                } else {
+                    menu.action = "";
+                    std::string infos[] = {menu._port, menu._name, menu._nbPlayer};
+                    coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::make_any<int>(menu._selectBullet), std::make_any<int>(menu._selectEnnemy), std::make_any<std::string>(infos[0]), std::make_any<std::string>(infos[1]), std::make_any<std::string>(infos[2])}});
+                    menu._selectBullet = -1;
+                    menu._selectEnnemy = -1;
+                }
+            }
+            if (menu.action == "Send Sprite") {
+                std::string base64 = fileToBase64(menu._pathSprite);
+                if (base64 == "") {
+                    menu._errorLoad = "Error: can't open file";
+                    menu.action = "Load Sprite";
+                } else {
+                    menu.action = "";
+                    menu._errorLoad = "";
+                    std::string fileName = std::filesystem::path(menu._pathSprite).filename().string();
+                    coordinator.AddEvent(Event{Event::actions::SEND_SPRITE, 0, {std::make_any<std::string>(base64), std::make_any<std::string>(fileName)}});
+                }
+
             }
             parallax.draw();
             if (!chat.isOpen())
@@ -110,7 +142,7 @@ int main(int ac, char **av)
                 logger->Update(coordinator);
             }
             startTime = currentTime;
-            menu.displayMenu();
+            menu.displayMenu(assetManager);
             Graphic::endDrawing();
         }
     }
