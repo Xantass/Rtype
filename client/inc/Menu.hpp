@@ -18,7 +18,7 @@
 
 class Menu {
     public:
-        Music _music = Graphic::loadMusic("assets/Theme.mp3");
+        Music _music = Graphic::loadMusic("assets/music/Theme.mp3");
         Texture2D settings;
         std::string action = "";
         std::string _host;
@@ -45,7 +45,9 @@ class Menu {
         Menu(std::string host, std::string port, std::string name, Coordinator &coordinator) : settings(Graphic::loadTexture("assets/settings.png")), _host(host), _port(port), _name(name), _nbPlayer("4"), _coordinator(coordinator)  {Graphic::playMusic(_music);}
         ~Menu() {Graphic::unloadMusic(_music);}
         void displayMenu(AssetManager &assetManager) {
-            if (Graphic::isKeyPressed(KEY_TAB)) {
+            Graphic::updateMusic(_music);
+            displaySettings();
+            if (Graphic::isKeyPressed(KEY_TAB) && action != "Game") {
                 if (action == "Select Ennemy" || action == "Select Bullet" || action == "Select Second Ennemy" || action == "Select Elite Ennemy" || action == "Select Boss Ennemy" || action == "Select Ennemy Bullet") {
                     action = "Create Room";
                 } else {
