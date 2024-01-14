@@ -55,8 +55,6 @@ void Logger::Update(Coordinator &coordinator)
         auto &hitbox = coordinator.GetComponent<Hitbox>(entity);
         auto &healthPoint = coordinator.GetComponent<HealthPoint>(entity);
 
-        Graphic::drawRectangleLines(position._x + hitbox._x, position._y + hitbox._y, hitbox.width, hitbox.height, RED);
-        Graphic::drawText("Entity " + std::to_string(entity), position._x, position._y + hitbox.height, 20, RED);
 
         if ((mouseX > position._x && mouseX < position._x + 100 && mouseY > position._y && mouseY < position._y + 100) ||
             (mouseX > 10 && mouseX < 10 + 100 && mouseY > yOffset && mouseY < yOffset + 20) ||
@@ -81,9 +79,14 @@ void Logger::Update(Coordinator &coordinator)
 
             Graphic::drawText("HealthPoint: " + std::to_string(healthPoint._curr_hp), 10, yOffset, 20, color);
             yOffset += 20;
+            Graphic::drawRectangleLines(position._x + hitbox._x, position._y + hitbox._y, hitbox.width, hitbox.height, color);
+            Graphic::drawText("Entity " + std::to_string(entity), position._x + hitbox._x, position._y + hitbox.height + hitbox._y, 20, color);
         } else {
             Graphic::drawText("Entity: " + std::to_string(entity), 10, yOffset, 20, WHITE);
             yOffset += 20;
+
+            Graphic::drawRectangleLines(position._x + hitbox._x, position._y + hitbox._y, hitbox.width, hitbox.height, RED);
+            Graphic::drawText("Entity " + std::to_string(entity), position._x + hitbox._x, position._y + hitbox.height + hitbox._y, 20, RED);
         }
     }
 
