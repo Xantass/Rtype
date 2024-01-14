@@ -21,7 +21,8 @@ inline void CollisionSystem::Update(Coordinator &coordinator)
                 pos._x + hit._x <= c_pos._x + c_hit._x + c_hit.width &&
                 pos._y + hit._y + hit.height >= c_pos._y + c_hit._y &&
                 pos._y + hit._y <= c_pos._y + c_hit._y + c_hit.height) {
-                if ((hit.type == PLAYER && c_hit.type == PLAYER) || (hit.type == PLAYER && c_hit.type == BULLET) || (hit.type == BULLET && c_hit.type == PLAYER) || (hit.type == ENNEMY && c_hit.type == ENNEMY))
+                if ((hit.type == PLAYER && c_hit.type == PLAYER) || (hit.type == PLAYER && c_hit.type == BULLET)
+                    || (hit.type == BULLET && c_hit.type == PLAYER) || (hit.type == ENNEMY && c_hit.type == ENNEMY))
                     break;
                 auto& dmg = coordinator.GetComponent<Damage>(entity);
                 auto& hp = coordinator.GetComponent<HealthPoint>(entity);

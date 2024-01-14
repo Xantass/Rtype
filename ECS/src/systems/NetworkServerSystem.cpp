@@ -7,10 +7,11 @@
 
 #include "NetworkServerSystem.hpp"
 
-inline void NetworkServerSystem::Init()
+inline void NetworkServerSystem::Init(std::map<int, std::tuple<std::string, std::string>> sprite)
 {
     udp::endpoint endpoint(udp::v4(), 4242);
 
+    _sprite = sprite;
     _socket.close();
     _socket.open(endpoint.protocol());
     _socket.bind(endpoint);
@@ -31,6 +32,7 @@ inline void NetworkServerSystem::Init()
     _functions[13] = nullptr;
     _functions[14] = nullptr;
     _functions[15] = nullptr;
+    _functions[16] = std::bind(&NetworkServerSystem::sprite, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _startTime = std::chrono::steady_clock::now();
 }
 
@@ -38,9 +40,7 @@ inline int NetworkServerSystem::getClient(int id)
 {
     int index = 0;
 
-    // std::cout << "GET CLIENT" << std::endl;
     for (auto client : _clients) {
-        // std::cout << "CLIENT ID: " << client.getID() << std::endl;
         if (id == client.getID()) {
             return index;
         }
@@ -51,12 +51,39 @@ inline int NetworkServerSystem::getClient(int id)
 
 inline int NetworkServerSystem::hourIntNow()
 {
-    auto currentTime = std::chrono::high_resolution_clock::now();
+    auto currentTime = std::chrono::steady_clock::now();
     auto timeSinceEpoch = currentTime.time_since_epoch();
     auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch);
     int currentTime_ms = static_cast<int>(milliseconds.count());
 
     return currentTime_ms;
+}
+
+inline std::vector<std::vector<int>> NetworkServerSystem::splitVector(const std::vector<int> &originalVector, size_t maxSize)
+{
+    std::vector<std::vector<int>> result;
+    
+    size_t startIndex = 0;
+
+    while (startIndex < originalVector.size()) {
+
+        size_t endIndex = startIndex + maxSize;
+
+        if (endIndex >= originalVector.size()) {
+            endIndex = originalVector.size();
+        }
+
+        std::vector<int> partie(originalVector.begin() + startIndex, originalVector.begin() + endIndex);
+
+        if ((startIndex + maxSize) >= originalVector.size())
+            result.push_back(partie);
+        else {
+            result.push_back(mergeVectors({-1}, partie));
+        }
+        startIndex = endIndex;
+    }
+
+    return result;
 }
 
 inline std::vector<int> NetworkServerSystem::mergeVectors(const std::vector<int>& vec1, const std::vector<int>& vec2)
@@ -170,6 +197,68 @@ inline void NetworkServerSystem::sendCreateRoom(int port, int nbPlayer, std::str
     }
 }
 
+inline void NetworkServerSystem::sprite(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
+{
+    (void)coordinator;
+
+    int timeStamp = decodedIntegers.at(0);
+    int index = getClient(decodedIntegers.at(1));
+
+    if (index == -1)
+        return;
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
+
+    int size = decodedIntegers.at(0);
+
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
+    send({_OK}, {timeStamp}, false, clientEndpoint, index);
+
+    std::vector<int> base64 = {};
+    std::vector<int> name = {};
+
+    int y = 0;
+    for (auto i : decodedIntegers) {
+        if (y == size)
+            break;
+        base64.push_back(i);
+        y++;
+    }
+    for (size_t i = base64.size(); i < decodedIntegers.size(); ++i)
+        name.push_back(decodedIntegers[i]);
+    int copy = 0;
+    std::string filePath = "./assets/sprite/" + vectorToString(name);
+    if (std::filesystem::exists(filePath) == true) {
+        while (1) {
+            if (std::filesystem::exists("./assets/sprite/" +  std::to_string(copy) + vectorToString(name)) == false)
+                break;
+            copy++;
+        }
+        filePath = "./assets/sprite/" +  std::to_string(copy) + vectorToString(name);
+    }
+    std::ofstream fichier;
+
+    fichier.open(filePath, std::ios::app);
+    if (fichier.is_open()) {
+        fichier << vectorToString(base64);
+        fichier.close();
+    } else {
+        std::cerr << "Impossible d'ouvrir le fichier." << std::endl;
+    }
+    int id = _sprite.size();
+    int i = 0;
+    base64 = mergeVectors(base64, stringToVector(filePath));
+    _sprite[id] = std::make_tuple(vectorToString(base64), filePath);
+    for (auto client : _clients) {
+        send({SPRITE, 3}, mergeVectors({id, size}, base64), true, client.getClientEndpoint(), i);
+        i++;
+    }
+    std::vector<int> data = mergeVectors({id, size}, base64);
+    std::vector<int> res = mergeVectors({SPRITE, 3}, data);
+    std::vector<unsigned char> buffer = encode(res);
+    for (auto room : _room)
+        _socket.send_to(asio::buffer(buffer), asio::ip::udp::endpoint(asio::ip::make_address("127.0.0.1"), std::get<0>(room)));
+}
+
 inline void NetworkServerSystem::response(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
 {
     (void)clientEndpoint;
@@ -191,19 +280,28 @@ inline void NetworkServerSystem::param(std::vector<int>& decodedIntegers, udp::e
 
     int timeStamp = decodedIntegers.at(0);
     int index = getClient(decodedIntegers.at(1));
+    std::vector<int> selectSprites;
 
     if (index == -1)
         return;
 
     int nbPlayer = decodedIntegers.at(2);
+    for (std::size_t i = 3; i < 9; i++)
+        selectSprites.push_back(decodedIntegers.at(i));
+    // int selectBullet = decodedIntegers.at(3);
+    // int selectEnnemy = decodedIntegers.at(4);
+    // int selectEnnemyTwo = decodedIntegers.at(5);
+    // int selectEnnemyElite = decodedIntegers.at(6);
+    // int selectEnnemyBoss = decodedIntegers.at(7);
+    // int selectEnnemyBullet = decodedIntegers.at(8);
 
-    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 3);
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 9);
 
     std::string name = vectorToString(decodedIntegers);
     int port = findValidPort(_service);
 
     try {
-        std::thread Thread(room, nbPlayer, port, clientEndpoint, _clients.at(index).getUsername());
+        std::thread Thread(room, nbPlayer, port, clientEndpoint, _clients.at(index).getUsername(), _sprite, selectSprites);
 
         Thread.detach();
         send({_OK}, {timeStamp}, false, clientEndpoint, index);
@@ -229,19 +327,31 @@ inline void NetworkServerSystem::connect(std::vector<int>& decodedIntegers, udp:
             return;
         }
     }
-    _clients.push_back(Client(username, clientEndpoint, _id));
+    _clients.push_back(Client(username, clientEndpoint, _id, -1));
     _id++;
 
     std::vector<int> tmp = {_clients.at(_clients.size() - 1).getID()};
     std::vector<unsigned char> buffer = encode(tmp);
+    int index = getClient(_id - 1);
 
     _socket.send_to(asio::buffer(buffer), clientEndpoint);
     tmp = {};
     for (auto room : _room) {
-        sendCreateRoom(std::get<0>(room), std::get<1>(room), std::get<2>(room));
+        std::vector<int> data = {std::get<0>(room), std::get<1>(room)};
+
+        data = mergeVectors(data, stringToVector(std::get<2>(room)));
+        send({CREATE_ROOM_CMD, 3}, data, true, clientEndpoint, index);
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
-    
+    for (auto sprite : _sprite) {
+        std::cout << "send _sprite[" << sprite.first << "]: " << std::get<1>(sprite.second) << std::endl;
+        std::vector<int> base64 = stringToVector(std::get<0>(sprite.second));
+        int size = base64.size();
+
+        base64 = mergeVectors(base64, stringToVector(std::get<1>(sprite.second)));
+        send({SPRITE, 3}, mergeVectors({sprite.first, size}, base64), true, clientEndpoint, index);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
 }
 
 inline void NetworkServerSystem::ping(Coordinator &coordinator)
@@ -313,7 +423,7 @@ inline void NetworkServerSystem::handleCmd(std::vector<int>& decodedIntegers, ud
 {
     int index = decodedIntegers.at(0);
 
-    if (index < 0 || index > 15)
+    if (index < 0 || index > 16)
         return;
     if (decodedIntegers.at(0) == 1) {
         decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 3);
@@ -357,22 +467,60 @@ inline void NetworkServerSystem::send(std::vector<int> header, std::vector<int> 
     }
 
     std::vector<int> res = mergeVectors(header, data);
-    std::vector<unsigned char> buffer = encode(res);
+    if (res.size() > 500) {
+        std::vector<unsigned char> buffer;
+        std::vector<std::vector<int>> data = splitVector(res, 500);
+        std::cout << " NB PACKETS: " << data.size() << std::endl;
 
-    _socket.send_to(asio::buffer(buffer), client);
-    if (stock == true) {
-        _clients.at(index).addPacketSend(timeStamp, buffer);
+        for (size_t i = 0; i < data.size(); i++) {
+            std::cout << "first value: " << data.at(i).at(0) << std::endl;
+            buffer = encode(data.at(i));
+            _socket.send_to(asio::buffer(buffer), client);
+        }
+    } else {
+        std::cout << "UNIQUE PACKET" << std::endl;
+        std::vector<unsigned char> buffer = encode(res);
+
+        _socket.send_to(asio::buffer(buffer), client);
+        if (stock == true) {
+            _clients.at(index).addPacketSend(timeStamp, buffer);
+        }
+        buffer.clear();
     }
+    std::cout << "SEND END" << std::endl;
     return;
 }
 
 inline std::tuple<std::vector<int>, udp::endpoint> NetworkServerSystem::receive()
 {
-    std::vector<unsigned char> data(1024);
+    std::vector<unsigned char> data(15000);
     udp::endpoint clientEndpoint;
     size_t length = _socket.receive_from(asio::buffer(data), clientEndpoint, 0);
     std::vector<int> decodedIntegers = decode(data, length);
+    std::vector<int> split = {};
+    int block = 0;
 
+    if (decodedIntegers.at(0) == -1) {
+        block = -1;
+        decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
+    }
+    while (block == -1) {
+        data.clear();
+        std::vector<unsigned char> dataBis(15000);
+        udp::endpoint clientEndpointBis;
+        _socket.non_blocking(false);
+        length = _socket.receive_from(asio::buffer(dataBis),clientEndpointBis, 0);
+        _socket.non_blocking(true);
+        split = decode(dataBis, length);
+        if (split.at(0) == -1) {
+            split.erase(split.begin(), split.begin() + 1);
+            decodedIntegers = mergeVectors(decodedIntegers, split);
+        } else {
+            decodedIntegers = mergeVectors(decodedIntegers, split);
+            block = 0;
+        }
+    }
+    data.clear();
     return std::make_tuple(decodedIntegers, clientEndpoint);
 }
 
@@ -406,7 +554,7 @@ inline void NetworkServerSystem::Update(Coordinator &coordinator)
             processReceiveData(clientEndpoint, coordinator, decodedIntegers);
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         } catch (std::exception& e) {
-            //std::cerr << "Error: " << e.what() << std::endl;
+            // std::cerr << "Error: " << e.what() << std::endl;
             break;
         }
     }

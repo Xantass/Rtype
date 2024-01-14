@@ -7,12 +7,13 @@
 
 #include "Client.hpp"
 
-Client::Client(std::string username, udp::endpoint clientEndpoint, int id)
+Client::Client(std::string username, udp::endpoint clientEndpoint, int id, int sprite)
 {
     _username = username;
     _clientEndpoint = clientEndpoint;
     _ID = id;
     _alive = true;
+    _sprite = sprite;
 }
 
 Client::Client(const Client& client)
@@ -21,6 +22,7 @@ Client::Client(const Client& client)
     _clientEndpoint = client._clientEndpoint;
     _ID = client._ID;
     _alive = client._alive;
+    _sprite = client._sprite;
 }
 
 Client::~Client()
@@ -95,4 +97,14 @@ void Client::addPacketReceive(int timeStamp, std::vector<int> packet)
 void Client::delPacketReceive(int timeStamp)
 {
     _packetsReceive.erase(timeStamp);
+}
+
+void Client::setSprite(int value)
+{
+    _sprite = value;
+}
+
+int Client::getSprite(void) const
+{
+    return _sprite;
 }

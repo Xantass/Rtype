@@ -13,58 +13,42 @@ int main(int argc, char **argv)
         return 84;
     (void)argv;
 
+    int index = 0;
+    std::map<int, std::tuple<std::string, std::string>> spriteData;
+    std::string spriteFolderPath = "./assets/sprite/";
+
+    for (const auto &entry : std::filesystem::directory_iterator(spriteFolderPath)) {
+        if (entry.is_regular_file()) {
+            std::string filepath = entry.path().string();
+
+            if (std::filesystem::exists(filepath)) {
+                std::ifstream file(filepath, std::ios::binary);
+                if (file) {
+                    std::ostringstream fileContent;
+                    fileContent << file.rdbuf();
+                    std::cout << "spriteData[" << index << "]: " << filepath << std::endl;
+                    spriteData[index] = std::make_tuple(fileContent.str(), filepath);
+                } else {
+                    std::cerr << "Erreur lors de la lecture du fichier : " << filepath << std::endl;
+                }
+            } else {
+                std::cerr << "Le fichier n'existe pas : " << filepath << std::endl;
+            }
+        }
+        index++;
+    }
+
     Coordinator coordinator;
 
     coordinator.Init();
 
-    // coordinator.RegisterComponent<Position>();
-    // coordinator.RegisterComponent<Velocity>();
-    // coordinator.RegisterComponent<Hitbox>();
-    // coordinator.RegisterComponent<Controllable>();
-    // coordinator.RegisterComponent<SpawnClock>();
-    // coordinator.RegisterComponent<HealthPoint>();
-    // coordinator.RegisterComponent<Damage>();
-
-    // auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
-    // auto controlSystem = coordinator.RegisterSystem<ControlSystem>();
     auto networkServerSystem = coordinator.RegisterSystem<NetworkServerSystem>();
-    // auto spawnSystem = coordinator.RegisterSystem<SpawnSystem>();
-    // auto collisionSystem = coordinator.RegisterSystem<CollisionSystem>();
-    // auto healthSystem = coordinator.RegisterSystem<HealthSystem>();
     
     Signature signature;
 
     coordinator.SetSystemSignature<NetworkServerSystem>(signature);
-    
-    // Signature signature2;
 
-    // signature2.set(coordinator.GetComponentType<Position>());
-    // signature2.set(coordinator.GetComponentType<Velocity>());
-    // signature2.set(coordinator.GetComponentType<Controllable>());
-    // coordinator.SetSystemSignature<ControlSystem>(signature2);
-
-    // Signature signature3;
-    
-    // signature3.set(coordinator.GetComponentType<SpawnClock>());
-    // coordinator.SetSystemSignature<SpawnClock>(signature3);
-    
-    // Signature signature4;
-    // signature4.set(coordinator.GetComponentType<Position>());
-    // signature4.set(coordinator.GetComponentType<Hitbox>());
-    // signature4.set(coordinator.GetComponentType<HealthPoint>());
-    // signature4.set(coordinator.GetComponentType<Damage>());
-    // coordinator.SetSystemSignature<CollisionSystem>(signature4);
-
-    // Signature signature5;
-    // signature5.set(coordinator.GetComponentType<HealthPoint>());
-    // coordinator.SetSystemSignature<HealthSystem>(signature5);
-
-    // Entity ent = coordinator.CreateEntity();
-    // coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 2, 100, 1000});
-    // coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 1, 500, 700});
-    // coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 3, 200, 900});
-
-    networkServerSystem->Init();
+    networkServerSystem->Init(spriteData);
     std::chrono::milliseconds interval(16);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();

@@ -15,6 +15,9 @@
 
 #include <functional>
 #include <chrono>
+#include <filesystem>
+#include <fstream>
+#include <map>
 #if defined(_WIN32)           
 	#define NOGDI             // All GDI defines and routines
 	#define NOUSER            // All USER defines and routines
@@ -43,7 +46,7 @@
 using namespace asio;
 using asio::ip::udp;
 
-int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameAdmin);
+int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameAdmin, std::map<int, std::tuple<std::string, std::string>> sprite, std::vector<int> selectSprites);
 
 /**
  * @class NetworkServerSystem
@@ -54,7 +57,7 @@ public:
     /**
      * @brief Initializes the NetworkServerSystem.
      */
-    void Init();
+    void Init(std::map<int, std::tuple<std::string, std::string>> sprite);
 
     /**
      * @brief Retrieves the client with the given ID.
@@ -68,6 +71,14 @@ public:
      * @return An integer representing the current hour.
      */
     int hourIntNow();
+
+    /**
+     * @brief Splits a vector of integers into subvectors with a specified maximum size.
+     * @param originalVector The original vector to split.
+     * @param maxSize The maximum size of each subvector.
+     * @return A vector of vectors containing the split subvectors.
+     */
+    std::vector<std::vector<int>> splitVector(const std::vector<int> &originalVector, size_t maxSize);
 
     /**
      * @brief Finds a valid port to use.
@@ -121,6 +132,12 @@ public:
      */
     std::string vectorToString(const std::vector<int>& data);
 
+    /**
+     * @brief Sends a command to create a room with specified parameters.
+     * @param port The port for the room.
+     * @param nbPlayer The number of players for the room.
+     * @param name The name of the room.
+     */
     void sendCreateRoom(int port, int nbPlayer, std::string name);
 
     /**
@@ -129,6 +146,14 @@ public:
      * @param clientEndpoint The endpoint of the client sending the command.
      */
     void handleCmd(std::vector<int>& decodedIntegers, udp::endpoint clientEndpoint, Coordinator &coordinator);
+
+    /**
+     * @brief Handles sprite-related data received from a client.
+     * @param decodedIntegers The vector of integers representing the sprite data.
+     * @param clientEndpoint The endpoint of the client sending the sprite data.
+     * @param coordinator The Coordinator reference.
+     */
+    void sprite(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     /**
      * @brief Sends a response to a client.
@@ -212,11 +237,12 @@ private:
     io_context _service; /**< The Boost ASIO io_service. */
     udp::socket _socket = udp::socket(_service, udp::endpoint(udp::v4(), 4242)); /**< The UDP socket for communication. */
     std::vector<Client> _clients; /**< Vector storing information about connected clients. */
-    std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[16]; /**< Array of function pointers. */
+    std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[17]; /**< Array of function pointers. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
     int _id = 0; /**< The ID of the server. */
-    int _port = 4243;
-    std::vector<std::tuple<int, int, std::string>> _room;
+    int _port = 4243; /**< The port for the room. */
+    std::vector<std::tuple<int, int, std::string>> _room; /**< Vector storing information about created rooms. */
+    std::map<int, std::tuple<std::string, std::string>> _sprite; /**< Map associating indices to sprite-related data. */
 };
 
 #include "../../src/systems/NetworkServerSystem.cpp"

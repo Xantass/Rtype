@@ -12,6 +12,9 @@ Table of Contents
       3.6.  Ping packet   . . . . . . . . . . . . . . . . . . . . . .
       3.7.  Pong packet   . . . . . . . . . . . . . . . . . . . . . .
       3.8.  Disconnect packet . . . . . . . . . . . . . . . . . . . .
+      3.9.  Create room packet . . . . . . . . . . . . . . . . . . .
+      3.10.  Sprite packet . . . . . . . . . . . . . . . . . . .
+      
  
 1.  Introduction
 
@@ -37,7 +40,7 @@ Table of Contents
     Each packet MUST be assigned to an opcode, as defined in each packet
     description sections.
 
-    The maximum size of the data MUST be "2^16-1"
+    The maximum size of the data MUST be 500 bytes.
 
     +-----------+----------+--------------+
     | Name      | type     | Description  |
@@ -91,6 +94,10 @@ Table of Contents
     | 4          | Client already stopped                |
     | 5          | Connect fail                          |
     | 6          | Start fail                            |
+    | 7          | Create room fail                      |
+    | 8          | Stop send packet                      |
+    | 9          | Failed move                           |
+    | 10         | Permission denied                     |
     +------------+---------------------------------------+
   
       Table 6: error code definition
@@ -127,12 +134,17 @@ Table of Contents
 
       Table 8: Parameters packet header structure
 
-    +------------+------------+----------------------------------+
-    | Name       | Data type  | Description                      |
-    +------------+------------+----------------------------------+
-    | difficulty | uint8_t    | the difficulty of the game       |
-    | nbPlayer   | uint8_t    | the number of player in game     |
-    +------------+------------+----------------------------------+
+    +--------------------+------------+----------------------------------+
+    | Name               | Data type  | Description                      |
+    +--------------------+------------+----------------------------------+
+    | NbPlayer           | uint8_t    | the number of player in game     |
+    | SpriteBullet       | uint8_t    | Sprite bullet in game            |
+    | SpriteEnnemy       | uint8_t    | Sprite Ennemy in game            |
+    | SpriteEnnemyTwo    | uint8_t    | Sprite EnnemyTwo in game         |
+    | SpriteEnnemyElite  | uint8_t    | Sprite EnnemyElite in game       |
+    | SpriteEnnemyBoss   | uint8_t    | Sprite EnnemyBoss in game        |
+    | SpriteEnnemyBullet | uint8_t    | Sprite EnnemyBullet in game      |
+    +--------------------+------------+----------------------------------+
 
       Table 9: the parameters packet data structure
 
@@ -160,6 +172,7 @@ Table of Contents
     | 11          | Move Player                           |
     | 12          | Destroy entitie                       |
     | 13          | Create entitie                        |
+    | 15          | Send Message                          |
     +-------------+---------------------------------------+
 
       Table 11: Action code definition
@@ -179,15 +192,20 @@ Table of Contents
 
       Table 12: Position packet header structure
 
-    +--------+------------+------------------------------+
-    | Name   | Data type  | Description                  |
-    +--------+------------+------------------------------+
-    | pos_x  | uint16_t   | the x position of the sprite |
-    | pos_y  | uint16_t   | the y position of the sprite |
-    | size_x | uint16_t   | the x size of the sprite     |
-    | size_y | uint16_t   | the y size of the sprite     |
-    | sprite | string     | the sprite                   |
-    +--------+------------+------------------------------+
+    +-------------+------------+-------------------------------+
+    | Name        | Data type  | Description                   |
+    +-------------+------------+-------------------------------+
+    | pos_x       | uint16_t   | the x position of the entity  |
+    | pos_y       | uint16_t   | the y position of the entity  |
+    | vel_x       | uint16_t   | the x vel of the entity       |
+    | vel_y       | uint16_t   | the y vel of the entity       |
+    | hitbox_x    | uint16_t   | the x hitbox of the entity    |
+    | hitbox_y    | uint16_t   | the y hitbox of the entity    |
+    | hitbox_type | uint16_t   | the type hitbox of the entity |
+    | heal_max    | uint8_t    | the heal max of the entity    |
+    | heal_cur    | uint8_t    | the heal cur of the entity    |
+    | sprite      | uint8_t    | the index sprite              |
+    +-------------+------------+-------------------------------+
 
       Table 13: the Positon packet data structure
 
@@ -234,3 +252,33 @@ Table of Contents
     +--------+-------+
 
       Table 16: Disconnect packet header structure
+
+3.9.  Create room packet
+
+    The "Create room" packet is used by server to create to all client.
+
+    This packet must be send if a client want to create room.
+
+    +--------+-------+
+    | Name   | Value |
+    +--------+-------+
+    | opcode | 14    |
+    | size   | 0     |
+    +--------+-------+
+
+      Table 17: Create room packet header structure
+
+3.10. Sprite packet
+
+    The "Sprite" packet is used by a client to load a sprite.
+
+    This packet must be send if a client to load is own sprite.
+
+    +--------+-------+
+    | Name   | Value |
+    +--------+-------+
+    | opcode | 16    |
+    | size   | 0     |
+    +--------+-------+
+
+      Table 18: Create room packet header structure

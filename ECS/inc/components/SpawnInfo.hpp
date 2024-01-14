@@ -1,6 +1,6 @@
 /*
 ** EPITECH PROJECT, 2023
-** RType
+** B-CPP-500-PAR-5-2-rtype-jules.gresset
 ** File description:
 ** SpawnInfo.hpp
 */
@@ -15,30 +15,21 @@
 #define SPAWNINFO_HPP_
 
 /**
- * @enum SpawnInfoType
- * @brief Enum containing the type of the SpawnInfo
- *
- */
-
-// enum SpawnInfoType {
-//     BULLET,
-//     BASIC,
-//     BOSS
-// };
-
-/**
  * @struct SpawnInfo
- * @brief Struct containing the SpawnInfo of an entity
+ * @brief Struct containing the SpawnInfoType of an entity
  *
  */
 struct SpawnInfo {
-    float _x_vel;
-    float _hit_w;
-    float _hit_h;
+    int _seconds;
+    float _y_start;
+    float _y_end;
+    float _y_vel;
+    float _x;
+    float _y;
+    float width;
+    float height;
     int _hp;
     int _dmg;
-    float _p_end;
-    float _p_vel;
     int _shoot;
 };
 
