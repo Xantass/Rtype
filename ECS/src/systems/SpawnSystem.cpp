@@ -16,13 +16,19 @@ inline void SpawnSystem::Update(Coordinator &coordinator)
     rdm();
     for (auto entity : this->_entities) {
         auto& cl = coordinator.GetComponent<SpawnClock>(entity);
-        cl._spawn_end = std::chrono::high_resolution_clock::now();
-        std::uniform_int_distribution<> y((cl._y_start), (cl._y_end));
+        auto& info = coordinator.GetComponent<SpawnInfo>(entity);
+        auto& pos = coordinator.GetComponent<Position>(entity);
+        cl._spawn_end = std::chrono::steady_clock::now();
+        std::uniform_int_distribution<> y((info._y_start), (info._y_end));
         auto elapsed_time = std::chrono::duration_cast<std::chrono::seconds>(cl._spawn_end - cl._spawn_point).count();
 
-        if ((elapsed_time != cl._check) && ((elapsed_time % cl._seconds) == 0)) {
+        if ((elapsed_time != cl._check) && ((elapsed_time % info._seconds) == 0)) {
             cl._check = elapsed_time;
-            coordinator.AddEvent(Event{Event::actions::SPAWN, 0, {y(rdm)}});
+            if (info._shoot == 1)
+                coordinator.AddEvent(Event{Event::actions::SPAWN, 0, {y(rdm), pos._x, info._y_vel, info._x, info._y, info.width, info.height, info._hp, info._dmg, info._shoot}});
+            else
+                coordinator.AddEvent(Event{Event::actions::SPAWN, entity, {(static_cast<int>(pos._y)), pos._x, info._y_vel, info._x, info._y, info.width, info.height, info._hp, info._dmg, info._shoot}});
+            return;
         }
     }
 }
