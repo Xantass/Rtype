@@ -276,6 +276,23 @@ class Graphic {
             return GetFPS();
         }
         /**
+         * @brief Load Sound in memory
+         *
+         * @param path
+         * @return Sound
+         */
+        static Sound loadSound(std::string path) {
+            return LoadSound(path.c_str());
+        }
+        /**
+         * @brief Play a sound
+         *
+         * @param sound
+         */
+        static void playSound(Sound sound) {
+            PlaySound(sound);
+        }
+        /**
          * @brief Check if left mouse button is currently down
          *
          * @return true
