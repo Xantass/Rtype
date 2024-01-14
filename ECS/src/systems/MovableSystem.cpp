@@ -22,8 +22,8 @@ inline void MovableSystem::Update(Coordinator &coordinator)
 
         if (Graphic::isKeyPressed(KEY_SPACE)) {
             std::chrono::steady_clock::time_point check = std::chrono::steady_clock::now();
-            auto elapsed_time = std::chrono::duration_cast<std::chrono::seconds>(check - start).count();
-            if (elapsed_time >= 1) {
+            auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(check - start).count();
+            if (elapsed_time >= 500) {
                 coordinator.AddEvent(Event{Event::actions::SHOOT, 0, {std::any(Velocity{1, 0})}});
                 start = std::chrono::steady_clock::now();
             }

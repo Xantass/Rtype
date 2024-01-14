@@ -44,7 +44,7 @@ int main(int ac, char **av)
 
     coordinator.Init();
     Graphic::init(1920, 1080, "R-Type");
-    Graphic::toggleFullScreen();
+    //Graphic::toggleFullScreen();
     Parallax parallax("assets/parallax/");
     Chat chat(av[3]);
 
