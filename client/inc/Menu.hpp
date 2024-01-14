@@ -8,6 +8,7 @@
 #ifndef MENU_HPP_
 #define MENU_HPP_
 
+#include <algorithm>
 #include <sstream>
 #include <vector>
 #include <iostream>
@@ -17,6 +18,8 @@
 
 class Menu {
     public:
+        Music _music = Graphic::loadMusic("assets/Theme.mp3");
+        Texture2D settings;
         std::string action = "";
         std::string _host;
         std::string _port;
@@ -28,16 +31,22 @@ class Menu {
         std::string _errorSelectEnnemy;
         std::string _errorSelectBullet;
         int _selectSprite = -1;
-        int _selectEnnemy = -1;
         int _selectBullet = -1;
+        int _selectEnnemyBullet = -1;
+        int _selectEnnemy = -1;
+        int _selectEnnemyTwo = -1;
+        int _selectEnnemyElite = -1;
+        int _selectEnnemyBoss = -1;
         std::vector<std::vector<std::string>> _roomList;
         Coordinator &_coordinator;
         int page = 0;
-        Menu(std::string host, std::string port, std::string name, Coordinator &coordinator) : _host(host), _port(port), _name(name), _nbPlayer("4"), _coordinator(coordinator)  {}
-        ~Menu() {}
+        std::string _settingsState = "";
+        float volume = 1;
+        Menu(std::string host, std::string port, std::string name, Coordinator &coordinator) : settings(Graphic::loadTexture("assets/settings.png")), _host(host), _port(port), _name(name), _nbPlayer("4"), _coordinator(coordinator)  {Graphic::playMusic(_music);}
+        ~Menu() {Graphic::unloadMusic(_music);}
         void displayMenu(AssetManager &assetManager) {
             if (Graphic::isKeyPressed(KEY_TAB)) {
-                if (action == "Select Ennemy" || action == "Select Bullet") {
+                if (action == "Select Ennemy" || action == "Select Bullet" || action == "Select Second Ennemy" || action == "Select Elite Ennemy" || action == "Select Boss Ennemy" || action == "Select Ennemy Bullet") {
                     action = "Create Room";
                 } else {
                     action = "";
@@ -46,7 +55,11 @@ class Menu {
                     _errorSelectEnnemy = "";
                     _errorSelectSprite = "";
                     _selectBullet = -1;
+                    _selectEnnemyBullet = -1;
                     _selectEnnemy = -1;
+                    _selectEnnemyTwo = -1;
+                    _selectEnnemyElite = -1;
+                    _selectEnnemyBoss = -1;
                 }
             }
             if (action == "<") {
@@ -73,14 +86,17 @@ class Menu {
                 displaySelectSprite(assetManager, _selectEnnemy);
             } else if (action == "Select Bullet") {
                 displaySelectSprite(assetManager, _selectBullet);
+            } else if (action == "Select Second Ennemy") {
+                displaySelectSprite(assetManager, _selectEnnemyTwo);
+            } else if (action == "Select Elite Ennemy") {
+                displaySelectSprite(assetManager, _selectEnnemyElite);
+            } else if (action == "Select Boss Ennemy") {
+                displaySelectSprite(assetManager, _selectEnnemyBoss);
+            } else if (action == "Select Ennemy Bullet") {
+                displaySelectSprite(assetManager, _selectEnnemyBullet);
             } else {
                 for (auto room : _roomList) {
                     if (room[1] == action) {
-                        if (_selectSprite == -1) {
-                            action = "Join Room";
-                            _errorSelectSprite = "Error: Choose your skin for the game";
-                            return;
-                        }
                         std::vector<std::string> list(3, "");
                         list[0] = _host;
                         list[1] = room[0];
@@ -178,13 +194,17 @@ class Menu {
         }
 
         void createRoom(void) {
-            displayTextInput({760, 380}, {400, 80}, _host, 20);
-            displayTextInput({760, 500}, {400, 80}, _port, 20);
-            displayTextInput({760, 620}, {400, 80}, _name, 20);
-            displayButton({760, 740}, {400, 80}, "Select Ennemy", true);
-            displayButton({760, 860}, {400, 80}, "Select Bullet", true);
-            displayTextInput({760, 980}, {180, 80}, _nbPlayer, 20);
-            displayButton({980, 980}, {180, 80}, "Launch Game", true);
+            displayTextInput({760, 20}, {400, 80}, _host, 20);
+            displayTextInput({760, 120}, {400, 80}, _port, 20);
+            displayTextInput({760, 220}, {400, 80}, _name, 20);
+            displayButton({760, 320}, {400, 80}, "Select Bullet", true);
+            displayButton({760, 420}, {400, 80}, "Select Ennemy", true);
+            displayButton({760, 520}, {400, 80}, "Select Second Ennemy", true);
+            displayButton({760, 620}, {400, 80}, "Select Elite Ennemy", true);
+            displayButton({760, 720}, {400, 80}, "Select Boss Ennemy", true);
+            displayButton({760, 820}, {400, 80}, "Select Ennemy Bullet", true);
+            displayTextInput({760, 920}, {180, 80}, _nbPlayer, 20);
+            displayButton({980, 920}, {180, 80}, "Launch Game", true);
         }
 
     protected:
@@ -262,6 +282,37 @@ class Menu {
                 room.clear();
             }
             input.close();
+        }
+        void displaySettings(void) {
+            if (_settingsState == "") {
+                Graphic::drawTexture(settings, 1790, 0, RWHITE);
+                Vector2 mousePosition = Graphic::getMousePosition();
+                if (Graphic::checkCollisionPointRec(mousePosition.x, mousePosition.y, 1790, 0, 150, 100) && Graphic::isMouseButtonPressed()) {
+                    _settingsState = "Settings";
+                }
+            } else if (_settingsState == "Settings") {
+                Graphic::drawRectangle(1610, 10, 300, 70, {0, 0, 0, 50});
+                Graphic::drawRectangleLines(1610, 10, 300, 70, RWHITE);
+                Rectangle sliderBar = { 1660, 35, 200, 20 };
+                Rectangle sliderKnob = { sliderBar.x + (sliderBar.width - 20) * volume, sliderBar.y - 10, 20, 40 };
+                Vector2 mousePosition = Graphic::getMousePosition();
+                bool knobHovered = Graphic::checkCollisionPointRec(mousePosition.x, mousePosition.y, sliderKnob.x, sliderKnob.y, sliderKnob.width, sliderKnob.height);
+                if (Graphic::isMouseButtonDown()) {
+                    if (knobHovered) {
+                        mousePosition = Graphic::getMousePosition();
+                        sliderKnob.x = std::clamp(mousePosition.x - sliderKnob.width / 2, sliderBar.x, sliderBar.x + sliderBar.width - sliderKnob.width);
+                        float relativeX = sliderKnob.x - sliderBar.x;
+                        float normalizedX = relativeX / (sliderBar.width - sliderKnob.width);
+                        volume = normalizedX;
+                        Graphic::setMusicVolume(_music, volume);
+                    }
+                }
+                if (Graphic::isMouseButtonPressed() && !knobHovered) {
+                    _settingsState = "";
+                }
+                DrawRectangleRec(sliderBar, GRAY);
+                DrawRectangleRec(sliderKnob, knobHovered ? DARKGRAY : LIGHTGRAY);
+            }
         }
 };
 

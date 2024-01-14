@@ -68,6 +68,12 @@ public:
      */
     int hourIntNow();
 
+    /**
+     * @brief Splits a vector of integers into subvectors with a specified maximum size.
+     * @param originalVector The original vector to split.
+     * @param maxSize The maximum size of each subvector.
+     * @return A vector of vectors containing the split subvectors.
+     */
     std::vector<std::vector<int>> splitVector(const std::vector<int> &originalVector, size_t maxSize);
 
     /**
@@ -107,6 +113,11 @@ public:
      */
     std::vector<int> stringToVector(const std::string& str);
 
+    /**
+     * @brief Converts a vector of integers into a string.
+     * @param data The vector of integers to convert.
+     * @return A string generated from the vector of integers.
+     */
     std::string vectorToString(const std::vector<int>& data);
 
     /**
@@ -121,6 +132,11 @@ public:
      */
     void ping(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
+    /**
+     * @brief Handles disconnection-related data received from a client.
+     * @param decodedIntegers The vector of integers representing the disconnection data.
+     * @param coordinator The Coordinator reference.
+     */
     void disconnect(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
     /**
@@ -150,10 +166,25 @@ public:
      */
     void createEntity(std::vector<int> decodedIntegers, Coordinator &coordinator);
 
+    /**
+     * @brief Handles data to create a room received from a client.
+     * @param decodedIntegers The vector of integers representing the room creation data.
+     * @param coordinator The Coordinator reference.
+     */
     void createRoom(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
+    /**
+     * @brief Handles message creation-related data received from a client.
+     * @param decodedIntegers The vector of integers representing the message creation data.
+     * @param coordinator The Coordinator reference.
+     */
     void createMessage(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
+    /**
+     * @brief Handles sprite creation-related data received from a client.
+     * @param decodedIntegers The vector of integers representing the sprite creation data.
+     * @param coordinator The Coordinator reference.
+     */
     void createSprite(std::vector<int>& decodedIntegers, Coordinator &coordinator);
 
     /**
@@ -182,8 +213,16 @@ public:
      */
     void moveEvent(Event& event);
 
+    /**
+     * @brief Handles an event related to a message.
+     * @param event The Event object representing the message-related event.
+     */
     void messageEvent(Event& event);
 
+    /**
+     * @brief Handles an event related to a sprite.
+     * @param event The Event object representing the sprite-related event.
+     */
     void spriteEvent(Event& event);
 
     /**
@@ -260,7 +299,7 @@ private:
     std::map<int, std::vector<int>> _packetsSend; /**< Packets sent with associated timestamps. */
     std::map<int, std::vector<int>> _packetsReceive; /**< Packets received with associated timestamps. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
-    std::string _username;
+    std::string _username; /**< Username to log into server. */
 };
 
 #include "../../src/systems/NetworkClientSystem.cpp"

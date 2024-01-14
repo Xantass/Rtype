@@ -31,7 +31,7 @@ int main(int ac, char **av)
         return -84;
     std::ofstream fichier;
     fichier.open("room.txt", std::ofstream::out | std::ofstream::trunc);
-    
+
     if (fichier.is_open()) {
         fichier << "PORT\tNAME\tNB_PLAYER" << std::endl;
         fichier.close();
@@ -45,7 +45,6 @@ int main(int ac, char **av)
     coordinator.Init();
     Graphic::init(1920, 1080, "R-Type");
     Graphic::toggleFullScreen();
-    Music music = Graphic::loadMusic("assets/music/Theme.mp3");
     Parallax parallax("assets/parallax/");
     Chat chat(av[3]);
 
@@ -93,7 +92,6 @@ int main(int ac, char **av)
 
     networkClientSystem->Init(host, port, name, portClient);
 
-    Graphic::playMusic(music);
     std::chrono::milliseconds interval(16);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
@@ -102,19 +100,18 @@ int main(int ac, char **av)
         currentTime = std::chrono::steady_clock::now();
         elapsedTime = currentTime - startTime;
         if (elapsedTime >= interval) {
-            Graphic::updateMusic(music);
             Graphic::beginDrawing();
             Graphic::clearBackground(RBLACK);
             if (menu.action == "Launch Game") {
-                if (menu._selectBullet == -1 || menu._selectEnnemy == -1) {
-                    menu.action = "Create Room";
-                } else {
-                    menu.action = "";
-                    std::string infos[] = {menu._port, menu._name, menu._nbPlayer};
-                    coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::make_any<int>(menu._selectBullet), std::make_any<int>(menu._selectEnnemy), std::make_any<std::string>(infos[0]), std::make_any<std::string>(infos[1]), std::make_any<std::string>(infos[2])}});
-                    menu._selectBullet = -1;
-                    menu._selectEnnemy = -1;
-                }
+                menu.action = "";
+                std::string infos[] = {menu._port, menu._name, menu._nbPlayer};
+                coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::make_any<int>(menu._selectBullet), std::make_any<int>(menu._selectEnnemy), std::make_any<int>(menu._selectEnnemyTwo), std::make_any<int>(menu._selectEnnemyElite), std::make_any<int>(menu._selectEnnemyBoss), std::make_any<int>(menu._selectEnnemyBullet), std::make_any<std::string>(infos[0]), std::make_any<std::string>(infos[1]), std::make_any<std::string>(infos[2])}});
+                menu._selectBullet = -1;
+                menu._selectEnnemy = -1;
+                menu._selectEnnemyTwo = -1;
+                menu._selectEnnemyElite = -1;
+                menu._selectEnnemyBoss = -1;
+                menu._selectEnnemyBullet = -1;
             }
             if (menu.action == "Send Sprite") {
                 std::string base64 = fileToBase64(menu._pathSprite);
@@ -146,7 +143,6 @@ int main(int ac, char **av)
             Graphic::endDrawing();
         }
     }
-    Graphic::unloadMusic(music);
     Graphic::close();
     return 0;
 }
