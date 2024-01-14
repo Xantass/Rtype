@@ -650,7 +650,6 @@ inline int NetworkClientSystem::checkAlreadyReceive(std::vector<int> decodedInte
     auto it = _packetsReceive.find(timeStamp);
 
     if (it != _packetsReceive.end()) {
-        //std::cout << "Error: Key not found" << std::endl;
         return 0;
     } else {
         send(_STOP_SEND, {timeStamp}, false);

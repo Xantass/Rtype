@@ -46,6 +46,8 @@ class NetworkRoomSystem : public System {
 public:
     // Methods
 
+    void setDefaultPath();
+
     /**
      * @brief Retrieves the client with the given ID.
      * @param id The ID of the client to retrieve.
@@ -294,6 +296,7 @@ private:
     std::map<int, std::tuple<std::string, std::string>> _sprite; /**< Map associating indices to sprite-related data. */
     int _spriteEnnemy; /**< The sprite index for enemy entities. */
     int _spriteBullet; /**< The sprite index for bullet entities. */
+    std::vector<int> _pathDefault; /**< Vector of default Sprite */
 };
 
 #include "../../src/systems/NetworkRoomSystem.cpp"

@@ -11,9 +11,18 @@ inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std:
 {
     udp::endpoint endpoint(udp::v4(), port);
 
-    _spriteBullet = selectBullet;
-    _spriteEnnemy = selectEnnemy;
     _sprite = sprite;
+    setDefaultPath();
+    if (selectBullet == -1) {
+        _spriteBullet = _pathDefault.at(2);
+    } else {
+        _spriteBullet = selectBullet;
+    }
+    if (selectEnnemy == -1) {
+        _spriteEnnemy = _pathDefault.at(1);
+    } else {
+        _spriteEnnemy = selectEnnemy;
+    }
     _nbPLayer = nbPLayer;
     _admin = std::make_tuple(clientEndpoint, nameAdmin);
     _socket.close();
@@ -38,6 +47,30 @@ inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std:
     _functions[15] = std::bind(&NetworkRoomSystem::message, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[16] = std::bind(&NetworkRoomSystem::sprite, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     return;
+}
+
+inline void NetworkRoomSystem::setDefaultPath(void)
+{
+    int index = 0; 
+    for (auto sprite : _sprite) {
+        if (std::get<1>(sprite.second) == "./assets/sprite/spaceship.png")
+            _pathDefault.push_back(index);
+        index++;
+    }
+    index = 0;
+    for (auto sprite : _sprite) {
+        if (std::get<1>(sprite.second) == "./assets/sprite/carli.png") {
+            _pathDefault.push_back(index);
+        }
+        index++;
+    }
+    index = 0;
+    for (auto sprite : _sprite) {
+        if (std::get<1>(sprite.second) == "./assets/sprite/bullets.png")
+            _pathDefault.push_back(index);
+        index++;
+    }
+    index = 0;
 }
 
 inline int NetworkRoomSystem::getClient(int id)
@@ -378,11 +411,8 @@ inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::e
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
 
     std::string username = vectorToString(decodedIntegers);
-    // std::cout << "username: " << username << std::endl;
     for (auto client : _clients) {
         if (client.getUsername() == username) {
-            // std::vector<unsigned char> buffer = encode(_FAIL_CONNECT);
-            // _socket.send_to(asio::buffer(buffer), clientEndpoint);
             return;
         }
     }
@@ -405,6 +435,8 @@ inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::e
         coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
     coordinator.AddComponent<HealthPoint>(entity, {3, 3});
     coordinator.AddComponent<Damage>(entity, {0, 0});
+    if (selectSprite == -1)
+        selectSprite = _pathDefault.at(0);
     sendCreate(entity, coordinator, selectSprite);
     _clients.push_back(Client(username, clientEndpoint, entity, selectSprite));
 

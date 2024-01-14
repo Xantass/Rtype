@@ -83,11 +83,6 @@ class Menu {
             } else {
                 for (auto room : _roomList) {
                     if (room[1] == action) {
-                        if (_selectSprite == -1) {
-                            action = "Join Room";
-                            _errorSelectSprite = "Error: Choose your skin for the game";
-                            return;
-                        }
                         std::vector<std::string> list(3, "");
                         list[0] = _host;
                         list[1] = room[0];
