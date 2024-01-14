@@ -30,22 +30,22 @@ inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std:
     if (selectSprites.at(2) == -1) {
         _spriteEnnemyTwo = _pathDefault.at(3);
     } else {
-        _spriteEnnemyTwo = selectSprites.at(1);
+        _spriteEnnemyTwo = selectSprites.at(2);
     }
     if (selectSprites.at(3) == -1) {
         _spriteEnnemyElite = _pathDefault.at(4);
     } else {
-        _spriteEnnemyElite = selectSprites.at(1);
+        _spriteEnnemyElite = selectSprites.at(3);
     }
     if (selectSprites.at(4) == -1) {
         _spriteEnnemyBoss = _pathDefault.at(5);
     } else {
-        _spriteEnnemyBoss = selectSprites.at(1);
+        _spriteEnnemyBoss = selectSprites.at(4);
     }
     if (selectSprites.at(5) == -1) {
         _spriteEnnemyBullet = _pathDefault.at(6);
     } else {
-        _spriteEnnemyBullet = selectSprites.at(1);
+        _spriteEnnemyBullet = selectSprites.at(5);
     }
     _nbPLayer = nbPLayer;
     _admin = std::make_tuple(clientEndpoint, nameAdmin);
