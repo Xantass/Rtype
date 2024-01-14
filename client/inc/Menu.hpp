@@ -18,7 +18,7 @@
 
 class Menu {
     public:
-        Music _music = Graphic::loadMusic("assets/music/Theme.mp3");
+        Music _music = Graphic::loadMusic("assets/music/soda.mp3");
         Texture2D settings;
         std::string action = "";
         std::string _host;
