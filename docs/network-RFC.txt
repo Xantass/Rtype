@@ -42,15 +42,16 @@ Table of Contents
 
     The maximum size of the data MUST be 500 bytes.
 
-    +-----------+----------+--------------+
-    | Name      | type     | Description  |
-    +-----------+----------+--------------+
-    | opcode    | uint8_t  | Opcode       |
-    | size      | uint16_t | Size of data |
-    | timeStamp | uint16_t | Size of data |
-    +--------+----------+-----------------+
+    +-----------+----------+---------------------------+
+    | Name      | type     | Description               |
+    +-----------+----------+---------------------------+
+    | opcode    | uint8_t  | Opcode                    |
+    | size      | uint8_t  | Size of data              |
+    | timeStamp | uint16_t  | time  when packet send   |
+    | id        | uint8_t  | ID of the client          |
+    +-----------+----------+---------------------------+
 
-      Table 3: Packet header structure
+      Table 1: Packet header structure
 
     * opcode : It's identify what is the packet type
 
@@ -74,7 +75,7 @@ Table of Contents
     | size   | 1     |
     +--------+-------+
 
-      Table 4: Result packet header structure
+      Table 2: Result packet header structure
 
     +-------+---------+--------------+
     | Name  | type    | Description  |
@@ -82,7 +83,7 @@ Table of Contents
     | error | uint8_t | Error code   |
     +-------+---------+--------------+
 
-      Table 5: Result packet data structure
+      Table 3: Result packet data structure
 
     +------------+---------------------------------------+
     | Error code | Description                           |
@@ -100,7 +101,7 @@ Table of Contents
     | 10         | Permission denied                     |
     +------------+---------------------------------------+
   
-      Table 6: error code definition
+      Table 4: error code definition
 
 3.2.  Connect packet
 
@@ -116,7 +117,7 @@ Table of Contents
     | size   | 1     |
     +--------+-------+
 
-      Table 7: Connect packet header structure
+      Table 5: Connect packet header structure
 
 3.3.  Parameters packet
 
@@ -132,7 +133,7 @@ Table of Contents
     | size   | 2     |
     +--------+-------+
 
-      Table 8: Parameters packet header structure
+      Table 6: Parameters packet header structure
 
     +--------------------+------------+----------------------------------+
     | Name               | Data type  | Description                      |
@@ -146,7 +147,7 @@ Table of Contents
     | SpriteEnnemyBullet | uint8_t    | Sprite EnnemyBullet in game      |
     +--------------------+------------+----------------------------------+
 
-      Table 9: the parameters packet data structure
+      Table 7: the parameters packet data structure
 
 3.4.  Action packet
 
@@ -161,7 +162,7 @@ Table of Contents
     | size   | 2     |
     +--------+-------+
 
-      Table 10: Action packet header structure
+      Table 8: Action packet header structure
 
     +-------------+---------------------------------------+
     | Action code | Description                           |
@@ -175,7 +176,7 @@ Table of Contents
     | 15          | Send Message                          |
     +-------------+---------------------------------------+
 
-      Table 11: Action code definition
+      Table 9: Action code definition
 
 3.5.  Position packet
 
@@ -190,7 +191,7 @@ Table of Contents
     | size   | 12    |
     +--------+-------+
 
-      Table 12: Position packet header structure
+      Table 10: Position packet header structure
 
     +-------------+------------+-------------------------------+
     | Name        | Data type  | Description                   |
@@ -207,7 +208,7 @@ Table of Contents
     | sprite      | uint8_t    | the index sprite              |
     +-------------+------------+-------------------------------+
 
-      Table 13: the Positon packet data structure
+      Table 11: the Positon packet data structure
 
 3.6.  Ping packet
 
@@ -224,7 +225,7 @@ Table of Contents
     | size   | 0     |
     +--------+-------+
 
-      Table 14: Ping packet header structure
+      Table 12: Ping packet header structure
 
 3.7.  Pong packet
 
@@ -236,7 +237,7 @@ Table of Contents
     | id     | ?     |
     +--------+-------+
 
-      Table 15: Pong packet header structure
+      Table 13: Pong packet header structure
 
 3.8.  Disconnect packet
 
@@ -251,7 +252,7 @@ Table of Contents
     | size   | 0     |
     +--------+-------+
 
-      Table 16: Disconnect packet header structure
+      Table 14: Disconnect packet header structure
 
 3.9.  Create room packet
 
@@ -266,7 +267,7 @@ Table of Contents
     | size   | 0     |
     +--------+-------+
 
-      Table 17: Create room packet header structure
+      Table 15: Create room packet header structure
 
 3.10. Sprite packet
 
@@ -281,4 +282,4 @@ Table of Contents
     | size   | 0     |
     +--------+-------+
 
-      Table 18: Create room packet header structure
+      Table 16: Create room packet header structure
