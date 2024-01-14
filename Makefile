@@ -8,16 +8,20 @@
 ifeq ($(OS), Windows_NT)
 	CLIENT_NAME = r-type_client.exe
 	SERVER_NAME = r-type_server.exe
+	FLAPPY_NAME = flappy-bird.exe
 	CLIENT_MAKE_RULE = cmake --build . --config Release && mv Release/$(CLIENT_NAME) ../../
 	SERVER_MAKE_RULE = cmake --build . --config Release && mv Release/$(SERVER_NAME) ../../
+	FLAPPY_MAKE_RULE = cmake --build . --config Release && mv Release/$(FLAPPY_NAME) ../../
 else
 	CLIENT_NAME = r-type_client
 	SERVER_NAME = r-type_server
+	FLAPPY_NAME = flappy-bird
 	CLIENT_MAKE_RULE  = make && mv $(CLIENT_NAME) ../../
 	SERVER_MAKE_RULE  = make && mv $(SERVER_NAME) ../../
+	FLAPPY_MAKE_RULE  = make && mv $(FLAPPY_NAME) ../../
 endif
 
-.PHONY: all clean re client server doc
+.PHONY: all clean re client server flappy doc
 
 all: client server
 
@@ -38,6 +42,15 @@ server:
 		cd build && mkdir server;\
 	fi
 	cd build/server/ && cmake ../../server/ && $(SERVER_MAKE_RULE)
+
+flappy:
+	if [ ! -d "build" ]; then\
+		mkdir build;\
+	fi
+	if [ ! -d "build/flappy/" ]; then\
+		cd build && mkdir flappy;\
+	fi
+	cd build/flappy/ && cmake ../../flappy/ && $(FLAPPY_MAKE_RULE)
 
 clean:
 	if [ -d "build" ]; then\

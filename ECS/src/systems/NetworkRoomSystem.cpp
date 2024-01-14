@@ -11,13 +11,42 @@ inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std:
 {
     udp::endpoint endpoint(udp::v4(), port);
 
-    _spriteBullet = selectSprites.at(0);
-    _spriteEnnemy = selectSprites.at(1);
     _spriteEnnemyTwo = selectSprites.at(2);
     _spriteEnnemyElite = selectSprites.at(3);
     _spriteEnnemyBoss = selectSprites.at(4);
     _spriteEnnemyBullet = selectSprites.at(5);
     _sprite = sprite;
+    setDefaultPath();
+    if (selectSprites.at(0) == -1) {
+        _spriteBullet = _pathDefault.at(2);
+    } else {
+        _spriteBullet = selectSprites.at(0);
+    }
+    if (selectSprites.at(1) == -1) {
+        _spriteEnnemy = _pathDefault.at(1);
+    } else {
+        _spriteEnnemy = selectSprites.at(1);
+    }
+    if (selectSprites.at(2) == -1) {
+        _spriteEnnemyTwo = _pathDefault.at(3);
+    } else {
+        _spriteEnnemyTwo = selectSprites.at(1);
+    }
+    if (selectSprites.at(3) == -1) {
+        _spriteEnnemyElite = _pathDefault.at(4);
+    } else {
+        _spriteEnnemyElite = selectSprites.at(1);
+    }
+    if (selectSprites.at(4) == -1) {
+        _spriteEnnemyBoss = _pathDefault.at(5);
+    } else {
+        _spriteEnnemyBoss = selectSprites.at(1);
+    }
+    if (selectSprites.at(5) == -1) {
+        _spriteEnnemyBullet = _pathDefault.at(6);
+    } else {
+        _spriteEnnemyBullet = selectSprites.at(1);
+    }
     _nbPLayer = nbPLayer;
     _admin = std::make_tuple(clientEndpoint, nameAdmin);
     _socket.close();
@@ -42,6 +71,54 @@ inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std:
     _functions[15] = std::bind(&NetworkRoomSystem::message, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     _functions[16] = std::bind(&NetworkRoomSystem::sprite, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     return;
+}
+
+inline void NetworkRoomSystem::setDefaultPath(void)
+{
+    int index = 0; 
+    for (auto sprite : _sprite) {
+        if (std::get<1>(sprite.second) == "./assets/sprite/spaceship.png")
+            _pathDefault.push_back(index);
+        index++;
+    }
+    index = 0;
+    for (auto sprite : _sprite) {
+        if (std::get<1>(sprite.second) == "./assets/sprite/carli.png") {
+            _pathDefault.push_back(index);
+        }
+        index++;
+    }
+    index = 0;
+    for (auto sprite : _sprite) {
+        if (std::get<1>(sprite.second) == "./assets/sprite/bullets.png")
+            _pathDefault.push_back(index);
+        index++;
+    }
+    index = 0;
+    for (auto sprite : _sprite) {
+        if (std::get<1>(sprite.second) == "./assets/sprite/ludo.png")
+            _pathDefault.push_back(index);
+        index++;
+    }
+    index = 0;
+    for (auto sprite : _sprite) {
+        if (std::get<1>(sprite.second) == "./assets/sprite/slimane.png")
+            _pathDefault.push_back(index);
+        index++;
+    }
+    index = 0;
+    for (auto sprite : _sprite) {
+        if (std::get<1>(sprite.second) == "./assets/sprite/kev_boss.png")
+            _pathDefault.push_back(index);
+        index++;
+    }
+    index = 0;
+    for (auto sprite : _sprite) {
+        if (std::get<1>(sprite.second) == "./assets/sprite/enn_bullets.png")
+            _pathDefault.push_back(index);
+        index++;
+    }
+    index = 0;
 }
 
 inline int NetworkRoomSystem::getClient(int id)
@@ -384,11 +461,8 @@ inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::e
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 1);
 
     std::string username = vectorToString(decodedIntegers);
-    // std::cout << "username: " << username << std::endl;
     for (auto client : _clients) {
         if (client.getUsername() == username) {
-            // std::vector<unsigned char> buffer = encode(_FAIL_CONNECT);
-            // _socket.send_to(asio::buffer(buffer), clientEndpoint);
             return;
         }
     }
@@ -408,9 +482,11 @@ inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::e
     if (username.length() > 4 && username.substr(0, 4) == "(S) ")
         coordinator.AddComponent<Hitbox>(entity, {0, 0, 0, 0, SPECTATOR});
     else
-        coordinator.AddComponent<Hitbox>(entity, {0, 0, 100, 100, PLAYER});
-    coordinator.AddComponent<HealthPoint>(entity, {3000, 3000});
-    coordinator.AddComponent<Damage>(entity, {1, 1});
+        coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
+    coordinator.AddComponent<HealthPoint>(entity, {3, 3});
+    coordinator.AddComponent<Damage>(entity, {0, 0});
+    if (selectSprite == -1)
+        selectSprite = _pathDefault.at(0);
     sendCreate(entity, coordinator, selectSprite);
     _clients.push_back(Client(username, clientEndpoint, entity, selectSprite));
 

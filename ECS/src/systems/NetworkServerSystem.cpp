@@ -470,15 +470,12 @@ inline void NetworkServerSystem::send(std::vector<int> header, std::vector<int> 
     if (res.size() > 500) {
         std::vector<unsigned char> buffer;
         std::vector<std::vector<int>> data = splitVector(res, 500);
-        std::cout << " NB PACKETS: " << data.size() << std::endl;
 
         for (size_t i = 0; i < data.size(); i++) {
-            std::cout << "first value: " << data.at(i).at(0) << std::endl;
             buffer = encode(data.at(i));
             _socket.send_to(asio::buffer(buffer), client);
         }
     } else {
-        std::cout << "UNIQUE PACKET" << std::endl;
         std::vector<unsigned char> buffer = encode(res);
 
         _socket.send_to(asio::buffer(buffer), client);
@@ -487,7 +484,6 @@ inline void NetworkServerSystem::send(std::vector<int> header, std::vector<int> 
         }
         buffer.clear();
     }
-    std::cout << "SEND END" << std::endl;
     return;
 }
 

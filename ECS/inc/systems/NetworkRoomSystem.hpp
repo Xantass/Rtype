@@ -46,6 +46,8 @@ class NetworkRoomSystem : public System {
 public:
     // Methods
 
+    void setDefaultPath();
+
     /**
      * @brief Retrieves the client with the given ID.
      * @param id The ID of the client to retrieve.
@@ -288,6 +290,7 @@ private:
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
     std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[17]; /**< Array of function pointers. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
+    std::vector<int> _pathDefault; /**< Vector of default Sprite */
     std::tuple<udp::endpoint, std::string> _admin;
     int _nbPLayer;
     std::vector<udp::endpoint> _ban;
