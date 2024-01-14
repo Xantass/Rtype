@@ -19,7 +19,7 @@
  *
  */
 struct Falling {
-    bool falling;
+    bool falling; ///< Bool showing if an entity is affected by gravity
 };
 
 #endif /* !FALLING_HPP_ */

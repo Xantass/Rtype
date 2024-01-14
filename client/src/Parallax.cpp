@@ -22,7 +22,7 @@ void Parallax::loadTextures(std::vector<std::string> paths)
         try {
             _textureList.push_back(std::make_tuple(Graphic::loadTexture(path), 1920));
         } catch (const std::exception& e) {
-            std::cerr << "Error: " << e.what() << std::endl;
+            // std::cerr << "Error: " << e.what() << std::endl;
         }
     }
 }
@@ -37,7 +37,7 @@ std::vector<std::string> Parallax::getAllFiles(void)
             }
         }
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        // std::cerr << "Error: " << e.what() << std::endl;
     }
     return paths;
 }

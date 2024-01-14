@@ -20,9 +20,9 @@
  *
  */
 enum ControllableType {
-    PLAYER_INPUT,
-    IA,
-    ENGINE
+    PLAYER_INPUT, ///< Player input
+    IA, ///< IA
+    ENGINE ///< ENGINE
 };
 
 /**

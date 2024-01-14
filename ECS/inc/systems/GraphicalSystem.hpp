@@ -5,6 +5,12 @@
 ** GraphicalSystem
 */
 
+/**
+ * @file GraphicalSystem.hpp
+ * @brief File containing the GraphicalSystem class
+ *
+ */
+
 #ifndef GRAPHICALSYSTEM_HPP_
 #define GRAPHICALSYSTEM_HPP_
 
@@ -21,14 +27,14 @@
  *
  */
 class GraphicalSystem : public System {
-    public:
-        /**
-         * @brief Update the graphical system using the entities stocker in the coordinator
-         * @param coordinator : The coordinator of the ECS
-         */
-        void Update(Coordinator &coordinator);
-    protected:
-    private:
+public:
+    /**
+     * @brief Update the graphical system using the entities stocker in the coordinator
+     * @param coordinator : The coordinator of the ECS
+     */
+    void Update(Coordinator &coordinator);
+protected:
+private:
 };
 
 #include "../../src/systems/GraphicalSystem.cpp"

@@ -5,6 +5,12 @@
 ** SoundSystem
 */
 
+/**
+ * @file SoundSystem.hpp
+ * @brief File containing the Sound system
+ *
+ */
+
 #ifndef SOUNDSYSTEM_HPP_
 #define SOUNDSYSTEM_HPP_
 
@@ -17,15 +23,15 @@
  *
  */
 class SoundSystem : public System {
-    public:
-        /**
-         * @brief Update the Sound system using the entities stocker in the coordinator
-         * @param coordinator : The coordinator of the ECS
-         *
-         */
-        void Update(Coordinator &coordinator);
-    protected:
-    private:
+public:
+    /**
+     * @brief Update the Sound system using the entities stocker in the coordinator
+     * @param coordinator : The coordinator of the ECS
+     *
+     */
+    void Update(Coordinator &coordinator);
+protected:
+private:
 };
 
 #include "../../src/systems/SoundSystem.cpp"

@@ -5,6 +5,12 @@
 ** StaticSystem.hpp
 */
 
+/**
+ * @file StaticSystem.hpp
+ * @brief File containing the Static system
+ *
+ */
+
 #ifndef STATICSYSTEM_HPP_
 #define STATICSYSTEM_HPP_
 
@@ -21,15 +27,15 @@
  *
  */
 class StaticSystem : public System {
-    public:
-        /**
-         * @brief Update the Static system using the entities stocker in the coordinator
-         * @param coordinator : The coordinator of the ECS
-         */
-        void Update(Coordinator &coordinator);
+public:
+    /**
+     * @brief Update the Static system using the entities stocker in the coordinator
+     * @param coordinator : The coordinator of the ECS
+     */
+    void Update(Coordinator &coordinator);
 
-    protected:
-    private:
+protected:
+private:
 };
 
 #include "../../src/systems/StaticSystem.cpp"

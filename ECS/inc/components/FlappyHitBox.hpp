@@ -13,17 +13,17 @@
 
 #ifndef FLAPPYHITBOX_HPP_
 #define FLAPPYHITBOX_HPP_
-/**
- * @enum HitboxType
- * @brief Enum containing the type of the hitbox
- *
- */
 namespace Flappy {
-enum HitboxType {
-    PLAYER,
-    WALL,
-    COIN,
-};
+    /**
+     * @enum HitboxType
+     * @brief Enum containing the type of the hitbox
+     *
+     */
+    enum HitboxType {
+        PLAYER, ///< Player
+        WALL, ///< Wall
+        COIN, ///< Coin
+    };
 }
 
 /**

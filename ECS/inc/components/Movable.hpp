@@ -5,15 +5,25 @@
 ** Movable
 */
 
+/**
+ * @brief File containing the Movable struct
+ * 
+ */
+
 #ifndef MOVABLE_HPP_
 #define MOVABLE_HPP_
 
+/**
+ * @enum Movable
+ * @brief Struct containing the direction of an entity
+ * 
+ */
 enum Direction {
-    TOP,
-    RIGHT,
-    BOTTOM,
-    LEFT,
-    NONE
+    TOP, ///< Top direction
+    RIGHT, ///< Right direction
+    BOTTOM, ///< Bottom direction
+    LEFT, ///< Left direction
+    NONE ///< No direction
 };
 
 struct Movable {

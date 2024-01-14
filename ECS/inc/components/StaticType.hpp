@@ -20,8 +20,8 @@
  *
  */
 struct StaticType {
-    float _x_end;
-    int _parts;
+    float _x_end; ///< X end position
+    int _parts; ///< Number of parts
 };
 
 #endif /* !STATIC_HPP_ */

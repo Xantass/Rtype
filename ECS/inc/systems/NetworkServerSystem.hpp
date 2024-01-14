@@ -46,6 +46,16 @@
 using namespace asio;
 using asio::ip::udp;
 
+/**
+ * @brief Creates a room with specified parameters.
+ * @param nbPlayer The number of players for the room.
+ * @param port The port for the room.
+ * @param clientEndpoint The endpoint of the client creating the room.
+ * @param nameAdmin The name of the room's admin.
+ * @param sprite The map associating indices to sprite-related data.
+ * @param selectSprites The vector of indices for selected sprites.
+ * @return An integer indicating the status of the room creation.
+ */
 int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameAdmin, std::map<int, std::tuple<std::string, std::string>> sprite, std::vector<int> selectSprites);
 
 /**

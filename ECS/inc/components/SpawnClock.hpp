@@ -17,12 +17,6 @@
 #include <chrono>
 
 /**
- * @enum SpawnClockType
- * @brief Enum containing the type of the SpawnClock
- *
- */
-
-/**
  * @struct SpawnClock
  * @brief Struct containing the SpawnClockType of an entity
  *

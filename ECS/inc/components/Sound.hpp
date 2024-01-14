@@ -20,8 +20,8 @@
  *
  */
 struct Son {
-    Sound sound;
-    bool shouldBePlayed;
+    Sound sound; ///< Sound of an entity
+    bool shouldBePlayed; ///< Bool showing if the sound should be played
 };
 
 #endif /* !SOUND_HPP_ */

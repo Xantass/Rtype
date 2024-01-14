@@ -27,7 +27,16 @@
  */
 class EntityManager {
 public:
+	/**
+	 * @brief Construct a new Entity Manager object
+	 * 
+	 */
     EntityManager();
+
+	/**
+	 * @brief Destroy the Entity Manager object
+	 * 
+	 */
     ~EntityManager();
 
 	/**

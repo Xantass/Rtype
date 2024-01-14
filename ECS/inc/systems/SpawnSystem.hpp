@@ -5,6 +5,12 @@
 ** SpawnSystem.hpp
 */
 
+/**
+ * @file SpawnSystem.hpp
+ * @brief File containing the SpawnSystem class
+ *
+ */
+
 #ifndef SPAWNSYSTEM_HPP_
 #define SPAWNSYSTEM_HPP_
 
@@ -19,15 +25,15 @@
  *
  */
 class SpawnSystem : public System {
-    public:
-        /**
-         * @brief Update the Spawn system using the entities stocker in the coordinator
-         * @param coordinator : The coordinator of the ECS
-         */
-        void Update(Coordinator &coordinator);
+public:
+    /**
+     * @brief Update the Spawn system using the entities stocker in the coordinator
+     * @param coordinator : The coordinator of the ECS
+     */
+    void Update(Coordinator &coordinator);
 
-    protected:
-    private:
+protected:
+private:
 };
 
 #include "../../src/systems/SpawnSystem.cpp"

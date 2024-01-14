@@ -5,6 +5,12 @@
 ** HealthSystem.hpp
 */
 
+/**
+ * @file HealthSystem.hpp
+ * @brief File containing the HealthSystem class
+ *
+ */
+
 #ifndef HEALTHSYSTEM_HPP_
 #define HEALTHSYSTEM_HPP_
 
@@ -17,15 +23,15 @@
  *
  */
 class HealthSystem : public System {
-    public:
-        /**
-         * @brief Update the health system using the entities stocker in the coordinator
-         * @param coordinator : The coordinator of the ECS
-         */
-        void Update(Coordinator &coordinator);
+public:
+    /**
+     * @brief Update the health system using the entities stocker in the coordinator
+     * @param coordinator : The coordinator of the ECS
+     */
+    void Update(Coordinator &coordinator);
 
-    protected:
-    private:
+protected:
+private:
 };
 
 #include "../../src/systems/HealthSystem.cpp"

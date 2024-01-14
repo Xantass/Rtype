@@ -5,7 +5,7 @@
 ** main
 */
 
-#include "main.hpp"
+#include "Main.hpp"
 #include "../../ECS/ECSServer.hpp"
 
 int main(int argc, char **argv)
@@ -27,7 +27,7 @@ int main(int argc, char **argv)
                 if (file) {
                     std::ostringstream fileContent;
                     fileContent << file.rdbuf();
-                    std::cout << "spriteData[" << index << "]: " << filepath << std::endl;
+                    // std::cout << "spriteData[" << index << "]: " << filepath << std::endl;
                     spriteData[index] = std::make_tuple(fileContent.str(), filepath);
                 } else {
                     std::cerr << "Erreur lors de la lecture du fichier : " << filepath << std::endl;

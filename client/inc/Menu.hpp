@@ -103,7 +103,7 @@ class Menu {
                         list[0] = _host;
                         list[1] = room[0];
                         list[2] = room[1];
-                        std::cout << "select: " << _selectSprite << std::endl;
+                        // std::cout << "select: " << _selectSprite << std::endl;
                         _coordinator.AddEvent(Event{Event::actions::JOIN, 0, {std::make_any<int>(_selectSprite), std::make_any<std::string>(list[0]), std::make_any<std::string>(list[1]), std::make_any<std::string>(list[2]), std::make_any<std::string>("false")}});
                         action = "Game";
                         _errorSelectSprite = "";

@@ -5,6 +5,12 @@
 ** EventManager
 */
 
+/**
+ * @file EventManager.hpp
+ * @brief File containing the EventManager class
+ * 
+ */
+
 #ifndef EVENTMANAGER_HPP_
 #define EVENTMANAGER_HPP_
 
@@ -22,18 +28,18 @@
  */
 struct Event {
     enum actions {
-        MOVE = 11,
-        SHOOT = 10,
-        EMPTY = 0,
-        PARAM = 2,
-        JOIN = 1,
-        CREATE = 3,
-        DESTROY = 4,
-        SPAWN = 5,
-        MESSAGE = 15,
-        SEND_SPRITE = 16,
-        CREATE_MESSAGE,
-        CREATE_SPRITE,
+        MOVE = 11, ///< Move action
+        SHOOT = 10, ///< Shoot action
+        EMPTY = 0, ///< Empty action
+        PARAM = 2, ///< Param action
+        JOIN = 1, ///< Join action
+        CREATE = 3, ///< Create action
+        DESTROY = 4, ///< Destroy action
+        SPAWN = 5, ///< Spawn action
+        MESSAGE = 15, ///< Message action
+        SEND_SPRITE = 16, ///< Send sprite action
+        CREATE_MESSAGE, ///< Create message action
+        CREATE_SPRITE, ///< Create sprite action
     };
 
     /**
@@ -64,6 +70,12 @@ struct Event {
     std::vector<std::any> _data;
 };
 
+/**
+ * @class EventManager
+ * @brief Class of the event manager
+ * @details The EventManager class is a class that manages the events.
+ * 
+ */
 class EventManager {
 public:
 

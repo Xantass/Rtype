@@ -33,8 +33,8 @@ include_directories("./inc/" "./../ECS/" "../ECS/inc/" "./../ECS/inc/systems/" "
 # Your project source files
 add_executable(r-type_client
     src/Main.cpp
-    src/Client.cpp
     src/Parallax.cpp
+    src/Chat.cpp
     )
 
 if(WIN32)

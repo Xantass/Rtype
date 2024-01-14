@@ -18,7 +18,7 @@
  *
  */
 struct Score {
-    int score;
+    int score; ///< Score of an entity
 };
 
 #endif /* !SCORE_HPP_ */

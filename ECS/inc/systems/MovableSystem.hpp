@@ -5,6 +5,12 @@
 ** MovableSystem
 */
 
+/**
+ * @file MovableSystem.hpp
+ * @brief File containing the MovableSystem class
+ *
+ */
+
 #ifndef MOVABLESYSTEM_HPP_
 #define MOVABLESYSTEM_HPP_
 
@@ -24,15 +30,15 @@
  *
  */
 class MovableSystem : public System {
-    public:
-        /**
-         * @brief Update the movable system using the entities stocker in the coordinator
-         * @param coordinator : The coordinator of the ECS
-         */
-        void Update(Coordinator &coordinator);
+public:
+    /**
+     * @brief Update the movable system using the entities stocker in the coordinator
+     * @param coordinator : The coordinator of the ECS
+     */
+    void Update(Coordinator &coordinator);
 
-    protected:
-    private:
+protected:
+private:
 };
 
 #include "../../src/systems/MovableSystem.cpp"

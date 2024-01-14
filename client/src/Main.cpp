@@ -6,7 +6,6 @@
 */
 
 #include <fstream>
-#include "../inc/Client.hpp"
 #include "../../ECS/ECSClient.hpp"
 #include "Parallax.hpp"
 #include "Menu.hpp"
@@ -135,7 +134,7 @@ int main(int ac, char **av)
             eventSystem->RunEvents(coordinator, assetManager);
             physicSystem->Update(coordinator);
             if (menu.action == "Game") {
-                chat.displayChatWindow(coordinator);
+                chat.DisplayChatWindow(coordinator);
                 logger->Update(coordinator);
             }
             startTime = currentTime;

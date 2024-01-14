@@ -39,7 +39,6 @@
 #include "components/Movable.hpp"
 #include "EnumProtocol.hpp"
 
-
 using namespace asio;
 using asio::ip::udp;
 

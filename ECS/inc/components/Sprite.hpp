@@ -23,7 +23,7 @@
  */
 struct Sprite {
     Texture2D texture; ///< Texture of the sprite
-    float scale;
+    float scale; ///< Scale of the sprite
 };
 
 #endif /* !SPRITE_HPP_ */

@@ -5,6 +5,12 @@
 ** EventSystem
 */
 
+/**
+ * @file EventSystem.hpp
+ * @brief File containing the EventSystem class
+ *
+ */
+
 #ifndef EVENTSYSTEM_HPP_
 #define EVENTSYSTEM_HPP_
 
@@ -13,6 +19,11 @@
 #include "Entity.hpp"
 #include "AssetManager.hpp"
 
+/**
+ * @class EventSystem
+ * @brief Class of the system handling the events
+ *
+ */
 class EventSystem : public System {
 public:
 

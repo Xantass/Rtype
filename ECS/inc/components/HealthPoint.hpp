@@ -20,8 +20,8 @@
  *
  */
 struct HealthPoint {
-    int _max_hp;
-    int _curr_hp;
+    int _max_hp; ///< Max HealthPoints that the entity can have
+    int _curr_hp; ///< Current HealthPoints that the entity have
 };
 
 #endif /* !HEALTH_POINT_HPP_ */

@@ -5,6 +5,12 @@
 ** AssetManager
 */
 
+/**
+ * @file AssetManager.hpp
+ * @brief File containing the AssetManager class
+ *
+ */
+
 #ifndef ASSETMANAGER_HPP_
 #define ASSETMANAGER_HPP_
 
@@ -14,9 +20,23 @@
 #include <filesystem>
 #include "Graphic.hpp"
 
+/**
+ * @class AssetManager
+ * @brief Class containing the AssetManager
+ *
+ */
 class AssetManager {
 public:
+    /**
+     * @brief Construct a new AssetManager object
+     * 
+     */
     AssetManager() {};
+
+    /**
+     * @brief Destroy the AssetManager object
+     * 
+     */
     ~AssetManager() {};
 
     /**

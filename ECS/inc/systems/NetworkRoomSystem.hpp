@@ -291,16 +291,16 @@ private:
     std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[17]; /**< Array of function pointers. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
     std::vector<int> _pathDefault; /**< Vector of default Sprite */
-    std::tuple<udp::endpoint, std::string> _admin;
-    int _nbPLayer;
-    std::vector<udp::endpoint> _ban;
-    std::map<int, std::tuple<std::string, std::string>> _sprite;
-    int _spriteEnnemy;
-    int _spriteBullet;
-    int _spriteEnnemyTwo;
-    int _spriteEnnemyElite;
-    int _spriteEnnemyBoss;
-    int _spriteEnnemyBullet;
+    std::tuple<udp::endpoint, std::string> _admin; /**< The admin of the room */
+    int _nbPLayer; /**< The number of player in the room */
+    std::vector<udp::endpoint> _ban; /**< The ban of the room */
+    std::map<int, std::tuple<std::string, std::string>> _sprite; /**< The sprite of the room */
+    int _spriteEnnemy; /**< The sprite of the ennemy */
+    int _spriteBullet; /**< The sprite of the bullet */
+    int _spriteEnnemyTwo; /**< The sprite of the ennemy two */
+    int _spriteEnnemyElite; /**< The sprite of the ennemy elite */
+    int _spriteEnnemyBoss; /**< The sprite of the ennemy boss */
+    int _spriteEnnemyBullet; /**< The sprite of the ennemy bullet */
 };
 
 #include "../../src/systems/NetworkRoomSystem.cpp"

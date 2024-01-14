@@ -25,45 +25,50 @@
  *
  */
 class Parallax {
-    public:
-        /**
-         * @brief Construct a new Parallax object
-         *
-         * @param pathToAssets
-         */
-        Parallax(std::string pathToAssets);
-        /**
-         * @brief Destroy the Parallax object
-         *
-         */
-        ~Parallax();
-        /**
-         * @brief Draw all textures of the parallax
-         *
-         */
-        void draw(void);
+public:
+    /**
+     * @brief Construct a new Parallax object
+     *
+     * @param pathToAssets
+     */
+    Parallax(std::string pathToAssets);
 
-    protected:
-    private:
-        std::vector<std::tuple<Texture2D, float>> _textureList;
-        std::string _path;
-        /**
-         * @brief Load all textures from parameter
-         *
-         * @param paths
-         */
-        void loadTextures(std::vector<std::string> paths);
-        /**
-         * @brief Get all files in folder
-         *
-         * @return std::vector<std::string>
-         */
-        std::vector<std::string> getAllFiles(void);
-        /**
-         * @brief Update the position of the textures
-         *
-         */
-        void update(void);
+    /**
+     * @brief Destroy the Parallax object
+     *
+     */
+    ~Parallax();
+
+    /**
+     * @brief Draw all textures of the parallax
+     *
+     */
+    void draw(void);
+
+protected:
+private:
+    std::vector<std::tuple<Texture2D, float>> _textureList; ///< List of textures
+
+    std::string _path;
+    /**
+     * @brief Load all textures from parameter
+     *
+     * @param paths
+     */
+    void loadTextures(std::vector<std::string> paths);
+
+    /**
+     * @brief Get all files in folder
+     *
+     * @return std::vector<std::string>
+     */
+    std::vector<std::string> getAllFiles(void);
+
+    /**
+     * @brief Update the position of the textures
+     *
+     */
+    void update(void);
 };
 
 #endif /* !PARALLAX_HPP_ */

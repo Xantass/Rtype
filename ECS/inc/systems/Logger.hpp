@@ -5,6 +5,12 @@
 ** Logger
 */
 
+/**
+ * @file Logger.hpp
+ * @brief File containing the Logger class
+ *
+ */
+
 #ifndef LOGGER_HPP_
 #define LOGGER_HPP_
 
@@ -13,14 +19,12 @@
 
 class Logger : public System {
 public:
-
     /**
      * @brief Update the logger
      * 
      * @param coordinator Coordinator reference
      */
     void Update(Coordinator &coordinator);
-    
 
 protected:
 private:

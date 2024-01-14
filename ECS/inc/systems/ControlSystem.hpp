@@ -5,6 +5,12 @@
 ** ControlSystem.hpp
 */
 
+/**
+ * @file ControlSystem.hpp
+ * @brief File containing the ControlSystem class
+ *
+ */
+
 #ifndef CONTROLSYSTEM_HPP_
 #define CONTROLSYSTEM_HPP_
 
@@ -20,15 +26,15 @@
  *
  */
 class ControlSystem : public System {
-    public:
-        /**
-         * @brief Update the control system using the entities stocker in the coordinator
-         * @param coordinator : The coordinator of the ECS
-         */
-        void Update(Coordinator &coordinator);
+public:
+    /**
+     * @brief Update the control system using the entities stocker in the coordinator
+     * @param coordinator : The coordinator of the ECS
+     */
+    void Update(Coordinator &coordinator);
 
-    protected:
-    private:
+protected:
+private:
 };
 
 #include "../../src/systems/ControlSystem.cpp"

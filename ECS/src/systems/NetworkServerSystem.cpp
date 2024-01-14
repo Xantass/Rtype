@@ -308,7 +308,7 @@ inline void NetworkServerSystem::param(std::vector<int>& decodedIntegers, udp::e
         sendCreateRoom(port, nbPlayer, name);
         _room.push_back(std::make_tuple(port, nbPlayer, name));
     } catch (std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        // std::cerr << "Error: " << e.what() << std::endl;
         send({_CREATE_ROOM}, {timeStamp}, false, clientEndpoint, index);
     }
     return;
@@ -344,7 +344,7 @@ inline void NetworkServerSystem::connect(std::vector<int>& decodedIntegers, udp:
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     for (auto sprite : _sprite) {
-        std::cout << "send _sprite[" << sprite.first << "]: " << std::get<1>(sprite.second) << std::endl;
+        // std::cout << "send _sprite[" << sprite.first << "]: " << std::get<1>(sprite.second) << std::endl;
         std::vector<int> base64 = stringToVector(std::get<0>(sprite.second));
         int size = base64.size();
 
@@ -414,7 +414,7 @@ inline int NetworkServerSystem::checkAlreadyReceive(std::vector<int>& decodedInt
         send(_STOP_SEND, {timeStamp}, false, clientEndpoint, index);
         return -1;
     } catch (std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        // std::cerr << "Error: " << e.what() << std::endl;
         return 0;
     }
 }

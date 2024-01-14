@@ -20,8 +20,8 @@
  *
  */
 struct Damage {
-    int _max_dmg;
-    int _curr_dmg;
+    int _max_dmg; ///< Max damage that the entity can do
+    int _curr_dmg; ///< Current damage that the entity do
 };
 
 #endif /* !DAMAGE_HPP_ */

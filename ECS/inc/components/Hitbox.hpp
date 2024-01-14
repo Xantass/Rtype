@@ -20,11 +20,11 @@
  *
  */
 enum HitboxType {
-    ENNEMY,
-    PLAYER,
-    BULLET,
-    SPECTATOR,
-    OTHER,
+    ENNEMY, ///< Ennemy hitbox
+    PLAYER, ///< Player hitbox
+    BULLET, ///< Bullet hitbox
+    SPECTATOR, ///< Spectator hitbox
+    OTHER, ///< Other hitbox
 };
 
 /**

@@ -5,6 +5,12 @@
 ** GravitySystem
 */
 
+/**
+ * @file GravitySystem.hpp
+ * @brief File containing the GravitySystem class
+ *
+ */
+
 #ifndef GRAVITYSYSTEM_HPP_
 #define GRAVITYSYSTEM_HPP_
 
@@ -18,14 +24,14 @@
  *
  */
 class GravitySystem : public System {
-    public:
-        /**
-         * @brief Update the gravity system using the entities stocker in the coordinator
-         * @param coordinator : The coordinator of the ECS
-         */
-        void Update(Coordinator &coordinator);
-    protected:
-    private:
+public:
+    /**
+     * @brief Update the gravity system using the entities stocker in the coordinator
+     * @param coordinator : The coordinator of the ECS
+     */
+    void Update(Coordinator &coordinator);
+protected:
+private:
 };
 
 #include "../../src/systems/GravitySystem.cpp"
