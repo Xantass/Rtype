@@ -103,19 +103,15 @@ int main(int ac, char **av)
             Graphic::beginDrawing();
             Graphic::clearBackground(RBLACK);
             if (menu.action == "Launch Game") {
-                if (menu._selectEnnemyTwo == -1 || menu._selectEnnemyElite == -1 || menu._selectEnnemyBoss == -1 || menu._selectEnnemyBullet == -1) {
-                    menu.action = "Create Room";
-                } else {
-                    menu.action = "";
-                    std::string infos[] = {menu._port, menu._name, menu._nbPlayer};
-                    coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::make_any<int>(menu._selectBullet), std::make_any<int>(menu._selectEnnemy), std::make_any<int>(menu._selectEnnemyTwo), std::make_any<int>(menu._selectEnnemyElite), std::make_any<int>(menu._selectEnnemyBoss), std::make_any<int>(menu._selectEnnemyBullet), std::make_any<std::string>(infos[0]), std::make_any<std::string>(infos[1]), std::make_any<std::string>(infos[2])}});
-                    menu._selectBullet = -1;
-                    menu._selectEnnemy = -1;
-                    menu._selectEnnemyTwo = -1;
-                    menu._selectEnnemyElite = -1;
-                    menu._selectEnnemyBoss = -1;
-                    menu._selectEnnemyBullet = -1;
-                }
+                menu.action = "";
+                std::string infos[] = {menu._port, menu._name, menu._nbPlayer};
+                coordinator.AddEvent(Event{Event::actions::PARAM, 0, {std::make_any<int>(menu._selectBullet), std::make_any<int>(menu._selectEnnemy), std::make_any<int>(menu._selectEnnemyTwo), std::make_any<int>(menu._selectEnnemyElite), std::make_any<int>(menu._selectEnnemyBoss), std::make_any<int>(menu._selectEnnemyBullet), std::make_any<std::string>(infos[0]), std::make_any<std::string>(infos[1]), std::make_any<std::string>(infos[2])}});
+                menu._selectBullet = -1;
+                menu._selectEnnemy = -1;
+                menu._selectEnnemyTwo = -1;
+                menu._selectEnnemyElite = -1;
+                menu._selectEnnemyBoss = -1;
+                menu._selectEnnemyBullet = -1;
             }
             if (menu.action == "Send Sprite") {
                 std::string base64 = fileToBase64(menu._pathSprite);

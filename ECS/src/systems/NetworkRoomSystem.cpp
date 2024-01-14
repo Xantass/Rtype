@@ -17,15 +17,35 @@ inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std:
     _spriteEnnemyBullet = selectSprites.at(5);
     _sprite = sprite;
     setDefaultPath();
-    if (selectBullet == -1) {
+    if (selectSprites.at(0) == -1) {
         _spriteBullet = _pathDefault.at(2);
     } else {
-        _spriteBullet = selectBullet;
+        _spriteBullet = selectSprites.at(0);
     }
-    if (selectEnnemy == -1) {
+    if (selectSprites.at(1) == -1) {
         _spriteEnnemy = _pathDefault.at(1);
     } else {
-        _spriteEnnemy = selectEnnemy;
+        _spriteEnnemy = selectSprites.at(1);
+    }
+    if (selectSprites.at(2) == -1) {
+        _spriteEnnemyTwo = _pathDefault.at(3);
+    } else {
+        _spriteEnnemyTwo = selectSprites.at(1);
+    }
+    if (selectSprites.at(3) == -1) {
+        _spriteEnnemyElite = _pathDefault.at(4);
+    } else {
+        _spriteEnnemyElite = selectSprites.at(1);
+    }
+    if (selectSprites.at(4) == -1) {
+        _spriteEnnemyBoss = _pathDefault.at(5);
+    } else {
+        _spriteEnnemyBoss = selectSprites.at(1);
+    }
+    if (selectSprites.at(5) == -1) {
+        _spriteEnnemyBullet = _pathDefault.at(6);
+    } else {
+        _spriteEnnemyBullet = selectSprites.at(1);
     }
     _nbPLayer = nbPLayer;
     _admin = std::make_tuple(clientEndpoint, nameAdmin);
@@ -71,6 +91,30 @@ inline void NetworkRoomSystem::setDefaultPath(void)
     index = 0;
     for (auto sprite : _sprite) {
         if (std::get<1>(sprite.second) == "./assets/sprite/bullets.png")
+            _pathDefault.push_back(index);
+        index++;
+    }
+    index = 0;
+    for (auto sprite : _sprite) {
+        if (std::get<1>(sprite.second) == "./assets/sprite/ludo.png")
+            _pathDefault.push_back(index);
+        index++;
+    }
+    index = 0;
+    for (auto sprite : _sprite) {
+        if (std::get<1>(sprite.second) == "./assets/sprite/slimane.png")
+            _pathDefault.push_back(index);
+        index++;
+    }
+    index = 0;
+    for (auto sprite : _sprite) {
+        if (std::get<1>(sprite.second) == "./assets/sprite/kev_boss.png")
+            _pathDefault.push_back(index);
+        index++;
+    }
+    index = 0;
+    for (auto sprite : _sprite) {
+        if (std::get<1>(sprite.second) == "./assets/sprite/enn_bullets.png")
             _pathDefault.push_back(index);
         index++;
     }
