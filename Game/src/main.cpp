@@ -1,55 +1,99 @@
 #include "raylib.h"
 #include <set>
+#include <unordered_map>
+#include <typeinfo>
 
 struct Vector2Comparator {
-    bool operator()(const Vector2& a, const Vector2& b) const {
-        return (a.x < b.x) || ((a.x == b.x) && (a.y < b.y));
+    bool operator()(const Vector2& v1, const Vector2& v2) const {
+        return (v1.x < v2.x) || ((v1.x == v2.x) && (v1.y < v2.y));
+    }
+};
+
+class Component {
+public:
+    virtual ~Component() = default;
+};
+
+struct Position : public Component {
+    float x, y, z;
+};
+
+struct Size : public Component {
+    float width, height, depth;
+};
+
+struct ColorComponent : public Component {
+    Color color;
+};
+
+class Entity {
+public:
+    std::unordered_map<std::size_t, Component*> components;
+
+    ~Entity() {
+        for (auto& pair : components) {
+            delete pair.second;
+        }
+    }
+};
+
+class System {
+public:
+    virtual void Update(Entity& entity) = 0;
+    virtual ~System() = default;
+};
+
+class PhysicsSystem : public System {
+public:
+    std::set<Entity*> _entities;
+
+    void Update(Entity& entity) override {
+        auto& positionComponent = *static_cast<Position*>(entity.components[typeid(Position).hash_code()]);
+    }
+};
+
+class ColorSystem : public System {
+public:
+    std::set<Entity*> _entities;
+
+    void Update(Entity& entity) override {
+        auto& colorComponent = *static_cast<ColorComponent*>(entity.components[typeid(ColorComponent).hash_code()]);
+    }
+};
+
+class Coordinator {
+public:
+    std::unordered_map<std::size_t, std::unordered_map<std::size_t, Component*>> entityComponents;
+    std::unordered_map<std::size_t, System*> systems;
+
+    template <typename T>
+    void RegisterComponent() {
+        std::size_t componentType = typeid(T).hash_code();
+        entityComponents[componentType] = std::unordered_map<std::size_t, Component*>();
+    }
+
+    template <typename T>
+    T& AddComponent(Entity& entity, T component) {
+        std::size_t componentType = typeid(T).hash_code();
+        entity.components[componentType] = new T(std::move(component));
+        return *static_cast<T*>(entity.components[componentType]);
+    }
+
+    template <typename T>
+    System* RegisterSystem() {
+        std::size_t systemType = typeid(T).hash_code();
+        systems[systemType] = new T();
+        return systems[systemType];
     }
 };
 
 class Game {
 public:
-    Game() {
-        InitWindow(1200, 800, "Mon Jeu 3D");
-        camera = { { 0.0f, 10.0f, 10.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 45.0f, 0 };
+    Coordinator coordinator;
+    System* physicsSystem;
+    System* colorSystem;
+    Entity* currentPlayerEntity;
 
-        player1.position = { -2.0f, 1.0f, 2.0f };
-        player1.size = { 1.0f, 2.0f, 1.0f };
-        player1.color = GREEN;
-
-        player2.position = { 2.0f, 1.0f, 2.0f };
-        player2.size = { 1.0f, 2.0f, 1.0f };
-        player2.color = GREEN;
-
-        collision1 = false;
-        collision2 = false;
-
-        currentPlayer = &player1;
-
-        SetTargetFPS(60);
-
-        // Ajout du menu
-        isMenuActive = true;
-        startButton = { 10, 10, 120, 40 };
-    }
-
-    ~Game() {
-        CloseWindow();
-    }
-
-    void Run() {
-        while (!WindowShouldClose()) {
-            if (isMenuActive) {
-                UpdateMenu();
-                DrawMenu();
-            } else {
-                Update();
-                Draw();
-            }
-        }
-    }
-
-private:
     Camera camera;
 
     struct Player {
@@ -66,13 +110,52 @@ private:
 
     Player* currentPlayer;
 
-    // Utilisez le comparateur personnalisé pour l'ensemble
     std::set<Vector2, Vector2Comparator> redSquarePositions;
 
-    // Variables pour le menu
     bool isMenuActive;
     Rectangle startButton;
 
+    Game() : isMenuActive(true) {
+        currentPlayerEntity = new Entity();
+
+        coordinator.RegisterComponent<Position>();
+        coordinator.RegisterComponent<ColorComponent>();
+
+        physicsSystem = coordinator.RegisterSystem<PhysicsSystem>();
+        colorSystem = coordinator.RegisterSystem<ColorSystem>();
+
+        auto& positionComponent = coordinator.AddComponent(*currentPlayerEntity, Position{});
+        auto& colorComponent = coordinator.AddComponent(*currentPlayerEntity, ColorComponent{});
+
+        camera = { { 0.0f, 10.0f, 10.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 45.0f, CAMERA_PERSPECTIVE };
+
+        player1.size = { 1.0f, 1.0f, 1.0f };
+        player2.size = { 1.0f, 1.0f, 1.0f };
+
+        startButton = { static_cast<float>(GetScreenWidth() / 2 - 80), static_cast<float>(GetScreenHeight() / 2 - 40), 160, 80 };
+
+        currentPlayer = &player1;
+
+        SetTargetFPS(60);
+    }
+
+    ~Game() {
+        delete currentPlayerEntity;
+    }
+
+    void Run() {
+        while (!WindowShouldClose()) {
+            if (isMenuActive) {
+                UpdateMenu();
+                DrawMenu();
+            } else {
+                Update();
+                Draw();
+            }
+        }
+    }
+
+private:
     void UpdateMenu() {
         if (CheckCollisionPointRec(GetMousePosition(), startButton) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             isMenuActive = false;
@@ -80,18 +163,15 @@ private:
     }
 
     void Update() {
-        // Camera movement
         if (IsKeyDown(KEY_RIGHT)) camera.position.x += 0.2f;
         else if (IsKeyDown(KEY_LEFT)) camera.position.x -= 0.2f;
         else if (IsKeyDown(KEY_DOWN)) camera.position.z += 0.2f;
         else if (IsKeyDown(KEY_UP)) camera.position.z -= 0.2f;
 
-        // Player switching
         if (IsKeyPressed(KEY_TAB)) {
             currentPlayer = (currentPlayer == &player1) ? &player2 : &player1;
         }
 
-        // Player movement
         if (IsKeyDown(KEY_A)) currentPlayer->position.x -= 0.2f;
         else if (IsKeyDown(KEY_D)) currentPlayer->position.x += 0.2f;
         else if (IsKeyDown(KEY_S)) currentPlayer->position.z += 0.2f;
@@ -104,8 +184,8 @@ private:
     }
 
     bool CheckCollisionWithRedSquare(Player& player) {
-        int gridX = static_cast<int>((player.position.x + 4.0f) / 2.0f);  
-        int gridZ = static_cast<int>((player.position.z + 4.0f) / 2.0f);  
+        int gridX = static_cast<int>((player.position.x + 4.0f) / 2.0f);
+        int gridZ = static_cast<int>((player.position.z + 4.0f) / 2.0f);
 
         return redSquarePositions.find({ static_cast<float>(gridX), static_cast<float>(gridZ) }) != redSquarePositions.end();
     }
@@ -127,8 +207,8 @@ private:
 
         BeginMode3D(camera);
 
-        DrawCubeV(player1.position, player1.size, GREEN );
-        DrawCubeV(player2.position, player2.size, BLACK);
+        DrawCubeV(player1.position, player1.size, player1.color);
+        DrawCubeV(player2.position, player2.size, player2.color);
 
         DrawChessboard();
 
@@ -166,10 +246,19 @@ private:
         EndDrawing();
     }
 };
+#include <iostream>
 
 int main() {
+    std::cout << "Starting the game..." << std::endl;
+
+    InitWindow(1800, 600, "My 3D Game");
+
     Game game;
     game.Run();
+
+    CloseWindow();
+
+    std::cout << "Exiting the game..." << std::endl;
 
     return 0;
 }
