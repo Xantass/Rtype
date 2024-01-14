@@ -15,6 +15,7 @@
 #include "inc/systems/HealthSystem.hpp"
 #include "systems/ControlSystem.hpp"
 #include "systems/SpawnSystem.hpp"
+#include "systems/StaticSystem.hpp"
 #include "inc/systems/NetworkRoomSystem.hpp"
 
 #endif

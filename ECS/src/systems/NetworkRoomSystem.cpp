@@ -629,16 +629,25 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
             if (check == 0)
                 break;
             Entity ennemy = coordinator.CreateEntity();
+            int ennemy_check = static_cast<int>(std::any_cast<int>(event._data[9]));
             coordinator.AddComponent<Position>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[1]))), (static_cast<float>(std::any_cast<int>(event._data[0])))});
             coordinator.AddComponent<Velocity>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[2]))), 0});
             coordinator.AddComponent<Hitbox>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[3]))), (static_cast<float>(std::any_cast<float>(event._data[4]))), (static_cast<float>(std::any_cast<float>(event._data[5]))), (static_cast<float>(std::any_cast<float>(event._data[6]))), ENNEMY});
             coordinator.AddComponent<Controllable>(ennemy, {IA});
             coordinator.AddComponent<HealthPoint>(ennemy, {(static_cast<int>(std::any_cast<int>(event._data[7]))), (static_cast<int>(std::any_cast<int>(event._data[7])))});
             coordinator.AddComponent<Damage>(ennemy, {(static_cast<int>(std::any_cast<int>(event._data[8]))), (static_cast<int>(std::any_cast<int>(event._data[8])))});
-            if ((static_cast<int>(std::any_cast<int>(event._data[9]))) == 1) {
-                coordinator.AddComponent<SpawnClock>(ennemy, {std::chrono::steady_clock::now(), std::chrono::steady_clock::now(), 0});
+            if (ennemy_check != 0) {
+                coordinator.AddComponent<SpawnClock>(ennemy, {std::chrono::steady_clock::now(), std::chrono::steady_clock::now(), 0, 60, 600});
                 coordinator.AddComponent<SpawnInfo>(ennemy, {2, 0, 0, -20, 0, 0, 51, 51, 1, 1, 0});
                 enn_sprite = _spriteEnnemy;
+            }
+            if (ennemy_check == 2)
+                enn_sprite = _spriteEnnemyTwo;
+            if (ennemy_check == 3)
+                enn_sprite = _spriteEnnemyElite;
+            if (ennemy_check == 4) {
+                coordinator.AddComponent<StaticType>(ennemy, {1700, 3});
+                enn_sprite = _spriteEnnemyBoss;
             }
             this->sendCreate(ennemy, coordinator, enn_sprite);
             break;
