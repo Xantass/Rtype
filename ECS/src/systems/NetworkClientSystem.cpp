@@ -56,7 +56,7 @@ inline void NetworkClientSystem::Init(std::string host, std::string port, std::s
     _functions[4] = std::bind(&NetworkClientSystem::pos, this, std::placeholders::_1, std::placeholders::_2);
     _functions[5] = std::bind(&NetworkClientSystem::ping, this, std::placeholders::_1, std::placeholders::_2);
     _functions[6] = nullptr;
-    _functions[7] = nullptr;
+    _functions[7] = std::bind(&NetworkClientSystem::disconnect, this, std::placeholders::_1, std::placeholders::_2);
     _functions[8] = nullptr;
     _functions[9] = nullptr;
     _functions[10] = nullptr;
@@ -195,6 +195,17 @@ inline void NetworkClientSystem::ping(std::vector<int>& decodedIntegers, Coordin
     decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
     std::vector<int> data = {_id};
     send(_PONG, data, true);
+}
+
+inline void NetworkClientSystem::disconnect(std::vector<int>& decodedIntegers, Coordinator &coordinator)
+{
+    (void)coordinator;
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 2);
+
+    int timeStamp = decodedIntegers.at(0);
+
+    send(_OK, {timeStamp}, false);
+    exit(0);
 }
 
 inline void NetworkClientSystem::pos(std::vector<int>& decodedIntegers, Coordinator &coordinator)
@@ -394,7 +405,11 @@ inline void NetworkClientSystem::joinEvent(Event& event, Coordinator& coordinato
     _serverEndpoint = udp::endpoint(asio::ip::make_address(list.at(0)), atoi(list.at(1).c_str()));
     std::vector<int> header = {CONNECT, 1};
 
-    send(header, stringToVector(_username), false);
+    if (list.at(3) == "true")
+        send(header, stringToVector("(S) " + _username), false);
+    else
+        send(header, stringToVector(_username), false);
+
     _socket.non_blocking(false);
 
     std::vector<unsigned char> data(1024);

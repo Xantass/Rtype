@@ -7,7 +7,7 @@
 
 #include "room.hpp"
 
-int room(int nbPlayer, int port)
+int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameAdmin)
 {
     (void)nbPlayer;
     Coordinator coordinator;
@@ -74,7 +74,7 @@ int room(int nbPlayer, int port)
     coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 1, 500, 700});
     coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 3, 200, 900});
 
-    networkRoomSystem->Init(port);
+    networkRoomSystem->Init(port, clientEndpoint, nameAdmin, nbPlayer);
     std::chrono::milliseconds interval(16);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();

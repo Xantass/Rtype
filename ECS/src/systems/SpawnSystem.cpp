@@ -22,7 +22,8 @@ inline void SpawnSystem::Update(Coordinator &coordinator)
 
         if ((elapsed_time != cl._check) && ((elapsed_time % cl._seconds) == 0)) {
             cl._check = elapsed_time;
-            coordinator.AddEvent(Event{Event::actions::SPAWN, 0, {std::make_any<float>(y(rdm))}});
+            // coordinator.AddEvent(Event{Event::actions::SPAWN, 0, {std::make_any<float>(y(rdm))}});
+            coordinator.AddEvent(Event{Event::actions::SPAWN, 10, {std::make_any<float>(500)}});
         }
     }
 }

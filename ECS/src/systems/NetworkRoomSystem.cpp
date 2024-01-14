@@ -7,10 +7,12 @@
 
 #include "NetworkRoomSystem.hpp"
 
-inline void NetworkRoomSystem::Init(int port)
+inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPLayer)
 {
     udp::endpoint endpoint(udp::v4(), port);
 
+    _nbPLayer = nbPLayer;
+    _admin = std::make_tuple(clientEndpoint, nameAdmin);
     _socket.close();
     _socket.open(endpoint.protocol());
     _socket.bind(endpoint);
@@ -184,6 +186,90 @@ inline void NetworkRoomSystem::sendCreate(int entity, Coordinator &coordinator)
     }
 }
 
+inline int NetworkRoomSystem::checkCmdMessage(std::string msg, int index, udp::endpoint& clientEndpoint)
+{
+    if (index == -1) {
+        return -1;
+    }
+
+    std::string kickCommand = "/kick";
+    std::string banCommand = "/ban";
+    size_t kickPosition = msg.find(kickCommand);
+    size_t banPosition = msg.find(banCommand);
+
+    if (kickPosition != std::string::npos) {
+        if (clientEndpoint != std::get<0>(_admin) || _clients.at(index).getUsername() != std::get<1>(_admin)) {
+            std::string error = "System: You don't have permission";
+            send({MESSAGE_SEND, 1}, stringToVector(error), true, clientEndpoint, index);
+            return -1;
+        }
+
+        std::string pseudo = msg.substr(kickPosition + kickCommand.length() + 1);
+        std::string msgSystem = "System: " + pseudo + " has been kick to the room";
+        int error = -1;
+        int i = 0;
+
+        for (auto client : _clients) {
+            if (client.getUsername() == pseudo) {
+                error = 0;
+            }
+            i++;
+        }
+        if (error == -1) {
+            std::string error = "System: You enter wrong username";
+            send({MESSAGE_SEND, 1}, stringToVector(error), true, clientEndpoint, index);
+            return -1;
+        }
+        i = 0;
+        for (auto client : _clients) {
+            if (client.getUsername() == pseudo) {
+                send({DISCONNECT, 1}, {}, true, client.getClientEndpoint(), i);
+            } else {
+                send({MESSAGE_SEND, 1}, stringToVector(msgSystem), true, client.getClientEndpoint(), i);
+            }
+            i++;
+        }
+        return -1;
+    }
+
+    if (banPosition != std::string::npos) {
+        if (clientEndpoint != std::get<0>(_admin) || _clients.at(index).getUsername() != std::get<1>(_admin)) {
+            std::string error = "System: You don't have permission";
+            send({MESSAGE_SEND, 1}, stringToVector(error), true, clientEndpoint, index);
+            return -1;
+        }
+
+        std::string pseudo = msg.substr(banPosition + banCommand.length() + 1);
+        std::string msgSystem = "System: " + pseudo + " has been ban to the room";
+        int error = -1;
+        int i = 0;
+
+        for (auto client : _clients) {
+            if (client.getUsername() == pseudo) {
+                error = 0;
+            }
+            i++;
+        }
+        if (error == -1) {
+            std::string error = "System: You enter wrong username";
+            send({MESSAGE_SEND, 1}, stringToVector(error), true, clientEndpoint, index);
+            return -1;
+        }
+        i = 0;
+        for (auto client : _clients) {
+            if (client.getUsername() == pseudo) {
+                _ban.push_back(client.getClientEndpoint());
+                send({DISCONNECT, 1}, {}, true, client.getClientEndpoint(), i);
+            } else {
+                send({MESSAGE_SEND, 1}, stringToVector(msgSystem), true, client.getClientEndpoint(), i);
+            }
+            i++;
+        }
+        return -1;
+    }
+    return 0;
+}
+
 inline void NetworkRoomSystem::message(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator)
 {
     (void)coordinator;
@@ -198,14 +284,17 @@ inline void NetworkRoomSystem::message(std::vector<int>& decodedIntegers, udp::e
     std::string message = vectorToString(decodedIntegers);
 
     send(_OK, {timeStamp}, false, clientEndpoint, index);
-    
-    std::cout << "Size name client: " << _clients.at(index).getUsername().size() << std::endl;
+
+    if (checkCmdMessage(message, index, clientEndpoint) == -1) {
+        return;
+    }
 
     std::string res = _clients.at(index).getUsername() + ": " + message;
     int i = 0;
 
     for (auto client : _clients) {
         send({MESSAGE_SEND, 1}, stringToVector(res), true, client.getClientEndpoint(), i);
+        i++;
     }
 }
 
@@ -237,11 +326,21 @@ inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::e
         }
     }
 
+    int i = 0;
+    std::string msgSystem = "System: " + username + " connected to the room";
+    for (auto client : _clients) {
+        send({MESSAGE_SEND, 1}, stringToVector(msgSystem), true, client.getClientEndpoint(), i);
+        i++;
+    }
+
     Entity entity = coordinator.CreateEntity();
 
     coordinator.AddComponent<Position>(entity, {1, 0});
     coordinator.AddComponent<Velocity>(entity, {0, 0});
-    coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
+    if (username.length() > 4 && username.substr(0, 4) == "(S) ")
+        coordinator.AddComponent<Hitbox>(entity, {0, 0, 0, 0, SPECTATOR});
+    else
+        coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
     coordinator.AddComponent<HealthPoint>(entity, {3, 3});
     coordinator.AddComponent<Damage>(entity, {0, 0});
     sendCreate(entity, coordinator);
@@ -447,12 +546,12 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
 
             Entity ennemy = coordinator.CreateEntity();
             coordinator.AddComponent<Position>(ennemy, {1990, (static_cast<float>(std::any_cast<float>(event._data[0])))});
-            coordinator.AddComponent<Velocity>(ennemy, {-20, 0});
-            coordinator.AddComponent<Hitbox>(ennemy, {0, 0, 100, 100, ENNEMY});
+            coordinator.AddComponent<Velocity>(ennemy, {-10, 0});
+            coordinator.AddComponent<Hitbox>(ennemy, {10, 10, 100, 100, ENNEMY});
             coordinator.AddComponent<Controllable>(ennemy, {IA});
             coordinator.AddComponent<HealthPoint>(ennemy, {1, 1});
             coordinator.AddComponent<Damage>(ennemy, {1, 1});
-            coordinator.AddComponent<Path>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[0]))), 200, 10});
+            coordinator.AddComponent<Path>(ennemy, {0});
             this->sendCreate(ennemy, coordinator);
             break;
         }
@@ -464,6 +563,10 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
 
 inline void NetworkRoomSystem::processReceiveData(udp::endpoint clientEndpoint, Coordinator &coordinator, std::vector<int> res)
 {
+    for (auto i : _ban) {
+        if (i == clientEndpoint)
+            return;
+    }
     if (clientEndpoint != asio::ip::udp::endpoint(asio::ip::make_address("0.0.0.0"), 0)) {
         handleCmd(res, clientEndpoint, coordinator);
     } else {

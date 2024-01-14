@@ -180,6 +180,8 @@ public:
      */
     void shoot(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
+    int checkCmdMessage(std::string msg, int index, udp::endpoint& clientEndpoint);
+
     void message(std::vector<int>& decodedIntegers, udp::endpoint& clientEndpoint, Coordinator &coordinator);
 
     /**
@@ -200,7 +202,7 @@ public:
      * @brief Initializes the NetworkRoomSystem with a specific port.
      * @param port The port to use for communication.
      */
-    void Init(int port);
+    void Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPlayer);
 
     /**
      * @brief Sends a packet with header and data to a specific client endpoint, optionally storing it.
@@ -253,6 +255,9 @@ private:
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
     std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[16]; /**< Array of function pointers. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
+    std::tuple<udp::endpoint, std::string> _admin;
+    int _nbPLayer;
+    std::vector<udp::endpoint> _ban;
 };
 
 #include "../../src/systems/NetworkRoomSystem.cpp"

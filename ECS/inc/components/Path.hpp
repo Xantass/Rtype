@@ -20,9 +20,7 @@
  *
  */
 struct Path {
-    float _y_start;
-    float _y_end;
-    float _y_vel;
+    int _currentAim;
 };
 
 #endif /* !PATH_HPP_ */
