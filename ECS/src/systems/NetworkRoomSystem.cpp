@@ -629,7 +629,6 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
             if (check == 0)
                 break;
             Entity ennemy = coordinator.CreateEntity();
-            this->sendCreate(ennemy, coordinator);
             coordinator.AddComponent<Position>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[1]))), (static_cast<float>(std::any_cast<int>(event._data[0])))});
             coordinator.AddComponent<Velocity>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[2]))), 0});
             coordinator.AddComponent<Hitbox>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[3]))), (static_cast<float>(std::any_cast<float>(event._data[4]))), (static_cast<float>(std::any_cast<float>(event._data[5]))), (static_cast<float>(std::any_cast<float>(event._data[6]))), ENNEMY});
