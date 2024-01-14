@@ -8,11 +8,11 @@
 #include <cstdlib>
 #include <ctime>
 #include "FlappyCollisionSystem.hpp"
+#include "ECSFlappy.hpp"
 
 inline void CollisionSystem2::Update(Coordinator &coordinator) {
     for (auto entity : this->_entities) {
         auto& pos = coordinator.GetComponent<Position>(entity);
-        auto& vel = coordinator.GetComponent<Velocity>(entity);
         auto& hit = coordinator.GetComponent<Hitbox2>(entity);
         if (hit.type == Flappy::PLAYER) {
             if (pos._y < 0) {
@@ -39,15 +39,18 @@ inline void CollisionSystem2::Update(Coordinator &coordinator) {
             if (entity == comp)
                 continue;
             auto& c_pos = coordinator.GetComponent<Position>(comp);
-            auto& c_vel = coordinator.GetComponent<Velocity>(comp);
+            auto& sprite = coordinator.GetComponent<Sprite>(comp);
             auto& c_hit = coordinator.GetComponent<Hitbox2>(comp);
-            if (hit.type == Flappy::PLAYER && c_hit.type == Flappy::COIN) {
+            if (hit.type == Flappy::PLAYER && c_hit.type == Flappy::COIN && sprite.scale == 1) {
                 if (pos._x + hit._x + hit.width >= c_pos._x + c_hit._x &&
                     pos._x + hit._x <= c_pos._x + c_hit._x + c_hit.width &&
                     pos._y + hit._y + hit.height >= c_pos._y + c_hit._y &&
                     pos._y + hit._y <= c_pos._y + c_hit._y + c_hit.height) {
-                    auto& sprite = coordinator.GetComponent<Sprite>(comp);
+                    auto& sound = coordinator.GetComponent<Son>(comp);
+                    auto& score = coordinator.GetComponent<Score>(comp);
                     sprite.scale = 0;
+                    sound.shouldBePlayed = true;
+                    score.score++;
                 }
             }
             if (hit.type == Flappy::PLAYER && c_hit.type == Flappy::WALL) {

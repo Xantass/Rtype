@@ -275,6 +275,23 @@ class Graphic {
         static int getFPS(void) {
             return GetFPS();
         }
+        /**
+         * @brief Load Sound in memory
+         *
+         * @param path
+         * @return Sound
+         */
+        static Sound loadSound(std::string path) {
+            return LoadSound(path.c_str());
+        }
+        /**
+         * @brief Play a sound
+         *
+         * @param sound
+         */
+        static void playSound(Sound sound) {
+            PlaySound(sound);
+        }
 };
 
 #endif /* !GRAPHIC_HPP_ */

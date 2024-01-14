@@ -18,11 +18,14 @@ int main(int ac, char **av) {
     coordinator.RegisterComponent<Sprite>();
     coordinator.RegisterComponent<Falling>();
     coordinator.RegisterComponent<Hitbox2>();
-    // coordinator.RegisterComponent<Hitbox>();
+    coordinator.RegisterComponent<Son>();
+    coordinator.RegisterComponent<Score>();
     auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
     auto graphicSystem = coordinator.RegisterSystem<GraphicSystem>();
     auto gravitySystem = coordinator.RegisterSystem<GravitySystem>();
     auto collisionSystem = coordinator.RegisterSystem<CollisionSystem2>();
+    auto soundSystem = coordinator.RegisterSystem<SoundSystem>();
+    auto scoreSystem = coordinator.RegisterSystem<ScoreSystem>();
 
     Signature signature;
     signature.set(coordinator.GetComponentType<Position>());
@@ -41,6 +44,12 @@ int main(int ac, char **av) {
     signature4.set(coordinator.GetComponentType<Velocity>());
     signature4.set(coordinator.GetComponentType<Hitbox2>());
     coordinator.SetSystemSignature<CollisionSystem2>(signature4);
+    Signature signature5;
+    signature5.set(coordinator.GetComponentType<Son>());
+    coordinator.SetSystemSignature<SoundSystem>(signature5);
+    Signature signature6;
+    signature6.set(coordinator.GetComponentType<Score>());
+    coordinator.SetSystemSignature<SoundSystem>(signature6);
 
     Graphic::init(1920, 1080, "Flappy Bird");
     Graphic::toggleFullScreen();
@@ -53,6 +62,8 @@ int main(int ac, char **av) {
         physicSystem->Update(coordinator);
         gravitySystem->Update(coordinator);
         collisionSystem->Update(coordinator);
+        soundSystem->Update(coordinator);
+        scoreSystem->Update(coordinator);
         Graphic::endDrawing();
     }
     Graphic::close();

@@ -20,6 +20,7 @@ void Creator::createBird(Coordinator &coordinator) {
     coordinator.AddComponent<Position>(entity, {300, 300});
     coordinator.AddComponent<Velocity>(entity, {0, 0});
     coordinator.AddComponent<Falling>(entity, {true});
+    coordinator.AddComponent<Score>(entity, {0});
     coordinator.AddComponent<Hitbox2>(entity, {30, 30, 170, 120, Flappy::PLAYER});
     coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/bird.png"), 1});
 }
@@ -49,6 +50,7 @@ void Creator::createCoin(Coordinator &coordinator) {
     coordinator.AddComponent<Position>(entity, {2140, 656});
     coordinator.AddComponent<Velocity>(entity, {-0.5, 0});
     coordinator.AddComponent<Hitbox2>(entity, {0, 0, 120, 112, Flappy::COIN});
+    coordinator.AddComponent<Son>(entity, {Graphic::loadSound("assets/coin.mp3"), false});
     coordinator.AddComponent<Sprite>(entity, {Graphic::loadTexture("assets/coin.png"), 1});
 }
 

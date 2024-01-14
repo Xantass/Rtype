@@ -15,7 +15,7 @@ inline void GraphicSystem::Update(Coordinator &coordinator)
     for (auto &entity : this->_entities) {
         auto& pos = coordinator.GetComponent<Position>(entity);
         auto& sprite = coordinator.GetComponent<Sprite>(entity);
-        auto& hit = coordinator.GetComponent<Hitbox2>(entity);
+        // auto& hit = coordinator.GetComponent<Hitbox2>(entity);
 
 
         Graphic::drawTextureEx(sprite.texture, {pos._x, pos._y}, 0, sprite.scale, WHITE);

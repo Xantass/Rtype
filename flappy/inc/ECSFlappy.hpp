@@ -9,9 +9,11 @@
 #define ECSFLAPPY_HPP_
 
 #include "inc/Coordinator.hpp"
+#include "inc/systems/ScoreSystem.hpp"
 #include "inc/systems/PhysicSystem.hpp"
 #include "inc/systems/GraphicSystem.hpp"
 #include "inc/systems/GravitySystem.hpp"
+#include "inc/systems/SoundSystem.hpp"
 #include "inc/systems/FlappyCollisionSystem.hpp"
 #include "Graphic.hpp"
 
