@@ -11,6 +11,7 @@
 #include "../Coordinator.hpp"
 #include "../System.hpp"
 #include "../components/SpawnClock.hpp"
+#include "../components/SpawnInfo.hpp"
 
 /**
  * @class SpawnSystem

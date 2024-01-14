@@ -7,12 +7,16 @@
 
 #include "NetworkRoomSystem.hpp"
 
-inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPLayer, std::map<int, std::tuple<std::string, std::string>> sprite, int selectBullet, int selectEnnemy)
+inline void NetworkRoomSystem::Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPLayer, std::map<int, std::tuple<std::string, std::string>> sprite, std::vector<int> selectSprites)
 {
     udp::endpoint endpoint(udp::v4(), port);
 
-    _spriteBullet = selectBullet;
-    _spriteEnnemy = selectEnnemy;
+    _spriteBullet = selectSprites.at(0);
+    _spriteEnnemy = selectSprites.at(1);
+    _spriteEnnemyTwo = selectSprites.at(2);
+    _spriteEnnemyElite = selectSprites.at(3);
+    _spriteEnnemyBoss = selectSprites.at(4);
+    _spriteEnnemyBullet = selectSprites.at(5);
     _sprite = sprite;
     _nbPLayer = nbPLayer;
     _admin = std::make_tuple(clientEndpoint, nameAdmin);
@@ -55,7 +59,7 @@ inline int NetworkRoomSystem::getClient(int id)
 
 inline int NetworkRoomSystem::hourIntNow()
 {
-    auto currentTime = std::chrono::high_resolution_clock::now();
+    auto currentTime = std::chrono::steady_clock::now();
     auto timeSinceEpoch = currentTime.time_since_epoch();
     auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch);
     int currentTime_ms = static_cast<int>(milliseconds.count());
@@ -205,7 +209,9 @@ inline void NetworkRoomSystem::sendCreate(int entity, Coordinator &coordinator, 
     auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
     auto& health = coordinator.GetComponent<HealthPoint>(entity);
 
-    std::vector<int> res = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp), selectSprite};
+    int scale = selectSprite == _spriteEnnemyBoss ? 2 : 1;
+
+    std::vector<int> res = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp), selectSprite, scale * 10};
 
     int index = 0;
 
@@ -402,9 +408,9 @@ inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::e
     if (username.length() > 4 && username.substr(0, 4) == "(S) ")
         coordinator.AddComponent<Hitbox>(entity, {0, 0, 0, 0, SPECTATOR});
     else
-        coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
-    coordinator.AddComponent<HealthPoint>(entity, {3, 3});
-    coordinator.AddComponent<Damage>(entity, {0, 0});
+        coordinator.AddComponent<Hitbox>(entity, {0, 0, 100, 100, PLAYER});
+    coordinator.AddComponent<HealthPoint>(entity, {3000, 3000});
+    coordinator.AddComponent<Damage>(entity, {1, 1});
     sendCreate(entity, coordinator, selectSprite);
     _clients.push_back(Client(username, clientEndpoint, entity, selectSprite));
 
@@ -536,9 +542,9 @@ inline void NetworkRoomSystem::shoot(std::vector<int>& decodedIntegers, udp::end
 
             coordinator.AddComponent<Position>(bullet, coordinator.GetComponent<Position>(decodedIntegers.at(0)));
             coordinator.AddComponent<Velocity>(bullet, {20, 0});
-            coordinator.AddComponent<Hitbox>(bullet, {0, 0, 1, 1, BULLET});
+            coordinator.AddComponent<Hitbox>(bullet, {0, 0, 60, 60, BULLET});
             coordinator.AddComponent<Damage>(bullet, {1, 1});
-            coordinator.AddComponent<HealthPoint>(bullet, {-1, -1});
+            coordinator.AddComponent<HealthPoint>(bullet, {1, 1});
             coordinator.AddComponent<Controllable>(bullet, {ENGINE});
 
             send(_PASS, {timeStamp}, false, clientEndpoint, index);
@@ -610,19 +616,37 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
             break;
         }
         if (event._type == Event::actions::SPAWN) {
-
+            int enn_sprite = _spriteEnnemyBullet;
+            int check = 1;
+            if (event._entity != 0) {
+                check = 0;
+                for (auto entity : this->_entities) {
+                    auto& hit = coordinator.GetComponent<Hitbox>(entity);
+                    if (entity == event._entity && hit.type == ENNEMY && hit.height != 51)
+                        check = 1;
+                }
+            }
+            if (check == 0)
+                break;
             Entity ennemy = coordinator.CreateEntity();
-            coordinator.AddComponent<Position>(ennemy, {1990, (static_cast<float>(std::any_cast<int>(event._data[0])))});
-            coordinator.AddComponent<Velocity>(ennemy, {-20, 0});
-            coordinator.AddComponent<Hitbox>(ennemy, {0, 0, 100, 100, ENNEMY});
+            coordinator.AddComponent<Position>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[1]))), (static_cast<float>(std::any_cast<int>(event._data[0])))});
+            coordinator.AddComponent<Velocity>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[2]))), 0});
+            coordinator.AddComponent<Hitbox>(ennemy, {(static_cast<float>(std::any_cast<float>(event._data[3]))), (static_cast<float>(std::any_cast<float>(event._data[4]))), (static_cast<float>(std::any_cast<float>(event._data[5]))), (static_cast<float>(std::any_cast<float>(event._data[6]))), ENNEMY});
             coordinator.AddComponent<Controllable>(ennemy, {IA});
-            coordinator.AddComponent<HealthPoint>(ennemy, {1, 1});
-            coordinator.AddComponent<Damage>(ennemy, {1, 1});
-            this->sendCreate(ennemy, coordinator, _spriteEnnemy);
+            coordinator.AddComponent<HealthPoint>(ennemy, {(static_cast<int>(std::any_cast<int>(event._data[7]))), (static_cast<int>(std::any_cast<int>(event._data[7])))});
+            coordinator.AddComponent<Damage>(ennemy, {(static_cast<int>(std::any_cast<int>(event._data[8]))), (static_cast<int>(std::any_cast<int>(event._data[8])))});
+            if ((static_cast<int>(std::any_cast<int>(event._data[9]))) == 1) {
+                coordinator.AddComponent<SpawnClock>(ennemy, {std::chrono::steady_clock::now(), std::chrono::steady_clock::now(), 0});
+                coordinator.AddComponent<SpawnInfo>(ennemy, {2, 0, 0, -20, 0, 0, 51, 51, 1, 1, 0});
+                enn_sprite = _spriteEnnemy;
+            }
+            this->sendCreate(ennemy, coordinator, enn_sprite);
             break;
         }
         if (event._type == Event::actions::DESTROY) {
             this->sendDestroy(event._entity);
+            coordinator.DestroyEntity(event._entity);
+            break;
         }
     }
 }
@@ -656,6 +680,7 @@ inline void NetworkRoomSystem::sendEcs(Coordinator &coordinator)
             auto& hitbox = coordinator.GetComponent<Hitbox>(entity);
             auto& health = coordinator.GetComponent<HealthPoint>(entity);
             int selectSprite = -1;
+            int scale = 1;
 
             for (auto clientBis : _clients) {
                 if (static_cast<int>(entity) == clientBis.getID()) {
@@ -663,7 +688,7 @@ inline void NetworkRoomSystem::sendEcs(Coordinator &coordinator)
                     break;
                 }
             }
-            std::vector<int> tmp = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp), static_cast<int>(selectSprite)};
+            std::vector<int> tmp = {static_cast<int>(entity), static_cast<int>(pos._x * 10), static_cast<int>(pos._y * 10), static_cast<int>(vel._x * 10), static_cast<int>(vel._y * 10), static_cast<int>(hitbox._x * 10), static_cast<int>(hitbox._y * 10), static_cast<int>(hitbox.width * 10), static_cast<int>(hitbox.height * 10), hitbox.type, static_cast<int>(health._max_hp), static_cast<int>(health._curr_hp), static_cast<int>(selectSprite), scale * 10};
 
             encode_ = mergeVectors(encode_, tmp);
         }
