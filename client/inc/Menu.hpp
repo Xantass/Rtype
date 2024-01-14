@@ -8,6 +8,7 @@
 #ifndef MENU_HPP_
 #define MENU_HPP_
 
+#include <algorithm>
 #include <sstream>
 #include <vector>
 #include <iostream>
@@ -17,6 +18,8 @@
 
 class Menu {
     public:
+        Music _music = Graphic::loadMusic("assets/Theme.mp3");
+        Texture2D settings;
         std::string action = "";
         std::string _host;
         std::string _port;
@@ -37,8 +40,10 @@ class Menu {
         std::vector<std::vector<std::string>> _roomList;
         Coordinator &_coordinator;
         int page = 0;
-        Menu(std::string host, std::string port, std::string name, Coordinator &coordinator) : _host(host), _port(port), _name(name), _nbPlayer("4"), _coordinator(coordinator)  {}
-        ~Menu() {}
+        std::string _settingsState = "";
+        float volume = 1;
+        Menu(std::string host, std::string port, std::string name, Coordinator &coordinator) : settings(Graphic::loadTexture("assets/settings.png")), _host(host), _port(port), _name(name), _nbPlayer("4"), _coordinator(coordinator)  {Graphic::playMusic(_music);}
+        ~Menu() {Graphic::unloadMusic(_music);}
         void displayMenu(AssetManager &assetManager) {
             if (Graphic::isKeyPressed(KEY_TAB)) {
                 if (action == "Select Ennemy" || action == "Select Bullet" || action == "Select Second Ennemy" || action == "Select Elite Ennemy" || action == "Select Boss Ennemy" || action == "Select Ennemy Bullet") {
@@ -282,6 +287,37 @@ class Menu {
                 room.clear();
             }
             input.close();
+        }
+        void displaySettings(void) {
+            if (_settingsState == "") {
+                Graphic::drawTexture(settings, 1790, 0, RWHITE);
+                Vector2 mousePosition = Graphic::getMousePosition();
+                if (Graphic::checkCollisionPointRec(mousePosition.x, mousePosition.y, 1790, 0, 150, 100) && Graphic::isMouseButtonPressed()) {
+                    _settingsState = "Settings";
+                }
+            } else if (_settingsState == "Settings") {
+                Graphic::drawRectangle(1610, 10, 300, 70, {0, 0, 0, 50});
+                Graphic::drawRectangleLines(1610, 10, 300, 70, RWHITE);
+                Rectangle sliderBar = { 1660, 35, 200, 20 };
+                Rectangle sliderKnob = { sliderBar.x + (sliderBar.width - 20) * volume, sliderBar.y - 10, 20, 40 };
+                Vector2 mousePosition = Graphic::getMousePosition();
+                bool knobHovered = Graphic::checkCollisionPointRec(mousePosition.x, mousePosition.y, sliderKnob.x, sliderKnob.y, sliderKnob.width, sliderKnob.height);
+                if (Graphic::isMouseButtonDown()) {
+                    if (knobHovered) {
+                        mousePosition = Graphic::getMousePosition();
+                        sliderKnob.x = std::clamp(mousePosition.x - sliderKnob.width / 2, sliderBar.x, sliderBar.x + sliderBar.width - sliderKnob.width);
+                        float relativeX = sliderKnob.x - sliderBar.x;
+                        float normalizedX = relativeX / (sliderBar.width - sliderKnob.width);
+                        volume = normalizedX;
+                        Graphic::setMusicVolume(_music, volume);
+                    }
+                }
+                if (Graphic::isMouseButtonPressed() && !knobHovered) {
+                    _settingsState = "";
+                }
+                DrawRectangleRec(sliderBar, GRAY);
+                DrawRectangleRec(sliderKnob, knobHovered ? DARKGRAY : LIGHTGRAY);
+            }
         }
 };
 

@@ -1,2 +1,0 @@
-PORT	NAME	NB_PLAYER
-1024	test	4
