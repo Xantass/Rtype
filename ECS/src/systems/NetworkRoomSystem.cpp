@@ -483,8 +483,8 @@ inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::e
         coordinator.AddComponent<Hitbox>(entity, {0, 0, 0, 0, SPECTATOR});
     else
         coordinator.AddComponent<Hitbox>(entity, {0, 0, 100, 100, PLAYER});
-    coordinator.AddComponent<HealthPoint>(entity, {3, 3});
-    coordinator.AddComponent<Damage>(entity, {1, 1});
+    coordinator.AddComponent<HealthPoint>(entity, {5, 5});
+    coordinator.AddComponent<Damage>(entity, {2, 2});
     if (selectSprite == -1)
         selectSprite = _pathDefault.at(0);
     sendCreate(entity, coordinator, selectSprite);

@@ -103,8 +103,8 @@ int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameA
         elapsedTime = currentTime - startTime;
         if (elapsedTime >= interval) {
             networkRoomSystem->Update(coordinator);
-            spawnSystem->Update(coordinator);
             staticSystem->Update(coordinator);
+            spawnSystem->Update(coordinator);
             physicSystem->Update(coordinator);
             controlSystem->Update(coordinator);
             collisionSystem->Update(coordinator);
