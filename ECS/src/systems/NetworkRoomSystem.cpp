@@ -482,9 +482,9 @@ inline void NetworkRoomSystem::connect(std::vector<int>& decodedIntegers, udp::e
     if (username.length() > 4 && username.substr(0, 4) == "(S) ")
         coordinator.AddComponent<Hitbox>(entity, {0, 0, 0, 0, SPECTATOR});
     else
-        coordinator.AddComponent<Hitbox>(entity, {0, 0, 1, 1, PLAYER});
+        coordinator.AddComponent<Hitbox>(entity, {0, 0, 100, 100, PLAYER});
     coordinator.AddComponent<HealthPoint>(entity, {3, 3});
-    coordinator.AddComponent<Damage>(entity, {0, 0});
+    coordinator.AddComponent<Damage>(entity, {1, 1});
     if (selectSprite == -1)
         selectSprite = _pathDefault.at(0);
     sendCreate(entity, coordinator, selectSprite);
@@ -722,7 +722,7 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
             if (ennemy_check == 3)
                 enn_sprite = _spriteEnnemyElite;
             if (ennemy_check == 4) {
-                coordinator.AddComponent<StaticType>(ennemy, {1400, 3});
+                coordinator.AddComponent<StaticType>(ennemy, {1700, 3});
                 enn_sprite = _spriteEnnemyBoss;
             }
             this->sendCreate(ennemy, coordinator, enn_sprite);
