@@ -7,7 +7,7 @@
 
 #include "room.hpp"
 
-int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameAdmin, std::map<int, std::tuple<std::string, std::string>> sprite, int selectBullet, int selectEnnemy)
+int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameAdmin, std::map<int, std::tuple<std::string, std::string>> sprite, std::vector<int> selectSprites)
 {
     (void)nbPlayer;
     Coordinator coordinator;
@@ -19,8 +19,10 @@ int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameA
     coordinator.RegisterComponent<Hitbox>();
     coordinator.RegisterComponent<Controllable>();
     coordinator.RegisterComponent<SpawnClock>();
+    coordinator.RegisterComponent<SpawnInfo>();
     coordinator.RegisterComponent<HealthPoint>();
     coordinator.RegisterComponent<Damage>();
+    coordinator.RegisterComponent<StaticType>();
 
     auto physicSystem = coordinator.RegisterSystem<PhysicSystem>();
     auto controlSystem = coordinator.RegisterSystem<ControlSystem>();
@@ -28,6 +30,7 @@ int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameA
     auto spawnSystem = coordinator.RegisterSystem<SpawnSystem>();
     auto collisionSystem = coordinator.RegisterSystem<CollisionSystem>();
     auto healthSystem = coordinator.RegisterSystem<HealthSystem>();
+    auto staticSystem = coordinator.RegisterSystem<StaticSystem>();
     
     Signature signature;
 
@@ -36,6 +39,9 @@ int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameA
     signature.set(coordinator.GetComponentType<Hitbox>());
     coordinator.SetSystemSignature<PhysicSystem>(signature);
     coordinator.SetSystemSignature<NetworkRoomSystem>(signature);
+    
+    signature.set(coordinator.GetComponentType<StaticType>());
+    coordinator.SetSystemSignature<StaticSystem>(signature);
     
     Signature signature2;
 
@@ -47,6 +53,8 @@ int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameA
     Signature signature3;
     
     signature3.set(coordinator.GetComponentType<SpawnClock>());
+    signature3.set(coordinator.GetComponentType<SpawnInfo>());
+    signature3.set(coordinator.GetComponentType<Position>());
     coordinator.SetSystemSignature<SpawnClock>(signature3);
     
     Signature signature4;
@@ -60,12 +68,32 @@ int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameA
     signature5.set(coordinator.GetComponentType<HealthPoint>());
     coordinator.SetSystemSignature<HealthSystem>(signature5);
 
-    Entity ent = coordinator.CreateEntity();
-    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 2, 100, 1000});
-    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 1, 500, 700});
-    coordinator.AddComponent<SpawnClock>(ent, {std::chrono::high_resolution_clock::now(), std::chrono::high_resolution_clock::now(), 0, 3, 200, 900});
+    Entity cl1 = coordinator.CreateEntity();
+    coordinator.AddComponent<Position>(cl1, {1990, 0});
+    coordinator.AddComponent<Velocity>(cl1, {0, 0});
+    coordinator.AddComponent<Hitbox>(cl1, {0, 0, 0, 0, SPECTATOR});
+    coordinator.AddComponent<SpawnClock>(cl1, {std::chrono::steady_clock::now(), std::chrono::steady_clock::now(), 0, 30, 60});
+    coordinator.AddComponent<SpawnInfo>(cl1, {2, 100, 900, -5, 30, 20, 100, 110, 1, 1, 1});
+    Entity cl1bis = coordinator.CreateEntity();
+    coordinator.AddComponent<Position>(cl1bis, {1990, 0});
+    coordinator.AddComponent<Velocity>(cl1bis, {0, 0});
+    coordinator.AddComponent<Hitbox>(cl1bis, {0, 0, 0, 0, SPECTATOR});
+    coordinator.AddComponent<SpawnClock>(cl1bis, {std::chrono::steady_clock::now(), std::chrono::steady_clock::now(), 0, 30, 60});
+    coordinator.AddComponent<SpawnInfo>(cl1bis, {3, 100, 900, -5, 30, 20, 100, 110, 2, 1, 2});
+    Entity cl2 = coordinator.CreateEntity();
+    coordinator.AddComponent<Position>(cl2, {1990, 0});
+    coordinator.AddComponent<Velocity>(cl2, {0, 0});
+    coordinator.AddComponent<Hitbox>(cl2, {0, 0, 0, 0, SPECTATOR});
+    coordinator.AddComponent<SpawnClock>(cl2, {std::chrono::steady_clock::now(), std::chrono::steady_clock::now(), 0, 40, 80});
+    coordinator.AddComponent<SpawnInfo>(cl2, {30, 400, 420, -5, 60, 40, 200, 220, 10, 1, 4});
+    // Entity cl3 = coordinator.CreateEntity();
+    // coordinator.AddComponent<Position>(cl3, {1990, 0});
+    // coordinator.AddComponent<Velocity>(cl3, {0, 0});
+    // coordinator.AddComponent<Hitbox>(cl3, {0, 0, 0, 0, SPECTATOR});
+    // coordinator.AddComponent<SpawnClock>(cl3, {std::chrono::steady_clock::now(), std::chrono::steady_clock::now(), 0, 30});
+    // coordinator.AddComponent<SpawnInfo>(cl3, {6, 200, 900, -15, 30, 20, 100, 110, 1, 1, 1});
 
-    networkRoomSystem->Init(port, clientEndpoint, nameAdmin, nbPlayer, sprite, selectBullet, selectEnnemy);
+    networkRoomSystem->Init(port, clientEndpoint, nameAdmin, nbPlayer, sprite, selectSprites);
     std::chrono::milliseconds interval(16);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
@@ -75,9 +103,10 @@ int room(int nbPlayer, int port, udp::endpoint clientEndpoint, std::string nameA
         elapsedTime = currentTime - startTime;
         if (elapsedTime >= interval) {
             networkRoomSystem->Update(coordinator);
+            staticSystem->Update(coordinator);
+            spawnSystem->Update(coordinator);
             physicSystem->Update(coordinator);
             controlSystem->Update(coordinator);
-            spawnSystem->Update(coordinator);
             collisionSystem->Update(coordinator);
             healthSystem->Update(coordinator);
             startTime = currentTime;

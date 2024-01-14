@@ -46,6 +46,8 @@ class NetworkRoomSystem : public System {
 public:
     // Methods
 
+    void setDefaultPath();
+
     /**
      * @brief Retrieves the client with the given ID.
      * @param id The ID of the client to retrieve.
@@ -235,7 +237,7 @@ public:
      * @brief Initializes the NetworkRoomSystem with a specific port.
      * @param port The port to use for communication.
      */
-    void Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPlayer, std::map<int, std::tuple<std::string, std::string>> sprite, int selectBullet, int selectEnnemy);
+    void Init(int port, udp::endpoint clientEndpoint, std::string nameAdmin, int nbPlayer, std::map<int, std::tuple<std::string, std::string>> sprite, std::vector<int> selectSprites);
 
     /**
      * @brief Sends a packet with header and data to a specific client endpoint, optionally storing it.
@@ -288,12 +290,17 @@ private:
     udp::endpoint _serverEndpoint; /**< The endpoint of the server. */
     std::function<void(std::vector<int>&, udp::endpoint&, Coordinator &coordinator)> _functions[17]; /**< Array of function pointers. */
     std::chrono::steady_clock::time_point _startTime; /**< The start time for tracking. */
-    std::tuple<udp::endpoint, std::string> _admin; /**< Tuple containing the admin's endpoint and username. */
-    int _nbPLayer; /**< The number of players for the room. */
-    std::vector<udp::endpoint> _ban; /**< Vector storing the endpoints of banned clients. */
-    std::map<int, std::tuple<std::string, std::string>> _sprite; /**< Map associating indices to sprite-related data. */
-    int _spriteEnnemy; /**< The sprite index for enemy entities. */
-    int _spriteBullet; /**< The sprite index for bullet entities. */
+    std::vector<int> _pathDefault; /**< Vector of default Sprite */
+    std::tuple<udp::endpoint, std::string> _admin;
+    int _nbPLayer;
+    std::vector<udp::endpoint> _ban;
+    std::map<int, std::tuple<std::string, std::string>> _sprite;
+    int _spriteEnnemy;
+    int _spriteBullet;
+    int _spriteEnnemyTwo;
+    int _spriteEnnemyElite;
+    int _spriteEnnemyBoss;
+    int _spriteEnnemyBullet;
 };
 
 #include "../../src/systems/NetworkRoomSystem.cpp"

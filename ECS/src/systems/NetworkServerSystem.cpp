@@ -51,7 +51,7 @@ inline int NetworkServerSystem::getClient(int id)
 
 inline int NetworkServerSystem::hourIntNow()
 {
-    auto currentTime = std::chrono::high_resolution_clock::now();
+    auto currentTime = std::chrono::steady_clock::now();
     auto timeSinceEpoch = currentTime.time_since_epoch();
     auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch);
     int currentTime_ms = static_cast<int>(milliseconds.count());
@@ -280,21 +280,28 @@ inline void NetworkServerSystem::param(std::vector<int>& decodedIntegers, udp::e
 
     int timeStamp = decodedIntegers.at(0);
     int index = getClient(decodedIntegers.at(1));
+    std::vector<int> selectSprites;
 
     if (index == -1)
         return;
 
     int nbPlayer = decodedIntegers.at(2);
-    int selectBullet = decodedIntegers.at(3);
-    int selectEnnemy = decodedIntegers.at(4);
+    for (std::size_t i = 3; i < 9; i++)
+        selectSprites.push_back(decodedIntegers.at(i));
+    // int selectBullet = decodedIntegers.at(3);
+    // int selectEnnemy = decodedIntegers.at(4);
+    // int selectEnnemyTwo = decodedIntegers.at(5);
+    // int selectEnnemyElite = decodedIntegers.at(6);
+    // int selectEnnemyBoss = decodedIntegers.at(7);
+    // int selectEnnemyBullet = decodedIntegers.at(8);
 
-    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 5);
+    decodedIntegers.erase(decodedIntegers.begin(), decodedIntegers.begin() + 9);
 
     std::string name = vectorToString(decodedIntegers);
     int port = findValidPort(_service);
 
     try {
-        std::thread Thread(room, nbPlayer, port, clientEndpoint, _clients.at(index).getUsername(), _sprite, selectBullet, selectEnnemy);
+        std::thread Thread(room, nbPlayer, port, clientEndpoint, _clients.at(index).getUsername(), _sprite, selectSprites);
 
         Thread.detach();
         send({_OK}, {timeStamp}, false, clientEndpoint, index);
@@ -463,15 +470,12 @@ inline void NetworkServerSystem::send(std::vector<int> header, std::vector<int> 
     if (res.size() > 500) {
         std::vector<unsigned char> buffer;
         std::vector<std::vector<int>> data = splitVector(res, 500);
-        std::cout << " NB PACKETS: " << data.size() << std::endl;
 
         for (size_t i = 0; i < data.size(); i++) {
-            std::cout << "first value: " << data.at(i).at(0) << std::endl;
             buffer = encode(data.at(i));
             _socket.send_to(asio::buffer(buffer), client);
         }
     } else {
-        std::cout << "UNIQUE PACKET" << std::endl;
         std::vector<unsigned char> buffer = encode(res);
 
         _socket.send_to(asio::buffer(buffer), client);
@@ -480,7 +484,6 @@ inline void NetworkServerSystem::send(std::vector<int> header, std::vector<int> 
         }
         buffer.clear();
     }
-    std::cout << "SEND END" << std::endl;
     return;
 }
 
