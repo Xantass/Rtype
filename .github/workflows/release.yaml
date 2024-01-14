@@ -64,7 +64,10 @@ jobs:
       - name: "📦 Zip Windows files"
         if: matrix.os == 'windows-latest'
         run: |
-          Get-ChildItem -Path ./r-type_client.exe, ./r-type_server.exe, ./assets/ | Compress-Archive -DestinationPath R-Type.zip 
+          $assetsPath = ".\assets"
+          $binariesPath = ".\r-type_client.exe", ".\r-type_server.exe"
+          Compress-Archive -Path $binariesPath -DestinationPath R-Type.zip
+          Compress-Archive -Path $assetsPath -Update -DestinationPath R-Type.zip
 
       - name: "📦 Zip Linux and MacOs files"
         if: matrix.os != 'windows-latest'
