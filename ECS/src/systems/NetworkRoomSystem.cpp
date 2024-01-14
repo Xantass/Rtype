@@ -713,7 +713,7 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
             coordinator.AddComponent<HealthPoint>(ennemy, {(static_cast<int>(std::any_cast<int>(event._data[7]))), (static_cast<int>(std::any_cast<int>(event._data[7])))});
             coordinator.AddComponent<Damage>(ennemy, {(static_cast<int>(std::any_cast<int>(event._data[8]))), (static_cast<int>(std::any_cast<int>(event._data[8])))});
             if (ennemy_check != 0) {
-                coordinator.AddComponent<SpawnClock>(ennemy, {std::chrono::steady_clock::now(), std::chrono::steady_clock::now(), 0, 60, 600});
+                coordinator.AddComponent<SpawnClock>(ennemy, {std::chrono::steady_clock::now(), std::chrono::steady_clock::now(), 0, 60, 61});
                 coordinator.AddComponent<SpawnInfo>(ennemy, {2, 0, 0, -20, 0, 0, 51, 51, 1, 1, 0});
                 enn_sprite = _spriteEnnemy;
             }
@@ -722,7 +722,7 @@ inline void NetworkRoomSystem::checkEvent(Coordinator &coordinator)
             if (ennemy_check == 3)
                 enn_sprite = _spriteEnnemyElite;
             if (ennemy_check == 4) {
-                coordinator.AddComponent<StaticType>(ennemy, {1700, 3});
+                coordinator.AddComponent<StaticType>(ennemy, {1400, 3});
                 enn_sprite = _spriteEnnemyBoss;
             }
             this->sendCreate(ennemy, coordinator, enn_sprite);

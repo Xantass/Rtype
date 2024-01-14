@@ -20,9 +20,9 @@ inline void StaticSystem::Update(Coordinator &coordinator)
 
         if (stat._parts != 0)
             total = (hit.height / stat._parts);
-        if (pos._x < stat._x_end) {
+        if (pos._x < 1600) {
             vel._x = 0;
-            pos._x = stat._x_end;
+            pos._x = 1600;
             for (int i = 0; i < stat._parts; i++) {
                 mid = total / 2;
                 mid += offset;
